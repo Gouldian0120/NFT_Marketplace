@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div class="modal fade popup" id="popup_connected" tabindex="-1" role="dialog"
+        <div class="modal fade popup" 
+            id="popup_connected" tabindex="-1" role="dialog"
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -8,7 +9,7 @@
                             aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <div class="modal-body space-y-20 p-40">
+                    <div v-if="isMetaMaskInstalled && isMetaMaskConnected" class="modal-body space-y-20 p-40">
                         <h3 class="text-center">Wallet Connected!</h3>
                         <p class="text-center">You have sucessfully connected your
                             wallet,
@@ -19,18 +20,7 @@
                             <a href="" class="btn btn-grad"> Create item</a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade popup" id="popup_error" tabindex="-1" role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <div class="modal-body space-y-20 p-40">
+                    <div v-if="isMetaMaskInstalled && !isMetaMaskConnected" class="modal-body space-y-20 p-40">
                         <h3 class="color_red">Error!</h3>
                         <p>User rejected the request.. <br>
                             If the problem persist please Contact support</p>
@@ -44,7 +34,7 @@
             <div class="container">
                 <a href="/" class="btn btn-white btn-sm mt-20">
                     Back to home</a>
-                <div class="hero__wallets pt-100 pb-50">
+                <div class="hero__wallets pt-20 pb-20">
                     <div class="space-y-20 d-flex flex-column align-items-center">
                         <div class="logo">
                             <img :src="require('@/assets/img/icons/logo.svg')" alt="">
@@ -58,10 +48,21 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <div class="wallets">
-                            <div class="row mb-20_reset">
-                                <!-- ================= item -->
-                                <div class="col-lg-4" v-for="n in 6" :key="n">
-                                    <wallet-card></wallet-card>
+                            <div class="row mb-30_reset">
+                                <div class="col-lg-6">
+                                    <wallet-card 
+                                        name="Metamask" 
+                                        :card-image="wallets.metamask" 
+                                        data-toggle="modal" 
+                                        data-target="#popup_connected"
+                                        @click.native="loginMetamask">
+                                    </wallet-card>
+                                </div>
+                                <div class="col-lg-6">
+                                    <wallet-card  
+                                        name="Coibase" 
+                                        :card-image="wallets.coibase">
+                                    </wallet-card>
                                 </div>
                             </div>
                         </div>
@@ -76,6 +77,28 @@
 
     import WalletCard from "../components/wallet-card";
     export default {
-      components: {WalletCard}
+        components: {WalletCard},
+        data() {
+            return {
+                wallets: {
+                    metamask: require("@/assets/img/icons/metamask.svg"),
+                    coibase: require("@/assets/img/icons/coibase.svg"),
+                },
+            };
+        },
+        computed: {
+            isMetaMaskInstalled() {
+                const {ethereum} = window;
+                return Boolean(ethereum && ethereum.isMetaMask)
+            },
+            isMetaMaskConnected() {
+                return this.$store.state.account != null;
+            },
+        },
+        methods: {
+            async loginMetamask() {
+                this.$store.dispatch("connect")
+            },
+        }
     }
 </script>
