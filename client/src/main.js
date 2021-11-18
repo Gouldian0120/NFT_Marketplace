@@ -9,6 +9,7 @@ import "./assets/css/plugins/bootstrap.min.css";
 import "swiper/css/swiper.css";
 import "./assets/scss/style.scss";
 import "./assets/css/plugins/swiper-bundle.min.css";
+import VueLazyload from "vue-lazyload";
 
 Vue.use(VueAwesomeSwiper, /* { default options with global component } */)
 Vue.config.productionTip = false;
@@ -16,15 +17,23 @@ import LoadScript from 'vue-plugin-load-script';
 
 Vue.use(LoadScript);
 
+const loadimage = require("@/assets/img/image_placeholder.jpg");
+const errorimage = require("@/assets/img/image_placeholder.jpg");
+Vue.use(VueLazyload, {
+    preLoad: 1.3,
+    error: errorimage,
+    loading: loadimage,
+    attempt: 2,
+  });
+
 Vue.loadScript("js/jquery-3.6.0.js");
 Vue.loadScript("js/bootstrap.bundle.min.js");
 Vue.loadScript("js/script.js");
 
-
 new Vue({
     data() {
         return {
-            darkMode: false
+            darkMode: true
         }
     },
     router,

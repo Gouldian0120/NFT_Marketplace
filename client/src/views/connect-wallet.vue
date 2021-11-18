@@ -92,12 +92,12 @@
                 return Boolean(ethereum && ethereum.isMetaMask)
             },
             isMetaMaskConnected() {
-                return this.$store.state.account != null;
+                return this.$store.state.user.account != null;
             },
         },
         methods: {
             async loginMetamask() {
-                this.$store.dispatch("connect")
+                this.$store.dispatch("user/connect")
             },
         }
     }

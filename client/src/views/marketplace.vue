@@ -10,45 +10,35 @@
                 <div class="d-flex justify-content-center">
                     <ul class="menu_categories space-x-20">
                         <li>
-                            <a href="#" class="color_brand">
-
-                                <span> All </span>
+                            <a href="#" class="color_brand"
+                            :class="'All' == filterName ? ' md-behance' : 'md-button-filter'"
+                            @click="
+                                () => {
+                                filterName = 'All';
+                                getItems();
+                                }
+                            ">
+                                <button class="btn btn-sm" style="border:solid 1px #345a77"> All </button>
                             </a>
                         </li>
-                        <li><a href="#">
-                            <i class="ri-gamepad-line"></i> <span> Games </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-brush-line"></i> <span> Art </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-stock-line"></i> <span> Trading Cards </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-music-line"></i> <span> Music </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-global-line"></i> <span> Domain Names </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-emotion-laugh-line"></i> <span> Memes </span>
-                        </a>
-
-                        </li>
-                        <li><a href="#">
-                            <i class="ri-layout-4-line"></i> <span> Collectibles </span>
-                        </a>
-
+                        <li
+                            v-for="(category, i) in listCategory"
+                            :key="i"
+                            href="javascript:void(0)"
+                            :class="
+                                category.name == filterName
+                                ? ' md-behance'
+                                : 'md-button-filter'
+                            "
+                            @click="
+                                () => {
+                                filterName = category.name;
+                                categoryID = category._id;
+                                getItems();
+                                }
+                            "
+                            >
+                            <button class="btn btn-sm" style="border:solid 1px #345a77">{{ category.name }}</button>
                         </li>
                     </ul>
                 </div>
@@ -61,8 +51,8 @@
                     <div class="row justify-content-between align-items-center">
                         <div class="col-lg-auto">
                             <div class="d-flex space-x-10 align-items-center">
-                        <span class="color_text txt_sm" style="min-width:
-                            max-content;"> FILTER BY: </span>
+                                <span class="color_text txt_sm" style="min-width:
+                                    max-content;"> FILTER BY: </span>   
                                 <ul class="menu_categories space-x-20">
                                     <li class="d-flex space-x-10 switch_item">
 
@@ -112,9 +102,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mb-30_reset">
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6" v-for="n in 8" :key="n">
-                        <item-card></item-card>
+                <div v-if="listItems && listItems.length > 0" class="row mb-30_reset">
+                    <div
+                        v-for="(item, i) in listItems"
+                        :key="i"
+                        class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+                    >
+                        <item-card
+                            text-center
+                            class="mt-3"
+                            card-plain
+                            :item-id="item._id"
+                            :item-name="item.name"
+                            :itemMinBid="item.minBid"
+                            :card-image="item.image"
+                        >
+                        </item-card>
                     </div>
                 </div>
             </div>
@@ -186,20 +189,113 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
-
     </div>
 </template>
 
 <script>
     import ItemCard from "../components/item-card";
     import CollectionCard from "../components/collection-card";
-
+    import { mapState } from 'vuex';
+    
     export default {
         name: "merketplace",
-        components: {CollectionCard, ItemCard}
+        components: {ItemCard, CollectionCard},
+        data() {
+            return {
+                listItems: [],
+                filterName: "All",
+                filterData: {
+                    skip: 0,
+                    limit: 16,
+                    keySearch: null,
+                },
+                categoryID: null,
+                sliders: {
+                    rangeSlider: [101, 700],
+                },
+                filters: {},
+                results: -1,
+                labels: {},
+            };
+        },
+        async mounted() {
+ //           this.$loading(true);
+            try {
+                await this.getCategories();
+                await this.getItems();
+            } catch (error) {
+ /*               this.$failAlert({
+                    text: error,
+                });*/
+            }
+  //          this.$loading(false);
+        },
+        computed: {
+            ...mapState('app', {
+                density: 'nftsDensity',
+            }),
+            listCategory() {
+                return this.$store.state.category.categories;
+            },
+        },
+        methods: {
+            onTokensCount(count) {
+                this.results = count;
+            },
+            onNftMainListLoading(loading) {
+                if (loading) {
+                    this.results = -1;
+                }
+            },
+            newValue(e) {
+                this.sliders.rangeSlider[0] = e[0];
+                this.sliders.rangeSlider[1] = e[1];
+            },
+            async loadNextItems() {
+                try {
+                    this.filterData.keySearch = this.categoryID;
+                    let newData = await this.$store.dispatch(
+                        this.filterName == "All"
+                            ? "item/getAllItems"
+                            : "item/getItemsByCategory",
+                        this.filterData
+                    );
+                    if (newData && newData.length > 0) {
+                        this.listItems.push.apply(this.listItems, newData);
+
+                    if (newData.length == this.filterData.limit) {
+                        this.filterData.skip += newData.length;
+                    } else {
+                        this.skip = 0;
+                    }
+                    }
+                } catch (error) {
+                    console.log(121212)
+                }
+            },
+            async getItems() {
+                this.listItems = await this.$store.dispatch(
+                    this.filterName == "All"
+                            ? "item/getAllItems"
+                            : "item/getItemsByCategory",
+                    {
+                        skip: 0,
+                        limit: 16,
+                        keySearch: this.categoryID,
+                    }
+                );
+
+                if (this.listItems.length == this.filterData.limit) {
+                    this.filterData.skip += this.listItems.length;
+                } else {
+                    this.skip = 0;
+                }
+            },
+            async getCategories() {
+                await this.$store.dispatch("category/getCategories");
+            },
+        },
     }
 </script>
 

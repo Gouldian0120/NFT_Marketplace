@@ -7,8 +7,12 @@
             <div class="item_details">
                 <div class="row sm:space-y-20">
                     <div class="col-md-6">
-                        <div :style="{ backgroundImage: 'url(' + require('@/assets/img/items/item_2.png') + ')' }"
-                             class="img-box item_img"></div>
+                        <div v-lazy-container="{ selector: 'img' }" class="img-box item_img">
+                            <img class="img"
+                                :data-src="item.image"
+                                :data-loading="loadimage"
+                            />
+                        </div>
                         <div class="my-3">
                             <div id="accordion" class="my-accordion">
                                 <div class="card">
@@ -21,23 +25,17 @@
                                             </a>
                                         </h5>
                                     </div>
-
                                     <div id="collapseOne" class="collapse show"
                                          aria-labelledby="headingOne" data-parent="#accordion">
                                         <div class="card-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life
-                                            accusamus terry richardson ad squid. 3 wolf moon officia
-                                            aute, non cupidatat skateboard dolor brunch. Food truck
-                                            quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-                                            sunt aliqua put a bird on it squid single-origin coffee
-                                            nulla assumenda shoreditch et.
+                                            {{ item.description }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card">
                                     <div class="px-3 py-2" id="headingTwo">
                                         <h5 class="mb-0">
-                                            <a class="collapsed  cursor-pointer"
+                                            <a class="collapsed cursor-pointer"
                                                data-toggle="collapse" data-target="#collapseTwo"
                                                aria-expanded="false" aria-controls="collapseTwo">
                                                 Chain Info
@@ -47,10 +45,18 @@
                                     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
                                          data-parent="#accordion">
                                         <div class="card-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life
-                                            accusamus terry richardson ad squid. 3 wolf moon officia
-                                            aute, non cupidatat skateboard dolor brunch. Food truck
-                                            quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
+                                            <div class="row-detail">
+                                                <span class="row-left">Collection</span>
+                                                <span class="row-right">{{ item.collection[0].name }}</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">Network</span>
+                                                <span class="row-right">Ropsten Testnet</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">Chain ID</span>
+                                                <span class="row-right">4</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -67,14 +73,14 @@
                                     <div id="collapseThree" class="collapse"
                                          aria-labelledby="headingThree" data-parent="#accordion">
                                         <div class="card-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life
-                                            accusamus terry richardson ad squid. 3 wolf moon officia
-                                            aute, non cupidatat skateboard dolor brunch. Food truck
-                                            quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-                                            sunt aliqua put a bird on it squid single-origin coffee
-                                            nulla assumenda shoreditch et. Nihil anim keffiyeh
-                                            helvetica, craft beer labore wes anderson cred nesciunt
-                                            sapiente ea proident.
+                                            <div class="row-detail">
+                                                <span class="row-left">Royalty</span>
+                                                <span class="row-right">{{ item.royalties / 100 }}%</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">Recipient</span>
+                                                <span class="row-right">0xA9a12a373Ac3ddcF4Ab52b7c9bFb9107f4AfA91e</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -84,16 +90,15 @@
                     <div class="col-md-6">
                         <div class="space-y-20">
                             <div class="d-flex justify-content-between flex-wrap">
-                                <h3>Creative girl illustration</h3>
+                                <h3>{{ item.name }}</h3>
                                 <div class="space-x-10 d-flex align-items-center">
-                                    <p>1 of 1</p>
+                                    <p>1 of {{ item.total_quantity }}</p>
                                     <a href="#" class="likes space-x-3">
                                         <i class="ri-heart-3-fill"></i>
                                         <span class="txt_sm">2.1k</span>
                                     </a>
                                 </div>
                             </div>
-
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="d-flex space-x-20">
                                 <a href="" class="btn btn-primary btn-lg" data-toggle="modal"
@@ -109,21 +114,25 @@
                                         </div>
                                         <div class="dropdown__popup">
                                             <ul class="space-y-10">
-                                                <li><a href=""> <i
+                                                <li>
+                                                    <a href=""> <i
                                                         class="ri-facebook-line"></i>
-                                                </a>
+                                                    </a>
                                                 </li>
-                                                <li><a href=""> <i
+                                                <li>
+                                                    <a href=""> <i
                                                         class="ri-messenger-line"></i>
-                                                </a>
+                                                    </a>
                                                 </li>
-                                                <li><a href=""> <i
+                                                <li>
+                                                    <a href=""> <i
                                                         class="ri-whatsapp-line"></i>
-                                                </a>
+                                                    </a>
                                                 </li>
-                                                <li><a href=""> <i
+                                                <li>
+                                                    <a href=""> <i
                                                         class="ri-youtube-line"></i>
-                                                </a>
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -136,13 +145,11 @@
                                         <div class="dropdown__popup">
                                             <ul class="space-y-10">
                                                 <li>
-                                                    <a href="#" class="space-x-10
-                                                d-flex"
+                                                    <a href="#" class="space-x-10 d-flex"
                                                        data-toggle="modal"
                                                        data-target="#popup_report">
                                                         <i class="ri-flag-line"></i>
-                                                        <span> Report
-                                                </span>
+                                                        <span> Report</span>
                                                     </a>
                                                 </li>
                                             </ul>
@@ -155,166 +162,149 @@
                                     <div class="col-lg-6">
                                         <div class="space-y-5">
                                             <p class="color_text">Minimum bid</p>
-                                            <h4>2.4000 <span class="txt_sm color_text">
-                                            ETH/ $4769.88</span></h4>
+                                            <h4>{{ item.minBid || 0 }}<span class="txt_sm color_text">
+                                            ETH/ ($ {{ convertToUSD(item.minBid) }})</span></h4>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="space-y-5">
                                             <p class="color_text">countdown</p>
-                                            <div class="d-flex countdown_item
-                                        align-items-center">
+                                            <div class="d-flex countdown_item align-items-center">
                                                 <div class="item">
-                                                    <div class="number hours">22<span></span></div>
+                                                    <div class="number hours">22</div>
                                                 </div>
                                                 <div class="dots">:</div>
                                                 <div class="item">
-                                                    <div class="number minutes">04<span></span></div>
+                                                    <div class="number minutes">04</div>
                                                 </div>
                                                 <div class="dots">:</div>
                                                 <div class="item">
-                                                    <div class="number seconds">35<span></span></div>
+                                                    <div class="number seconds">35</div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="box">
                                 <div class="space-y-20">
-                                    <div class="d-flex justify-content-between
-                                mb-30_reset">
-                                        <ul class="nav nav-tabs d-flex space-x-10 mb-30"
-                                            role="tablist">
+                                    <div class="d-flex justify-content-between mb-30_reset">
+                                        <ul class="nav nav-tabs d-flex space-x-10 mb-30" role="tablist">
                                             <li class="nav-item">
                                                 <a
-                                                        class="btn btn-white btn-sm active"
-                                                        data-toggle="tab"
-                                                        href="#tabs-1"
-                                                        role="tab">
-                                                    Details</a>
+                                                    :class="{'active':tab===1}"
+                                                    class="btn btn-white btn-sm active"
+                                                    @click="tab=1"
+                                                    >
+                                                Details</a>
                                             </li>
                                             <li class="nav-item">
                                                 <a
-                                                        class="btn btn-white btn-sm"
-                                                        data-toggle="tab"
-                                                        href="#tabs-2"
-                                                        role="tab">
-                                                    Bids</a>
+                                                    :class="{'active':tab===2}"
+                                                    class="btn btn-white btn-sm"
+                                                    @click="tab=2"
+                                                    >
+                                                Bids</a>
                                             </li>
                                             <li class="nav-item">
                                                 <a
-                                                        class="btn btn-white btn-sm"
-                                                        data-toggle="tab"
-                                                        href="#tabs-3"
-                                                        role="tab">
-                                                    History</a>
+                                                    :class="{'active':tab===3}"
+                                                    class="btn btn-white btn-sm"
+                                                    @click="tab=3"
+                                                    >
+                                                History</a>
                                             </li>
                                         </ul>
-                                        <!-- Tab panes -->
+                                       
                                         <div class="dropdown d-none d-sm-block">
-                                            <button
-                                                    class="btn btn-white btn-sm
-                                        dropdown-toggle"
-                                                    type="button"
-
+                                            <button class="btn btn-white btn-sm dropdown-toggle" type="button"
                                                     data-toggle="dropdown"
                                                     aria-haspopup="true"
                                                     aria-expanded="false">
                                                 Recent Active
                                             </button>
-                                            <div
-                                                    class="dropdown-menu">
+                                            <div class="dropdown-menu">
                                                 <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another
-                                                    action</a>
-                                                <a class="dropdown-item" href="#">Something
-                                                    else here</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="hr"></div>
                                     <div class="tab-content">
-                                        <div class="tab-pane active" id="tabs-1"
-                                             role="tabpanel">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life
-                                            accusamus terry richardson ad squid. 3 wolf moon officia
-                                            aute, non cupidatat skateboard dolor brunch. Food truck
-                                            quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor,
-                                            sunt aliqua put a bird on it squid single-origin coffee
-                                            nulla assumenda shoreditch et.
+                                        <div :class="{'active':tab===1}" v-if="tab===1" class="tab-pane active" id="tabs-1" role="tabpanel">
+                                            <div class="row-detail">
+                                                <span class="row-left">Contract Address</span>
+                                                <span class="row-right">{{ item._id }}</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">Token ID</span>
+                                                <span class="row-right">{{ item.token_id }}</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">img_back</span>
+                                                <span class="row-right">{{ item.image }}</span>
+                                            </div>
+                                            <div class="row-detail">
+                                                <span class="row-left">Created</span>
+                                                <span class="row-right">{{ item.created_at }}</span>
+                                            </div>
                                         </div>
-                                        <div class="tab-pane" id="tabs-2"
+                                        <div :class="{'active':tab===2}" v-if="tab===2" class="tab-pane" id="tabs-2"
                                              role="tabpanel">
-                                            <p>No active bids yet. Be the first to make
-                                                a bid!</p>
+                                            <p>No active bids yet. Be the first to make a bid!</p>
                                         </div>
-                                        <div class="tab-pane space-y-20" id="tabs-3"
+                                        <div :class="{'active':tab===3}" v-if="tab===3" class="tab-pane space-y-20" id="tabs-3"
                                              role="tabpanel">
-                                            <div class="creator_item creator_card
-                                        space-x-10">
+                                            <div class="creator_item creator_card space-x-10">
                                                 <div class="avatars space-x-10">
                                                     <div class="media">
                                                         <div class="badge">
                                                             <img
-                                                                    :src="require('@/assets/img/icons/Badge.svg')"
-                                                                    alt="">
+                                                                :src="require('@/assets/img/icons/Badge.svg')"
+                                                                alt="">
                                                         </div>
                                                         <router-link :to="{name:'profile'}">
                                                             <img
-                                                                    :src="require('@/assets/img/avatars/avatar_1.png')"
-                                                                    alt="Avatar"
-                                                                    class="avatar
-                                                        avatar-md">
+                                                                :src="require('@/assets/img/avatars/avatar_1.png')"
+                                                                alt="Avatar"
+                                                                class="avatar avatar-md">
                                                         </router-link>
                                                     </div>
                                                     <div>
-                                                        <p class="color_black">Bid
-                                                            accepted <span
-                                                                    class="color_brand">1
-                                                        ETH</span> by
-                                                            <router-link
-                                                                    class="color_black txt
-                                                        _bold"
-                                                                    :to="{name:'profile'}">ayoub
+                                                        <p class="color_black">Bid accepted 
+                                                            <span class="color_brand">1 ETH</span> by
+                                                            <router-link class="color_black txt _bold" :to="{name:'profile'}">
+                                                                ayoub
                                                             </router-link>
                                                         </p>
-                                                        <span class="date color_text">28/06/2021,
-                                                    12:08</span>
+                                                        <span class="date color_text">28/06/2021, 12:08</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="creator_item creator_card
-                                        space-x-10">
+                                            <div class="creator_item creator_card space-x-10">
                                                 <div class="avatars space-x-10">
                                                     <div class="media">
                                                         <div class="badge">
                                                             <img
-                                                                    :src="require('@/assets/img/icons/Badge.svg')"
-                                                                    alt="">
+                                                                :src="require('@/assets/img/icons/Badge.svg')"
+                                                                alt="">
                                                         </div>
                                                         <router-link :to="{name:'profile'}">
                                                             <img
-                                                                    :src="require('@/assets/img/avatars/avatar_2.png')"
-                                                                    alt="Avatar"
-                                                                    class="avatar
-                                                        avatar-md">
+                                                                :src="require('@/assets/img/avatars/avatar_2.png')"
+                                                                alt="Avatar"
+                                                                class="avatar avatar-md">
                                                         </router-link>
                                                     </div>
                                                     <div>
-                                                        <p class="color_black">Bid
-                                                            accepted <span
-                                                                    class="color_brand">3
-                                                        ETH</span> by
-                                                            <router-link
-                                                                    class="color_black txt
-                                                        _bold"
-                                                                    :to="{name:'profile'}">monir
+                                                        <p class="color_black">Bid accepted 
+                                                            <span class="color_brand">3 ETH</span> by
+                                                            <router-link class="color_black txt _bold" :to="{name:'profile'}">
+                                                                monir
                                                             </router-link>
                                                         </p>
-                                                        <span class="date color_text">22/05/2021,
-                                                    12:08</span>
+                                                        <span class="date color_text">22/05/2021,12:08</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -322,7 +312,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="hr2"></div>
                             <div class="creators">
                                 <div class="row">
@@ -332,14 +321,13 @@
                                             <div class="media">
                                                 <router-link :to="{name:'profile'}">
                                                     <img
-                                                            :src="require('@/assets/img/avatars/avatar_3.png')"
-                                                            alt="Avatar" class="avatar
-                                                avatar-sm">
+                                                        :src="require('@/assets/img/avatars/avatar_3.png')"
+                                                        alt="Avatar" class="avatar avatar-sm">
                                                 </router-link>
                                             </div>
                                             <div>
                                                 <router-link :to="{name:'profile'}">
-                                                    <p class="avatars_name color_black">@ayoub_fouzi...</p>
+                                                    <p class="avatars_name color_black">{{ showShortName(item.owner) }}</p>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -350,35 +338,29 @@
                                             <div class="media">
                                                 <div class="badge">
                                                     <img class="badge"
-                                                         :src="require('@/assets/img/icons/Badge.svg')"
-                                                         alt="">
+                                                        :src="require('@/assets/img/icons/Badge.svg')"
+                                                        alt="">
                                                 </div>
                                                 <router-link :to="{name:'profile'}">
                                                     <img
-                                                            :src="require('@/assets/img/avatars/avatar_2.png')"
-                                                            alt="Avatar" class="avatar
-                                                avatar-sm">
+                                                        :src="require('@/assets/img/avatars/avatar_2.png')"
+                                                        alt="Avatar" class="avatar avatar-sm">
                                                 </router-link>
                                             </div>
                                             <div>
-
                                                 <router-link :to="{name:'profile'}">
-                                                    <p class="avatars_name color_black">@makinzi_jamy...</p>
+                                                    <p class="avatars_name color_black">{{ showShortName(item.creator) }}</p>
                                                 </router-link>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-<!--        <div class="py-1 bg_white">-->
-
-<!--        </div>-->
         <div>
             <div class="container pt-5">
                 <div class="row justify-content-center">
@@ -454,44 +436,40 @@
                                                 <a :class="{'active':tab===1}"
                                                    class="btn btn-white btn-sm"
                                                    @click="tab=1">
-                                                    Creations</a>
+                                                   Creations
+                                                </a>
                                             </li>
                                             <li class="nav-item">
                                                 <a :class="{'active':tab===2}"
                                                    class="btn btn-white btn-sm"
                                                    @click="tab=2">
-                                                    Collections</a>
+                                                   Collections
+                                                </a>
                                             </li>
                                         </ul>
                                         <!-- Tab panes -->
                                         <div class="dropdown d-none d-sm-block">
                                             <button
-                                                    class="btn btn-white btn-sm dropdown-toggle"
-                                                    type="button"
-
-                                                    data-toggle="dropdown"
-                                                    aria-haspopup="true"
-                                                    aria-expanded="false">
+                                                class="btn btn-white btn-sm dropdown-toggle"
+                                                type="button"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true"
+                                                aria-expanded="false">
                                                 Recent Active
                                             </button>
-                                            <div
-                                                    class="dropdown-menu">
+                                            <div class="dropdown-menu">
                                                 <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another
-                                                    action</a>
-                                                <a class="dropdown-item" href="#">Something
-                                                    else here</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div>
                                         <div :class="{'active':tab===1}" v-if="tab===1">
                                             <div class="row mb-30_reset">
                                                 <div class="col-xl-4 col-lg-6 col-md-6" v-for="n in 6" :key="n">
                                                     <job-card></job-card>
                                                 </div>
-
                                             </div>
                                         </div>
                                         <div v-if="tab===2" :class="{'active':tab===2}">
@@ -520,17 +498,254 @@
     export default {
         data() {
             return {
-                tab: 1
-            }
+                tab: 1,
+                loadimage: require("@/assets/img/loading.gif"),
+                item: null,
+                carouselItems: [],
+                listItems: [],
+                selectColor: "rose",
+                selectSize: "small",/*
+                tableData: [
+                    {
+                    id: 1,
+                    name: "Dakota Rice",
+                    salary: "$36.738",
+                    country: "Niger",
+                    city: "Oud-Turnhout",
+                    icon1: "person",
+                    icon2: "edit",
+                    icon3: "close",
+                    },
+                    {
+                    id: 2,
+                    name: "Minerva Hooper",
+                    salary: "$23,789",
+                    country: "Curaçao",
+                    city: "Sinaai-Waas",
+                    icon1: "person",
+                    icon2: "edit",
+                    icon3: "close",
+                    },
+                    {
+                    id: 3,
+                    name: "Sage Rodriguez",
+                    salary: "$56,142",
+                    country: "Netherlands",
+                    city: "Baileux",
+                    icon1: "person",
+                    icon2: "edit",
+                    icon3: "close",
+                    },
+                    {
+                    id: 4,
+                    name: "Philip Chaney",
+                    salary: "$38,735",
+                    country: "Korea, South",
+                    city: "Overland Park",
+                    icon1: "person",
+                    icon2: "edit",
+                    icon3: "close",
+                    },
+                    {
+                    id: 5,
+                    name: "Doris Greene",
+                    salary: "$63,542",
+                    country: "Malawi",
+                    city: "Feldkirchen in Kärnten",
+                    icon1: "person",
+                    icon2: "edit",
+                    icon3: "close",
+                    },
+                ],
+                data: [
+                    {
+                    name: "Some Data",
+                    chartType: "bar",
+                    values: [25, 40, 30, 35, 8, 52, 17, -4],
+                    },
+                    {
+                    name: "Another Set",
+                    chartType: "bar",
+                    values: [25, 50, -10, 15, 18, 32, 27, 14],
+                    },
+                    {
+                    name: "Yet Another",
+                    chartType: "line",
+                    values: [15, 20, -3, -15, 58, 12, -17, 37],
+                    },
+                ],*/
+            };
         },
-        mounted() {
-            let box = this.$el.querySelectorAll('.img-box');
+        async mounted() {
+            let box = document.querySelectorAll('.img-box');
             box.forEach(el => {
                 el.style.height = el.offsetWidth * 0.75 + 'px'
             })
 
+            try {
+                this.item = await this.getItem();
+            } 
+            catch (error) {
+                console.log("error11")
+            }
+            
+            try {
+                this.listItems = await this.$store.dispatch("item/getAllItems", {
+                    skip: Math.floor(Math.random() * 100),
+                    limit: 12,
+                });
+                for (let index = 0; index < this.listItems.length; index++) {
+                    let tmp = Math.floor(index / 4);
+                    if (this.carouselItems.length == tmp) {
+                        this.carouselItems.push([]);
+                    }
+                    this.carouselItems[tmp].push(this.listItems[index]);
+                }
+            } catch (error) {
+                console.log("error22")
+            }
+
+            await this.$store.dispatch("user/getETHRate");
         },
         components: {CollectionCard, JobCard},
+        computed: {
+            itemId() {
+                return this.$route.params.id;
+            },
+            ETHRate() {
+                return this.$store.state.user.ETHRate;
+            },
+            userData() {
+                return this.$store.state.user?.information;
+            },
+            metaMaskAddress() {
+                return this.userData?.wallet_address;
+            },
+        },
+        watch: {
+            async itemId(newValue, oldValue) {
+            if (newValue && newValue.length > 0) {
+                this.item = await this.getItem();
+            }
+            },
+        },
+        methods: {
+            showShortName(name) {
+                return (
+                name.substring(0, 6) +
+                "..." +
+                name.substring(name.length - 8, name.length)
+                );
+            },
+            shadowImageBlog(image) {
+                return {
+                backgroundImage: `url(${image})`,
+                opacity: 1,
+                };
+            },
+            getItem() {
+                return this.$store.dispatch("item/getDetailItem", { id: this.itemId });
+            },
+            async sellItem() {
+                await this.$store.dispatch("global/setLoadingTitle", "Sell Item");
+                this.$loadingModal(true);
 
+                try {
+                    const result = await this.$store.dispatch(
+                        "item/requestMintSignature",
+                        this.item.token_id
+                    );
+    /*
+                    const isSellItem = await Web3Ultils.sellItem(
+                        result,
+                        this.item,
+                        this.metaMaskAddress
+                    );
+                    if (isSellItem) {
+                        this.$successAlert({
+                        text: "Sell Item Successfull",
+                        });
+                        this.$router.push("/user-profile");
+                    }*/
+                } catch (error) {/*
+                    this.$failAlert({
+                        text: error,
+                    });*/
+                }
+
+                this.$loadingModal(false);
+            },
+            convertToUSD(value) {
+                let eth = value || 0;
+                return eth * this.ETHRate;
+            },
+
+            editItem() {
+                this.$router.push("/editItem/" + this.itemId);
+            },
+            async buyItem() {
+                await this.$store.dispatch("global/setLoadingTitle", "Buy Item");
+                this.$loadingModal(true);
+                try {
+                    const result = await this.$store.dispatch(
+                        "item/requestBuyAsset",
+                        this.item.token_id
+                    );
+    /*
+                    const isBuyItem = await Web3Ultils.buyAsset(
+                        result,
+                        this.item,
+                        this.metaMaskAddress
+                    );
+
+                    if (isBuyItem) {
+                        this.$successAlert({
+                        text: "Buy Item Successfull",
+                        });
+                        this.$router.push("/user-profile");
+                    }*/
+                } 
+                catch (error) {/*
+                    this.$failAlert({
+                        text: error,
+                    });*/
+                }
+
+                this.$loadingModal(false);
+            },
+        },
     }
 </script>
+
+<style scoped>
+    .img {
+        width: 100% !important;
+        height: 100% !important;
+        text-align: center;
+        border-radius: 12px;
+    }
+
+    .md-card-header {
+        text-align-last: center;
+    }
+
+    .row-detail {
+        width: 100%;
+        display: flow-root;
+        padding: 5px;
+    }
+
+    .row-left {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .row-right {
+        float: right;
+        font-weight: 500;
+        font-size: 14px;
+        width: 350px;
+        word-wrap: break-word;
+    }
+</style>

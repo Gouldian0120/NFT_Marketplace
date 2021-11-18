@@ -145,8 +145,7 @@
                             </div>
 
                             <div class="d-flex justify-content-center mb-30">
-                                <router-link :to="{name:'marketplace'}" class="btn btn-md
-                                btn-dark"> View all
+                                <router-link :to="{name:'marketplace'}" class="btn btn-md btn-dark"> View all
                                 </router-link>
                             </div>
                         </div>
@@ -154,12 +153,11 @@
                 </div>
             </div>
         </div>
-        <div class="section__artists mt-20">
+        <div class="section__artists">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 space-y-30">
-                        <div class="section_head d-flex justify-content-between
-                    align-items-center">
+                        <div class="section_head d-flex justify-content-between align-items-center">
                             <h2 class="section__title">Hot Sellers</h2>
                             <div class="dropdown">
                                 <button class="btn btn-white btn-sm dropdown-toggle"
@@ -178,58 +176,39 @@
                         </div>
                         <div class="box">
                             <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="space-y-10">
-                                        <div class="creator_item space-x-10" v-for="(n,index) in 4" :key="n">
-                                            <div class="avatars space-x-10">
-                                                <div class="media">
-                                                    <router-link :to="{name:'profile'}">
-                                                        <img
-                                                                :src="require('@/assets/img/avatars/avatar_1.png')"
-                                                                alt="Avatar" class="avatar
-                                                    avatar-md">
-                                                    </router-link>
+                                <div
+                                    class="col-lg-6 creator_item space-x-10"
+                                    v-for="(item, i) in listUsers.slice(0,8)"
+                                    :key="i"
+                                >
+                                    <div class="avatars space-x-10">
+                                        <div class="media">
+                                            <router-link :to="'/user-profile/$' + item.wallet_address">
+                                                <div class="media" style="width:89px; height:89px; border-radius: 50%;">
+                                                        <div v-lazy-container="{ selector: 'img' }">
+                                                            <img width="80px" height="80px" style="border-radius: 50%;"
+                                                                :data-src="item.avatar || loadimage"
+                                                                :data-loading="loadimage"
+                                                            />
+                                                        </div>
                                                     <div class="has_number">
-                                                        {{index + 1}}
+                                                        {{i + 1}}
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <router-link :to="{name:'profile'}">
-                                                        <p class="avatars_name
-                                                    color_black">@xander_hall...</p>
-                                                    </router-link>
-                                                    <span class="price color_green">13.02
-                                                ETH
-                                                </span>
-                                                </div>
-                                            </div>
+                                            </router-link>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="space-y-10">
-                                        <div class="creator_item space-x-10" v-for="(n,index) in 4" :key="n">
-                                            <div class="avatars space-x-10">
-                                                <div class="media">
-                                                    <router-link :to="{name:'profile'}">
-                                                        <img
-                                                                :src="require('@/assets/img/avatars/avatar_12.png')"
-                                                                alt="Avatar" class="avatar
-                                                    avatar-md">
-                                                    </router-link>
-                                                    <div class="has_number">
-                                                        {{index + 4 + 1}}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <router-link :to="{name:'profile'}">
-                                                        <p class="avatars_name
-                                                    color_black">@cade_glover...</p>
-                                                    </router-link>
-                                                    <span class="price color_green">12.45
-                                                ETH</span>
-                                                </div>
-                                            </div>
+                                        <div class="">
+                                            <a
+                                                class="float-left"
+                                                :href="`#/user-profile/${item.wallet_address}`"
+                                            >
+                                                <h4 class="comment-heading show-name">
+                                                    {{
+                                                    item.full_name || showWalletSeller(item.wallet_address)
+                                                    }}
+                                                </h4>
+                                            </a>
+                                            <p>{{ item.bio }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -237,8 +216,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6 space-y-30">
-                        <div class="section_head d-flex justify-content-between
-                    align-items-center">
+                        <div class="section_head d-flex justify-content-between align-items-center">
                             <h3 class="section__title">Hot Buyers</h3>
                             <div class="dropdown">
                                 <button class="btn btn-white btn-sm dropdown-toggle"
@@ -311,7 +289,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -320,19 +297,18 @@
                 </div>
             </div>
         </div>
-        <div class="section mt-20">
+        <div class="section mt-100">
             <div class="container">
                 <div class="section__head">
-                    <div class="d-flex justify-content-between sm-column
-                align-items-center mb-20">
+                    <div class="d-flex justify-content-between sm-column align-items-center mb-20">
                         <h2 class="section__title"> Recently Listed</h2>
                         <router-link :to="{name:'collections'}" class="btn btn-dark btn-sm">
                             View All
                         </router-link>
                     </div>
                     <div class="d-flex space-x-10">
-                <span class="color_text txt_sm" style="min-width: max-content;">
-                    FILTER BY: </span>
+                        <span class="color_text txt_sm" style="min-width: max-content;">
+                            FILTER BY: </span>
                         <ul class="menu_categories space-x-20">
                             <li class="d-flex space-x-10 switch_item">
                                 <input type="checkbox" id="switch1" checked=""><label
@@ -353,10 +329,33 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6" v-for="n in 4" :key="n">
-                        <item-card></item-card>
+                    <div  
+                        v-if="carouselItems && carouselItems.length > 0"
+                        trigger="click"
+                        :interval="10000">
+                        <div
+                            v-for="(group, i) in carouselItems" :key="i" 
+                        >
+                            <div class="row">
+                                <div
+                                    v-for="(item, k) in group"
+                                    :key="k"
+                                   class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+                                >
+                                    <item-card
+                                        text-center
+                                        class="mt-3"
+                                        card-plain
+                                        :item-id="item._id"
+                                        :item-name="item.name"
+                                        :itemMinBid="item.minBid"
+                                        :card-image="item.image"
+                                    >
+                                    </item-card>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -381,15 +380,15 @@
             </div>
         </div>
 
-        <div class="mt-20">
+        <div class="mt-50">
             <div class="container">
                 <div class="section__head">
                     <div
-                            class="d-flex
-                flex-md-wrap
-                justify-content-between
-                align-items-center
-                mb-20">
+                        class="d-flex
+                            flex-md-wrap
+                            justify-content-between
+                            align-items-center
+                            mb-20">
                         <h2 class="section__title">Top artworks</h2>
                         <div class="dropdown">
                             <button
@@ -409,9 +408,9 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center space-x-10">
-                <span class="color_text txt_sm" style="min-width: max-content">
-                    FILTER BY:
-                </span>
+                        <span class="color_text txt_sm" style="min-width: max-content">
+                            FILTER BY:
+                        </span>
                         <ul class="menu_categories space-x-20">
                             <li class="d-flex space-x-10 switch_item">
                                 <input type="checkbox" id="switch5"
@@ -528,12 +527,9 @@
                 </div>
             </div>
         </div>
-
-
         <div class="call2action is__light">
             <div class="container">
-                <div class="row justify-content-between align-items-center
-            sm:space-y-20">
+                <div class="row justify-content-between align-items-center sm:space-y-20">
                     <div class="col-md-6">
                         <div class="space-y-20">
                             <h1>Start your own
@@ -545,8 +541,7 @@
                                 is used by multiple websites to provide the users the
                                 best
                                 possible experience.</p>
-                            <router-link to="/connect-wallet" class="btn
-                        btn-primary">Start
+                            <router-link to="/connect-wallet" class="btn btn-primary">Start
                                 Collecting
                             </router-link>
                         </div>
@@ -607,7 +602,6 @@
                                     code and project</p>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -622,12 +616,85 @@
 
     export default {
         components: {ArtworkCard, ItemCard},
-         mounted() {
+        async mounted() {
             let box = document.querySelectorAll('.img-box');
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
             })
-        }
 
+            try {
+                await this.getItemsOnSale();
+
+                await this.getListCollections();
+
+                this.listUsers = await this.$store.dispatch("user/getAllUsers");
+            } catch (error) {/*
+                this.$failAlert({
+                    text: error,
+                });*/
+            }
+        },
+        data() {
+            return {
+                loadimage: require("@/assets/img/loading.gif"),
+                carouselItems: [],
+                listItemsOnSale: [],
+                listColllections: [],
+                listUsers: [],
+                subscribe: null,
+                filterName: "All",
+                carousel: [],
+            };
+        },
+        computed: {
+        },
+        methods: {
+            goTo(url) {
+                this.$router.push("/" + url);
+            },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 5) +
+                    "..." +
+                    wallet.substring(wallet.length - 5, wallet.length)
+                );
+            },
+            async getItemsOnSale() {
+                this.listItemsOnSale = await this.$store.dispatch(
+                    "item/getAllItemsOnSale",
+                    {
+                        skip: 0,
+                        limit: 12,
+                    }
+                );
+
+                const saleItemsSigned = this.listItemsOnSale.filter(
+                    (x) => x.isPutOnMarket && x.sellOrder
+                );
+
+                for (let index = 0; index < saleItemsSigned.length; index++) {
+                    let tmp = Math.floor(index / 4);
+                    if (this.carouselItems.length == tmp) {
+                        this.carouselItems.push([]);
+                    }
+                    this.carouselItems[tmp].push(saleItemsSigned[index]);
+                }
+            },
+            async getListCollections() {
+                this.listColllections = await this.$store.dispatch(
+                    "collection/getAllCollections"
+                );
+
+                console.log(this.listColllections.length)
+                
+                for (let index = 0; index < this.listColllections.length; index++) {
+                    let tmp = Math.floor(index / 2);
+                    if (this.carousel.length == tmp) {
+                        this.carousel.push([]);
+                    }
+                    this.carousel[tmp].push(this.listColllections[index]);
+                }
+            },
+        },
     }
 </script>
