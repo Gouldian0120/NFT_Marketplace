@@ -29,7 +29,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-                            <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
+ <!--                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
                         </div>
                     </div>
                 </router-link>
@@ -38,13 +38,11 @@
                     <span class="txt_sm">1.2k</span>
                 </a>
             </div>
-            <!-- =============== -->
-
             <h6 class="card_title">
                 <router-link
                         :to="'/item-details'"
                         class="color_black">
-                    {{this.itemName}}
+                    {{showShortName(this.itemName)}}
                 </router-link>
             </h6>
             <div class="card_footer d-block space-y-10">
@@ -55,30 +53,27 @@
                     <router-link :to="{name:'home'}">
                         <p class="txt_sm">
                             Price: <span class="color_green txt_sm">{{this.itemMinBid || 0}}
-                                            ETH</span>
+                                    ETH</span>
                         </p>
                     </router-link>
                 </div>
                 <div class="hr"></div>
                 <div class="d-flex
-                                align-items-center
-                                space-x-10
-                                justify-content-between">
-                    <div class="d-flex align-items-center
-                                    space-x-5">
+                            align-items-center
+                            space-x-10
+                            justify-content-between">
+                    <div class="d-flex align-items-center space-x-5">
                         <i class="ri-history-line"></i>
                         <router-link :to="{name:'home'}" data-toggle="modal"
                                      data-target="#popup_history">
-                            <p class="color_text txt_sm
-                                            view_history" style="width:
-                                            auto">
+                            <p class="color_text txt_sm view_history" style="width: auto">
                                 View History
                             </p>
                         </router-link>
                     </div>
                     <router-link :to="{name:'home'}" class="btn btn-sm btn-primary"
-                                 data-toggle="modal"
-                                 data-target="#popup_bid">
+                        data-toggle="modal"
+                        data-target="#popup_bid">
                         Place Bid
                     </router-link>
                 </div>
@@ -86,7 +81,6 @@
         </div>
     </div>
 </template>
-
 
 <script>
     export default {
@@ -109,8 +103,15 @@
             })
         },
         methods: {
-            goToProduct() {
-                this.$router.push("/asset/" + this.itemId);
+            showShortName(name) {
+                if (name.length < 25)
+                    return name;
+                else
+                    return (
+                        name.substring(0, 6) +
+                        "..." +
+                        name.substring(name.length - 8, name.length)
+                    );
             },
         },
     };
@@ -129,9 +130,5 @@
         height: 178px !important;
         text-align: center;
         border-radius: 12px;
-    }
-
-    .md-card-header {
-        text-align-last: center;
     }
 </style>

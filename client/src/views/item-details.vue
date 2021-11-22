@@ -7,7 +7,7 @@
             <div class="item_details">
                 <div class="row sm:space-y-20">
                     <div class="col-md-6">
-                        <div v-lazy-container="{ selector: 'img' }" class="img-box item_img">
+                        <div v-lazy-container="{ selector: 'img' }" class="img-box">
                             <img class="img"
                                 :data-src="item.image"
                                 :data-loading="loadimage"
@@ -90,7 +90,7 @@
                     <div class="col-md-6">
                         <div class="space-y-20">
                             <div class="d-flex justify-content-between flex-wrap">
-                                <h3>{{ item.name }}</h3>
+                                <h3><span style="color:#f8f810">{{ item.name }}</span></h3>
                                 <div class="space-x-10 d-flex align-items-center">
                                     <p>1 of {{ item.total_quantity }}</p>
                                     <a href="#" class="likes space-x-3">
@@ -168,7 +168,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="space-y-5">
-                                            <p class="color_text">countdown</p>
+                                            <p class="color_text">Countdown</p>
                                             <div class="d-flex countdown_item align-items-center">
                                                 <div class="item">
                                                     <div class="number hours">22</div>
@@ -317,7 +317,7 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="avatars space-x-5">
-                                            <div>Owner</div>
+                                            <div><p>Owner</p></div>
                                             <div class="media">
                                                 <router-link :to="{name:'profile'}">
                                                     <img
@@ -334,7 +334,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="avatars space-x-5">
-                                            <div>Creator</div>
+                                            <div><p>Creator</p></div>
                                             <div class="media">
                                                 <div class="badge">
                                                     <img class="badge"
@@ -360,130 +360,39 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div>
-            <div class="container pt-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-3 col-md-7 order-md-0 order-1">
-                        <div class="profile__sidebar">
-                            <div class="space-y-40">
-                                <div class="space-y-10">
-                                    <h5>About me</h5>
-                                    <div class="box space-y-20">
-                                        <p>
-                                            I make art with the simple goal of giving you
-                                            something
-                                            pleasing to look at for a few seconds.
-                                        </p>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <span class="txt_sm color_text">Collections</span>
-                                                <h4>105</h4>
-                                            </div>
-                                            <div class="col-6">
-                                                <span class="txt_sm color_text">Creations</span>
-                                                <h4>406</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="space-y-10">
-                                    <h5>Follow me</h5>
-                                    <div class="box">
-                                        <ul class="social_profile space-y-10 overflow-hidden">
-                                            <li>
-                                                <a href="#">
-                                                    <i class="ri-facebook-line"></i>
-                                                    <span class="color_text">facebook/</span>
-                                                    @creabik
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="ri-messenger-line"></i>
-                                                    <span class="color_text"> messenger/</span>
-                                                    @creabik
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="ri-whatsapp-line"></i>
-                                                    <span class="color_text"> whatsapp/</span>
-                                                    @creabik
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="ri-youtube-line"></i>
-                                                    <span class="color_text">youtube/</span>
-                                                    @creabik
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+            <div class="mt-50">
+                <div class="avatars space-x-5">
+                    <h3>More from this collection &nbsp;&nbsp;&nbsp;</h3>
+                    <div class="media">
+                        <router-link :to="{name:'profile'}">
+                            <div v-lazy-container="{ selector: 'img' }">
+                                <img class="loadimg avatar avatar-sm" :data-src="collectionItems.image" :data-loading="loadimage"/>
                             </div>
-                            <p class="text-center txt_sm mt-20 color_text">Since 2021</p>
-                        </div>
+                        </router-link>
                     </div>
-                    <div class="col-lg-9 col-md-12 order-md-1 order-0">
-                        <div class="profile__content">
-                            <div class="d-flex justify-content-between">
-                                <div class="space-x-10">
-                                    <div class="d-flex justify-content-between">
-                                        <ul class="nav nav-tabs d-flex space-x-10 mb-30">
-                                            <li class="nav-item">
-                                                <a :class="{'active':tab===1}"
-                                                   class="btn btn-white btn-sm"
-                                                   @click="tab=1">
-                                                   Creations
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a :class="{'active':tab===2}"
-                                                   class="btn btn-white btn-sm"
-                                                   @click="tab=2">
-                                                   Collections
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <!-- Tab panes -->
-                                        <div class="dropdown d-none d-sm-block">
-                                            <button
-                                                class="btn btn-white btn-sm dropdown-toggle"
-                                                type="button"
-                                                data-toggle="dropdown"
-                                                aria-haspopup="true"
-                                                aria-expanded="false">
-                                                Recent Active
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#">Something else here</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div :class="{'active':tab===1}" v-if="tab===1">
-                                            <div class="row mb-30_reset">
-                                                <div class="col-xl-4 col-lg-6 col-md-6" v-for="n in 6" :key="n">
-                                                    <job-card></job-card>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div v-if="tab===2" :class="{'active':tab===2}">
-                                            <div class="row justify-content-center mb-30_reset">
-                                                <div class="col-lg-6 col-md-6 col-sm-8" v-for="n in 6" :key="n">
-                                                    <collection-card></collection-card>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <router-link :to="{name:'profile'}">
+                            <h4><p class="avatars_name color_green">{{ collectionItems.name }}</p></h4>
+                        </router-link>
                     </div>
+                </div>
+            </div>
+            <div v-if="collectionItems.items && collectionItems.items.length > 0" class="row mb-30_reset">
+                <div
+                    v-for="(item1, i) in collectionItems.items"
+                    :key="i"
+                    class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+                >
+                    <item-card
+                        text-center
+                        class="mt-3"
+                        card-plain
+                        :item-id="item1._id"
+                        :item-name="item1.name"
+                        :itemMinBid="item1.minBid"
+                        :card-image="item1.image"
+                    >
+                    </item-card>
                 </div>
             </div>
         </div>
@@ -492,15 +401,15 @@
 
 <script>
 
-    import JobCard from "../components/job-card";
-    import CollectionCard from "../components/collection-card";
-
+    import ItemCard from "../components/item-card";
     export default {
+        components: {ItemCard},
         data() {
             return {
                 tab: 1,
                 loadimage: require("@/assets/img/loading.gif"),
                 item: null,
+                collectionItems: null,
                 carouselItems: [],
                 listItems: [],
                 selectColor: "rose",
@@ -586,28 +495,24 @@
                 this.item = await this.getItem();
             } 
             catch (error) {
-                console.log("error11")
+                console.log("error000")
             }
             
             try {
-                this.listItems = await this.$store.dispatch("item/getAllItems", {
-                    skip: Math.floor(Math.random() * 100),
-                    limit: 12,
-                });
-                for (let index = 0; index < this.listItems.length; index++) {
-                    let tmp = Math.floor(index / 4);
-                    if (this.carouselItems.length == tmp) {
-                        this.carouselItems.push([]);
+                this.collectionItems = await this.$store.dispatch(
+                    "collection/getDetailCollection", 
+                    {
+                        skip: 0,
+                        limit: 16,
+                        id: this.item.collection_id 
                     }
-                    this.carouselItems[tmp].push(this.listItems[index]);
-                }
+                );
             } catch (error) {
                 console.log("error22")
             }
 
             await this.$store.dispatch("user/getETHRate");
         },
-        components: {CollectionCard, JobCard},
         computed: {
             itemId() {
                 return this.$route.params.id;
@@ -677,7 +582,7 @@
             },
             convertToUSD(value) {
                 let eth = value || 0;
-                return eth * this.ETHRate;
+                return (eth * this.ETHRate).toString();
             },
 
             editItem() {
@@ -720,7 +625,7 @@
 <style scoped>
     .img {
         width: 100% !important;
-        height: 100% !important;
+        height: 420px !important;
         text-align: center;
         border-radius: 12px;
     }

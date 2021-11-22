@@ -169,8 +169,7 @@
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="#">Action</a>
                                     <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else
-                                        here</a>
+                                    <a class="dropdown-item" href="#">Something else here</a>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +301,7 @@
                 <div class="section__head">
                     <div class="d-flex justify-content-between sm-column align-items-center mb-20">
                         <h2 class="section__title"> Recently Listed</h2>
-                        <router-link :to="{name:'collections'}" class="btn btn-dark btn-sm">
+                        <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
                             View All
                         </router-link>
                     </div>
@@ -389,7 +388,7 @@
                             justify-content-between
                             align-items-center
                             mb-20">
-                        <h2 class="section__title">Top artworks</h2>
+                        <h2 class="section__title">Top artworks</h2><!--
                         <div class="dropdown">
                             <button
                                     class="btn btn-dark btn-sm dropdown-toggle"
@@ -405,8 +404,8 @@
                                 <a class="dropdown-item" href="#">Another action</a>
                                 <a class="dropdown-item" href="#">Something else here</a>
                             </div>
-                        </div>
-                    </div>
+                        </div>-->
+                    </div><!--
                     <div class="d-flex align-items-center space-x-10">
                         <span class="color_text txt_sm" style="min-width: max-content">
                             FILTER BY:
@@ -437,7 +436,7 @@
                                 <span> Has sold </span>
                             </li>
                         </ul>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
@@ -665,6 +664,7 @@
                     {
                         skip: 0,
                         limit: 12,
+                        sortBy: "updated_at"
                     }
                 );
 

@@ -121,86 +121,17 @@
                     </div>
                 </div>
             </div>
-            <div class="seaction mt-20">
-                <div class="section__head">
-                    <h2 class="section__title mb-20"> Collections</h2>
-                    <div class="row justify-content-between align-items-center">
-                        <div class="col-lg-auto">
-                            <div class="d-flex align-items-center space-x-10">
-                        <span class="color_text txt_sm" style="min-width:
-                            max-content;"> FILTER BY: </span>
-                                <ul class="menu_categories space-x-20">
-                                    <li class="d-flex space-x-10 switch_item">
-
-                                        <input type="checkbox" id="switch7"
-                                        /><label
-                                            for="switch7">Toggle</label>
-                                        <span> Has list price </span>
-                                    </li>
-                                    <li class="d-flex space-x-10 switch_item">
-
-                                        <input type="checkbox" id="switch8"
-                                               checked/><label
-                                            for="switch8">Toggle</label>
-                                        <span> Has open offer </span>
-                                    </li>
-                                    <li class="d-flex space-x-10 switch_item">
-
-                                        <input type="checkbox" id="switch9"
-                                        /><label
-                                            for="switch9">Toggle</label>
-                                        <span> Owned by creator </span>
-                                    </li>
-                                    <li class="d-flex space-x-10 switch_item">
-
-                                        <input type="checkbox" id="switch10"
-                                        /><label
-                                            for="switch10">Toggle</label>
-                                        <span> Has sold </span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-auto">
-                            <div class="d-flex space-x-10 align-items-center sm:mt-20">
-                                <span class="color_text txt_sm"> SORT BY: </span>
-                                <div class="dropdown">
-                                    <button class="btn btn-dark btn-sm dropdown-toggle"
-                                            type="button"
-                                            data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                        Recent Active
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else
-                                            here</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row justify-content-center mb-30_reset">
-                    <div class="col-lg-4 col-md-6 col-sm-8" v-for="n in 3" :key="n">
-                        <collection-card></collection-card>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
 
 <script>
     import ItemCard from "../components/item-card";
-    import CollectionCard from "../components/collection-card";
-    import { mapState } from 'vuex';
+//  import CollectionCard from "../components/collection-card";
     
     export default {
         name: "merketplace",
-        components: {ItemCard, CollectionCard},
+        components: {ItemCard},
         data() {
             return {
                 listItems: [],
@@ -215,8 +146,6 @@
                     rangeSlider: [101, 700],
                 },
                 filters: {},
-                results: -1,
-                labels: {},
             };
         },
         async mounted() {
@@ -232,22 +161,11 @@
   //          this.$loading(false);
         },
         computed: {
-            ...mapState('app', {
-                density: 'nftsDensity',
-            }),
             listCategory() {
                 return this.$store.state.category.categories;
             },
         },
         methods: {
-            onTokensCount(count) {
-                this.results = count;
-            },
-            onNftMainListLoading(loading) {
-                if (loading) {
-                    this.results = -1;
-                }
-            },
             newValue(e) {
                 this.sliders.rangeSlider[0] = e[0];
                 this.sliders.rangeSlider[1] = e[1];
