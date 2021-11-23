@@ -41,7 +41,8 @@ const routes = [
         component: () => import(/* webpackChunkName: "about" */ '../views/marketplace.vue')
     },
     {
-        path: '/profile',
+        //path: '/profile/:wallet',
+        path: '/profile/0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7',
         name: 'profile',
         component: () => import(/* webpackChunkName: "about" */ '../views/profile.vue')
     },

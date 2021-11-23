@@ -1,10 +1,10 @@
 <template>
-    <div class="collections space-y-10 mb-30">
+    <div class="collections space-y-10 mb-30" style="width:280px">
         <router-link :to="{name:'collections'}">
             <div class="collections_item">
                 <div class="images-box space-y-10">
                     <div v-lazy-container="{ selector: 'img' }">
- <!--                       <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
+                        <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
                     </div>
                 </div>
             </div>
@@ -12,7 +12,7 @@
         <div class="collections_footer justify-content-between pl-2 pr-2">
             <h5 class="collection_title">
                 <router-link :to="{name:'collections'}">
-                    <span class="txt_md" style="color:yellow">{{showShortName(this.itemName)}}</span>
+                    <span class="txt_sm" style="color:yellow">{{showShortName(this.itemName)}}</span>
                 </router-link>
             </h5>
             <span class="txt_md" style="color:red"> {{this.item.items.length}} items</span>
@@ -77,13 +77,6 @@
 </script>
 
 <style scoped>
-    .img {
-        width: 261px !important;
-        height: 230px !important;
-        text-align: center;
-        border-radius: 12px;
-    }
-
     .loadimg {
         width: 100% !important;
         height: 178px !important;

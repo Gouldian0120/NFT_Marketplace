@@ -1,5 +1,5 @@
 <template>
-    <div class="card__item four">
+    <div class="card__item four" style="width:280px">
         <div class="card_body space-y-10">
             <div class="creators space-x-10">
                 <div class="avatars space-x-3">
@@ -29,7 +29,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
- <!--                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
+                            <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
                         </div>
                     </div>
                 </router-link>
@@ -40,8 +40,8 @@
             </div>
             <h6 class="card_title">
                 <router-link
-                        :to="'/item-details'"
-                        class="color_black">
+                    :to="'/item-details'"
+                    class="color_black">
                     {{showShortName(this.itemName)}}
                 </router-link>
             </h6>
@@ -52,8 +52,8 @@
                     </div>
                     <router-link :to="{name:'home'}">
                         <p class="txt_sm">
-                            Price: <span class="color_green txt_sm">{{this.itemMinBid || 0}}
-                                    ETH</span>
+                            Price: <span class="color_green txt_sm">
+                                {{this.itemMinBid || 0}} ETH</span>
                         </p>
                     </router-link>
                 </div>
@@ -118,13 +118,6 @@
 </script>
 
 <style scoped>
-    .img {
-        width: 261px !important;
-        height: 230px !important;
-        text-align: center;
-        border-radius: 12px;
-    }
-
     .loadimg {
         width: 100% !important;
         height: 178px !important;

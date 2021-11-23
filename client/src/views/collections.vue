@@ -4,7 +4,7 @@
             <div class="container">
                 <h1>Artwork Collections</h1>
             </div>
-        </div>
+        </div><!--
         <div class="filters bg_white border-b py-20">
             <div class="container">
                 <div class="row justify-content-between align-items-center">
@@ -55,7 +55,8 @@
                     </div>
                 </div>
             </div>
-        </div><div class="seaction mt-100">
+        </div>-->
+        <div class="seaction mt-100">
             <div class="container">
                 <div class="justify-content-center mb-30_reset">
                     <div v-if="listItems && listItems.length > 0" class="row mb-30_reset">
@@ -102,7 +103,7 @@ export default {
         };
     },
     async mounted() {
-//      this.$loading(true);
+        this.$loading(true);
         try {
             await this.getItems();
         } catch (error) {
@@ -110,7 +111,7 @@ export default {
                 text: error,
             });*/
         }
-//      this.$loading(false);
+        this.$loading(false);
     },
     computed: {
     },

@@ -114,7 +114,7 @@
                             card-plain
                             :item-id="item._id"
                             :item-name="item.name"
-                            :itemMinBid="item.minBid"
+                            :item-minBid="item.minBid"
                             :card-image="item.image"
                         >
                         </item-card>
@@ -149,16 +149,16 @@
             };
         },
         async mounted() {
- //           this.$loading(true);
+            this.$loading(true);
             try {
                 await this.getCategories();
                 await this.getItems();
             } catch (error) {
- /*               this.$failAlert({
+                this.$failAlert({
                     text: error,
-                });*/
+                });
             }
-  //          this.$loading(false);
+            this.$loading(false);
         },
         computed: {
             listCategory() {

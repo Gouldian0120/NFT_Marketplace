@@ -7,11 +7,14 @@
             <div class="item_details">
                 <div class="row sm:space-y-20">
                     <div class="col-md-6">
-                        <div v-lazy-container="{ selector: 'img' }" class="img-box">
-                            <img class="img"
-                                :data-src="item.image"
-                                :data-loading="loadimage"
-                            />
+                        <div style="background-color:#fff"
+                             class="img-box item_img p-1">
+                             <div v-lazy-container="{ selector: 'img' }">
+                                <img class="img"
+                                    :data-src="item.image"
+                                    :data-loading="loadimage"
+                                />
+                            </div>
                         </div>
                         <div class="my-3">
                             <div id="accordion" class="my-accordion">
@@ -486,6 +489,7 @@
             };
         },
         async mounted() {
+            this.$loading(true);
             let box = document.querySelectorAll('.img-box');
             box.forEach(el => {
                 el.style.height = el.offsetWidth * 0.75 + 'px'
@@ -512,6 +516,7 @@
             }
 
             await this.$store.dispatch("user/getETHRate");
+            this.$loading(false);
         },
         computed: {
             itemId() {
@@ -582,7 +587,12 @@
             },
             convertToUSD(value) {
                 let eth = value || 0;
-                return (eth * this.ETHRate).toString();
+                let price = (eth * this.ETHRate).toString();
+
+                if (price.length < 10)
+                    return price
+                else
+                    return price.substr(0, 10);
             },
 
             editItem() {
@@ -623,9 +633,10 @@
 </script>
 
 <style scoped>
+
     .img {
         width: 100% !important;
-        height: 420px !important;
+        height: 422px !important;
         text-align: center;
         border-radius: 12px;
     }
