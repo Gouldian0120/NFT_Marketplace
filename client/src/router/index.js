@@ -52,6 +52,11 @@ const routes = [
         component: () => import( /* webpackChunkName: "about" */ '../views/upload.vue')
     },
     {
+        path: '/registerCollection',
+        name: 'registerCollection',
+        component: () => import( /* webpackChunkName: "about" */ '../views/registercollection.vue')
+    },
+    {
         path: '/upload-type',
         name: 'upload-type',
         component: () => import( /* webpackChunkName: "about" */ '../views/upload-type.vue')

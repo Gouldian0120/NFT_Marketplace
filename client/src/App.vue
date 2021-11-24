@@ -39,3 +39,18 @@
     },
   }
 </script>
+
+<style>
+  .global-loading {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #183b56 !important;
+    opacity: 0.5;
+    padding-top: 48vh;
+    z-index: 1001;
+    color: white;
+  }
+</style>

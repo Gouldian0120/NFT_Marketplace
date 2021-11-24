@@ -15,17 +15,18 @@
                             wallet,
                             now you can start bidding or upload your own art!</p>
                         <div class="d-flex justify-content-center space-x-20">
-                            <a href="#" data-dismiss="modal" class="btn btn-dark">
-                                Discover Assets</a>
-                            <a href="" class="btn btn-grad"> Create item</a>
+                            <button class="btn btn-grad" @click="goTo('marketplace')" data-dismiss="modal">
+                                Discover Assets</button>
+                            <button class="btn btn-grad" @click="goTo('registercollection')" data-dismiss="modal">
+                                Create Collection</button>
                         </div>
                     </div>
-                    <div v-if="isMetaMaskInstalled && !isMetaMaskConnected" class="modal-body space-y-20 p-40">
+                    <div v-if="isMetaMaskInstalled && !isMetaMaskConnected" 
+                        class="modal-body space-y-20 p-40">
                         <h3 class="color_red">Error!</h3>
                         <p>User rejected the request.. <br>
                             If the problem persist please Contact support</p>
-
-                        <a href="" class="btn btn-primary"> Try again</a>
+                        <a href="" class="btn btn-primary">Try again</a>
                     </div>
                 </div>
             </div>
@@ -86,7 +87,17 @@
                 },
             };
         },
+        watch: {
+            metaMaskAddress(newValue, oldValue) {
+                if (newValue && newValue.length > 0) {
+                    this.$router.push("/");
+                }
+            },
+        },
         computed: {
+            metaMaskAddress() {
+                return this.$store.state.user.information?.wallet_address;
+            },
             isMetaMaskInstalled() {
                 const {ethereum} = window;
                 return Boolean(ethereum && ethereum.isMetaMask)
@@ -97,7 +108,20 @@
         },
         methods: {
             async loginMetamask() {
-                this.$store.dispatch("user/connect")
+                this.$loading(true);
+                try {
+                    await this.$store.dispatch("user/loginMetamask");
+                } 
+                catch (error) {
+                    this.$failAlert({
+                    text: error,
+                    });
+                } finally {
+                    this.$loading(false);
+                }
+            },
+            goTo(url) {
+                this.$router.push("/" + url);
             },
         }
     }

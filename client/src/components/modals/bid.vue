@@ -1,6 +1,6 @@
 <template>
-    <div class="modal fade popup" id="popup_bid" tabindex="-1" role="dialog"
-             aria-hidden="true">
+    <div class="modal fade popup" id="popup_bid" tabindex="-1" 
+            role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <button type="button" class="close" data-dismiss="modal"
@@ -11,7 +11,6 @@
                         <h3>Place a Bid</h3>
                         <p>You must bid at least <span class="color_black">15 ETH</span>
                         </p>
-
                         <input type="text" class="form-control"
                                placeholder="00.00 ETH">
                         <div class="hr"></div>
@@ -35,7 +34,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
 </template>
 
 <script>

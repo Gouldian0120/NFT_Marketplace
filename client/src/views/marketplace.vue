@@ -153,10 +153,10 @@
             try {
                 await this.getCategories();
                 await this.getItems();
-            } catch (error) {
+            } catch (error) {/*
                 this.$failAlert({
                     text: error,
-                });
+                });*/
             }
             this.$loading(false);
         },

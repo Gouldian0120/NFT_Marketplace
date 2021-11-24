@@ -17,7 +17,7 @@
                                     <div v-lazy-container="{ selector: 'img' }">
                                         <img class="avatarloadimg" 
                                             :data-src="viewUser.avatar || avatarimage" 
-                                            :data-loading="loadimage"/>
+                                            />
                                     </div>
                                     <h5>{{viewUser.full_name}}</h5>
                                 </div>

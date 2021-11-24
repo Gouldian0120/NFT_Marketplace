@@ -10,9 +10,9 @@ import { ZERO_ADDRESS, ONE_ETHER, ASSET_TYPE } from "./Constants";
 export const Web3Ultils = {
   sellItem: async function (result, item, metaMaskAddress) {
     if (window.ethereum && process.env.VUE_APP_RARIBLE_ADDRESS) {
-      window.web3 = new Web3(ethereum);
+      window.web3 = new Web3(window.ethereum);
       try {
-        await ethereum.enable();
+        await window.ethereum.enable();
 
         const myContractRaribleToken = new window.web3.eth.Contract(
           RaribleToken,
@@ -126,8 +126,8 @@ export const Web3Ultils = {
       sellerFee: process.env.VUE_APP_SELL_FEE,
     };
 
-    const hash = web3.utils.keccak256(
-      web3.eth.abi.encodeParameters(
+    const hash = window.web3.utils.keccak256(
+      window.web3.eth.abi.encodeParameters(
         [
           {
             Order: {
@@ -155,7 +155,7 @@ export const Web3Ultils = {
       )
     );
 
-    const signature = await web3.eth.personal.sign(
+    const signature = await window.web3.eth.personal.sign(
       hash.slice(2),
       metaMaskAddress
     );
@@ -178,9 +178,9 @@ export const Web3Ultils = {
   },
   buyAsset: async function (result, item, metaMaskAddress) {
     if (window.ethereum && process.env.VUE_APP_EXCHANGE_V1) {
-      window.web3 = new Web3(ethereum);
+      window.web3 = new Web3(window.ethereum);
       try {
-        await ethereum.enable();
+        await window.ethereum.enable();
 
         //Approve exchange token
 
@@ -224,10 +224,10 @@ export const Web3Ultils = {
               sellOrder.buying,
               sellOrder.sellerFee,
             ],
-            [web3.utils.hexToNumber(signature.v), signature.r, signature.s],
+            [window.web3.utils.hexToNumber(signature.v), signature.r, signature.s],
             result.buyerFee,
             [
-              web3.utils.hexToNumber(buyerFeeSignature.v),
+              window.web3.utils.hexToNumber(buyerFeeSignature.v),
               buyerFeeSignature.r,
               buyerFeeSignature.s,
             ],

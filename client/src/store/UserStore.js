@@ -15,9 +15,7 @@ export const UserStore = {
     AccountInterval: null,
   },
   mutations: {
-    init() {
-    },
-    set_account(state,account) {
+    SET_ACCOUNT(state,account) {
       state.account = account
     },
     SET_USER(state, data) {
@@ -57,16 +55,108 @@ export const UserStore = {
           localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
         });
     },
-    getETHRate: ({ commit }) => {
+    getETHRate: ({ commit }) => {/*
       return Request()
         .get(
           "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
         )
         .then((res) => {
           commit("SET_ETH_RATE", res.data.ethereum.usd);
+        });*/
+    },
+    loginUser: ({ state, commit, dispatch }, data) => {
+      commit("SET_ACCOUNT", data);
+      apolloClient
+        .mutate({
+          mutation: LOGIN_USER,
+          variables: {
+            wallet_address: data,
+          },
+        })
+        .then(({ data }) => {
+          if (data) {
+            let currentUser = data.checkExistUser;
+
+            state.information = data;
+//          commit("SET_USER", currentUser);
+
+            localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
+            dispatch("getETHRate");
+/*
+            successAlert({
+              text: `Login success with address \n ${currentUser.wallet_address}`,
+            });*/
+          }
         });
     },
-    /*
+    logoutUser: ({ commit, state }) => {
+      localStorage.removeItem("metaMaskAddress");
+
+      clearInterval(state.AccountInterval);
+      commit("SET_USER", null);
+    },
+    web3TimerCheck: ({ dispatch, state }) => {
+      if (state.web3 === null) return;
+      state.AccountInterval = setInterval(async () => {
+        await dispatch("checkAccounts");
+      }, 2000);
+    },
+    checkAccounts: ({ commit, dispatch, state }) => {
+      state.web3.eth.getAccounts(async (err, accounts) => {
+        const netID = state.web3.utils.hexToNumber(window.ethereum.chainId); //User MetaMask's current status
+
+        if (netID != 3) {
+          await dispatch("logoutUser");
+          failAlert({
+            text: "Current web working with testnet Ropsten",
+          });
+          return;
+        }
+
+        if (err != null || !accounts || accounts.length == 0)
+        {
+          await dispatch("logoutUser");
+          failAlert({
+            text: "Please log in to your metamask to continue with this app.",
+          });
+        }
+        else if (!state.information || state.information.wallet_address != accounts[0])
+        {
+          clearInterval(state.AccountInterval);
+          await dispatch("loginUser", accounts[0]);
+          await dispatch("web3TimerCheck");
+        }
+      });
+    },
+    loginMetamask: async ({ commit, dispatch, state }) => {
+      if (window.ethereum) {
+        try {
+          state.web3 = new Web3(window.ethereum);
+          await window.ethereum.enable();
+          await dispatch("checkAccounts");
+        } catch (error) {
+          failAlert({
+            text: error,
+          });
+        }
+      }
+      else if (window.web3) {
+        try {
+          state.web3 = new Web3(window.web3.currentProvider);
+          await dispatch("checkAccounts");
+        } catch (error) {
+          failAlert({
+            text: error,
+          });
+        }
+      }
+      else {
+        state.web3 = null;
+        failAlert({
+          text: "Please install metamask for this application",
+        });
+      }
+    },/*
     connect({commit}) {
       window.ethereum.request({ 
           method: 'eth_requestAccounts' 
@@ -115,7 +205,7 @@ export const UserStore = {
           console.error(err);
         }
       });  
-    },*/
+    },/*
     connect({commit, dispatch}) {
       window.ethereum.request({ 
           method: 'eth_requestAccounts' 
@@ -166,6 +256,6 @@ export const UserStore = {
     },
     disconnect({state}) {
       state.account = null
-    },
+    },*/
   }
 };

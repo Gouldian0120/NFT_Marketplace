@@ -29,7 +29,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-                            <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
+                        <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
                         </div>
                     </div>
                 </router-link>
@@ -120,7 +120,7 @@
 <style scoped>
     .loadimg {
         width: 100% !important;
-        height: 178px !important;
+        height: 180px !important;
         text-align: center;
         border-radius: 12px;
     }
