@@ -23,10 +23,10 @@
                             </li>
                             <li>
                                 <router-link :to="{name:'profile'}" class="color_black"> Profile</router-link>
-                            </li>
+                            </li><!--
                             <li>
                                 <router-link :to="{name:'editprofile'}" class="color_black"> editprofile</router-link>
-                            </li>
+                            </li>-->
                             <li>
                                 <router-link :to="{name:'creators'}" class="color_black"> Creators</router-link>
                             </li>
