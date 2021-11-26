@@ -48,7 +48,7 @@
     width: 100%;
     height: 100%;
     background: #183b56 !important;
-    opacity: 0.5;
+    opacity: 0.6;
     padding-top: 48vh;
     z-index: 1001;
     color: white;

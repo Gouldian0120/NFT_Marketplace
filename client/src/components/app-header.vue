@@ -25,6 +25,9 @@
                                 <router-link :to="{name:'profile'}" class="color_black"> Profile</router-link>
                             </li>
                             <li>
+                                <router-link :to="{name:'editprofile'}" class="color_black"> editprofile</router-link>
+                            </li>
+                            <li>
                                 <router-link :to="{name:'creators'}" class="color_black"> Creators</router-link>
                             </li>
                             <li>
@@ -32,80 +35,82 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="header__search">
+                    <div class="header__search ml-10 mr-10">
                         <input type="text" placeholder="Search"/>
                         <button class="header__result">
                             <i class="ri-search-line"></i>
                         </button>
                     </div>
                     <div class="d-flex align-items-center space-x-20" 
-                            v-if="isMetaMaskInstalled && isMetaMaskConnected">
+                            v-if="metaMaskAddress && metaMaskAddress.length > 0">
                         <div class="header__notifications">
-                            <div class="js-notifications-icon">
-                                <i class="ri-notification-3-line"></i>
-                            </div>
-                            <div class="notifications_popup space-y-20">
-                                <div class="d-flex justify-content-between">
-                                    <h5> Notifications</h5>
-                                    <router-link to="/activity" class="badge color_white">
-                                        View all
-                                    </router-link>
+                            <div class="dropdown">
+                                <div class="dropdown-toggle"
+                                        type="button"
+                                        data-toggle="dropdown" >
+                                    <i class="ri-notification-3-line"></i>
                                 </div>
-                                <div class="item space-x-20 d-flex justify-content-between align-items-center">
-                                    <img class="thumb"
-                                         :src="require('@/assets/img/notifications/1.png')"
-                                         alt="..."
-                                    />
-                                    <div class="details">
-                                        <router-link to="/activity">
-                                            <h6>Money revieved</h6>
+                                <div class="dropdown-menu space-y-10  pl-2 pr-2">
+                                    <div class="d-flex justify-content-between">
+                                        <h5> Notifications</h5>
+                                        <router-link to="/activity" class="badge color_white">
+                                            View all
                                         </router-link>
-                                        <p>0.6 ETH</p>
                                     </div>
-                                    <span class="circle"></span>
+                                    <div class="item space-x-10 d-flex justify-content-between align-items-center">
+                                        <img class="thumb"
+                                            :src="require('@/assets/img/notifications/1.png')"
+                                            alt="..."
+                                        />
+                                        <div class="" style="width:180px; word-wrap:break-word">
+                                            <router-link to="/activity">
+                                                <div>Money revieved ...</div>
+                                            </router-link>
+                                            <p>0.6 ETH</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="header__avatar">
-                            <!--
-                            <div class="price">
-                                <span>2.45 <strong>ETH</strong></span>
+                            <div class="dropdown-toggle"
+                                    type="button"
+                                    data-toggle="dropdown">
+                                <img
+                                    class="avatarimg"
+                                    :src="require('@/assets/img/avatars/avatar.png')"
+                                    alt="avatar"
+                                />
                             </div>
-                            -->
-                            <img
-                                class="avatar"
-                                :src="require('@/assets/img/avatars/avatar_2.png')"
-                                alt="avatar"
-                            />
-                            <div class="avatar_popup space-y-20">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <span> 13b9ebda035r178... </span>
+                            <div class="dropdown-menu space-y-10">
+                                <div class="d-flex align-items-center justify-content-between ml-10 mr-10">
+                                    <span>
+                                        {{showWalletSeller(this.$store.state.user.account)}}
+                                    </span>
                                     <a href="/" class="ml-2">
                                         <i class="ri-file-copy-line"></i>
                                     </a>
-                                </div><!--
-                                <div class="d-flex align-items-center space-x-10">
-                                    <img
-                                        class="coin"
-                                        :src="require('@/assets/img/logos/coin.svg')"
-                                        alt="/"
-                                    />
-                                    <div class="info">
-                                        <p class="text-sm font-book text-gray-400">Balance</p>
-                                        <p class="w-full text-sm font-bold text-green-500">16.58 ETH</p>
-                                    </div>
-                                </div>-->
+                                </div>
                                 <div class="hr"></div>
-                                <div class="links space-y-10">
-                                    <a href="#">
-                                        <i class="ri-landscape-line"></i> 
-                                        <span> My items</span>
-                                    </a>
-                                    <a href="#">
-                                        <i class="ri-pencil-line"></i> 
-                                        <span> Edit Profile</span>
-                                    </a>
-                                    <a href="#">
+                                <div class="links ml-10 mr-10">
+                                    
+                                    <router-link :to="'/profile/' + this.$store.state.user.account">
+                                        <a href="">
+                                            <i class="ri-landscape-line"></i> 
+                                            <span> My Items</span>
+                                        </a>
+                                    </router-link>
+                                </div>
+                                <div class="links ml-10 mr-10">
+                                    <router-link :to="'/editprofile/' + this.$store.state.user.account">
+                                        <a href="">
+                                            <i class="ri-pencil-line"></i> 
+                                            <span> Edit Profile</span>
+                                        </a>
+                                    </router-link>
+                                </div>
+                                <div class="links ml-10 mr-10">
+                                    <a href="#" @click="logout">
                                         <i class="ri-logout-circle-line"></i> 
                                         <span> Logout</span>
                                     </a>
@@ -113,7 +118,7 @@
                             </div>
                         </div>
                         <div class="header__btns">
-                            <router-link class="btn btn-primary btn-sm" to="/registercollection">
+                            <router-link class="btn btn-primary btn-sm" to="/createcollection">
                                 Create
                             </router-link>
                         </div>
@@ -199,23 +204,33 @@
             metaMaskAddress() {
                 return this.$store.state.user.information?.wallet_address;
             },
-            isMetaMaskInstalled() {
-                const {ethereum} = window;
-                return Boolean(ethereum && ethereum.isMetaMask)
-            },
-            isMetaMaskConnected() {
-                return this.$store.state.user.account != null;
-            },
         },
         methods: {
             logout() {
                 this.$store.dispatch("user/logoutUser");
                 this.$router.push("/");
             },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 5) +
+                    "..." +
+                    wallet.substring(wallet.length - 5, wallet.length)
+                );
+            },
         },
     }
 </script>
 
 <style scoped>
+    .avatarimg {
+        max-width:100px;
+        height:25px;
+        width:25px;
+        border-radius: 50%;
+    }
 
+    .thumb {
+        width:35px;
+        height:35px;
+    }
 </style>

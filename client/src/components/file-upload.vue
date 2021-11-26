@@ -2,36 +2,44 @@
   <div>
     <template v-if="type === 'image-regular' || type === 'image-circle'">
       <div class="file-input" :class="type">
-        <div class="image-container">
+        <div class="image-container" style="padding:0">
           <img v-if="inputValue && !hasImage" :src="inputValue" title="" />
-          <img
-            v-else-if="type === 'image-regular'"
-            :src="imageRegular"
-            title=""
-          />
+          <img v-else-if="type === 'image-regular'"
+            :src="imageRegular" style="border-radius:10px; height:300px; width:480px"
+            title="" />
           <img v-else :src="imageCircle" title="" />
         </div>
+        <span v-if="type === 'image-circle'" style="text-align:left">
+          We recommend an image of at least 400x400. Gifs work too.
+        </span>
+        <span v-if="type === 'image-regular'">
+          This image will appear at the top of your page.<br>
+          1400 x 400 recommended.
+        </span>
         <div class="button-container">
-          <md-button
+          <button class="btn btn-white mt-3"
             v-if="hasImage"
-            class="md-danger md-round"
             @click="removeImage"
-            ><i class="fa fa-times" />Remove</md-button
-          >
-          <md-button class="md-success md-round md-fileinput">
-            <template v-if="type === 'image-regular' && !hasImage"
-              >Select image</template
             >
-            <template v-else-if="type === 'image-circle' && !hasImage"
-              >Add photo</template
-            >
-            <template v-else>Change</template>
-            <input type="file" :name="type" @change="onFileChange" />
-          </md-button>
+            <i class="icon-remove-sign"></i>
+            Remove
+          </button>
+          <button class="btn btn-white mt-3 btn-fileinput">
+            <template v-if="type === 'image-regular' && !hasImage">
+              Select image  
+            </template>
+            <template v-else-if="type === 'image-circle' && !hasImage">
+              Add photo
+            </template>
+            <template v-else>
+              Change
+            </template>
+            <input type="file" :name="type" @change="onFileChange" accept="image/*"/>
+          </button>
         </div>
       </div>
     </template>
-
+<!--
     <template v-else-if="type === 'input'">
       <template v-if="!withButton">
         <md-field class="form-file-upload form-file-simple">
@@ -69,25 +77,24 @@
               :id="inputName + 'Hidden'"
               type="file"
               :multiple="multiple"
-              @change="
-                newValueMultiple(inputName + 'Visible', inputName + 'Hidden')
-              "
+              @change="newValueMultiple(inputName + 'Visible', inputName + 'Hidden')"
             />
           </md-field>
           <md-button
             class="md-success md-round md-just-icon"
             @click="triggerInputFileHidden(inputName + 'Hidden')"
-            ><md-icon>{{ btnIcon }}</md-icon></md-button
           >
+            <md-icon>{{ btnIcon }}</md-icon>
+          </md-button>
         </div>
       </template>
-    </template>
+    </template>-->
   </div>
 </template>
 
 <script>
 export default {
-  name: "FileUpload",
+  name: "file-upload",
   props: {
     type: String,
     inputName: String,
@@ -171,4 +178,39 @@ export default {
 };
 </script>
 
-<style lang="css"></style>
+<style lang="scss">
+  .btn-fileinput {
+
+    [type="file"] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-size: 23px;
+      cursor: pointer;
+      opacity: 0;
+    }
+  }
+
+.image-container {
+  //@include shadow-big-image;
+  // max-width: 250px;
+  margin-bottom: 10px;
+
+  .image-circle & {
+    border-radius: 50%;
+    max-width: 100px;
+    max-height: 100px;
+    overflow: hidden;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
+
+  &,
+  img {
+    border-radius: 4px;
+  }
+}
+</style>

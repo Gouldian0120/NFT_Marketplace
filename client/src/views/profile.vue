@@ -5,8 +5,7 @@
                 <div class="cover">
                     <div v-lazy-container="{ selector: 'img' }">
                         <img class="bannerloadimg"
-                            :data-src="viewUser.banner_img || bannerimage" 
-                            :data-loading="loadimage"/>
+                            :data-src="viewUser.banner_img || bannerimage" />
                     </div>
                 </div>
                 <div class="infos">
@@ -17,7 +16,7 @@
                                     <div v-lazy-container="{ selector: 'img' }">
                                         <img class="avatarloadimg" 
                                             :data-src="viewUser.avatar || avatarimage" 
-                                            />
+                                            :data-loading="loadimage"/>
                                     </div>
                                     <h5>{{viewUser.full_name}}</h5>
                                 </div>
@@ -212,8 +211,8 @@
         },
         computed: {
             userWallet() {
-                //return this.$route.params.wallet;
-                return "0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7"
+                return this.$route.params.wallet;
+                // return "0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7"
             },
         },
         watch: {
@@ -267,7 +266,7 @@
                             }
                         );
 
-                        this.itemCount = Items.length
+                        this.collectionCount = Items.length
 
                         Items = await this.$store.dispatch(
                             "item/getItemCreated",
@@ -276,7 +275,7 @@
                             }
                         );
 
-                        this.collectionCount = Items.length
+                        this.itemCount = Items.length
 
 
                     } else {

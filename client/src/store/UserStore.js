@@ -65,7 +65,6 @@ export const UserStore = {
         });*/
     },
     loginUser: ({ state, commit, dispatch }, data) => {
-      commit("SET_ACCOUNT", data);
       apolloClient
         .mutate({
           mutation: LOGIN_USER,
@@ -77,15 +76,16 @@ export const UserStore = {
           if (data) {
             let currentUser = data.checkExistUser;
 
-            state.information = data;
-//          commit("SET_USER", currentUser);
+            console.log(6666)
+            commit("SET_USER", currentUser);
+            console.log(state.information);
 
             localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
             dispatch("getETHRate");
-/*
+
             successAlert({
               text: `Login success with address \n ${currentUser.wallet_address}`,
-            });*/
+            });
           }
         });
     },
@@ -94,6 +94,7 @@ export const UserStore = {
 
       clearInterval(state.AccountInterval);
       commit("SET_USER", null);
+      commit("SET_ACCOUNT", null);
     },
     web3TimerCheck: ({ dispatch, state }) => {
       if (state.web3 === null) return;
@@ -120,13 +121,27 @@ export const UserStore = {
             text: "Please log in to your metamask to continue with this app.",
           });
         }
-        else if (!state.information || state.information.wallet_address != accounts[0])
+        else
         {
-          clearInterval(state.AccountInterval);
-          await dispatch("loginUser", accounts[0]);
-          await dispatch("web3TimerCheck");
+          commit("SET_ACCOUNT", accounts[0]);
+/*
+          if (!state.information || state.information.wallet_address != accounts[0])
+          {
+            clearInterval(state.AccountInterval);
+            await dispatch("loginUser", accounts[0]);
+            await dispatch("web3TimerCheck");
+          }
+          */
         }
       });
+    },
+    loginAppoloServer: async ({ dispatch, state }, data) => {
+      if (!state.information || state.information.wallet_address != data)
+      {
+        clearInterval(state.AccountInterval);
+        await dispatch("loginUser", data);
+        await dispatch("web3TimerCheck");
+      }
     },
     loginMetamask: async ({ commit, dispatch, state }) => {
       if (window.ethereum) {
@@ -135,9 +150,9 @@ export const UserStore = {
           await window.ethereum.enable();
           await dispatch("checkAccounts");
         } catch (error) {
-          failAlert({
+ /*         failAlert({
             text: error,
-          });
+          });*/
         }
       }
       else if (window.web3) {
@@ -145,117 +160,17 @@ export const UserStore = {
           state.web3 = new Web3(window.web3.currentProvider);
           await dispatch("checkAccounts");
         } catch (error) {
-          failAlert({
+ /*         failAlert({
             text: error,
-          });
+          });*/
         }
       }
       else {
         state.web3 = null;
-        failAlert({
+ /*       failAlert({
           text: "Please install metamask for this application",
-        });
+        });*/
       }
-    },/*
-    connect({commit}) {
-      window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-      }).then((accounts) => {
-          if(accounts.length==0) {
-              console.log("No connected");
-          } 
-          else {
-            window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0xfa2' }],
-            }).then(() => {
-              console.log("wallet_switchEthereumChain")
-              const account = {
-                address: accounts[0],
-              }
-              commit('set_account',account)
-              console.log(account.address)
-            }).catch(error => {
-              console.log("error:wallet_switchEthereumChain",error)
-              if (error.code==4902 || error.code==-32603) {
-                window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [{ 
-                    chainId: '0xfa2', 
-                    chainName: 'FantomNetwork',
-                    rpcUrls: ['https://rpc.testnet.fantom.network'],
-                    blockExplorerUrls: ['https://testnet.ftmscan.com'],
-                    nativeCurrency: {
-                      name: 'Fantom',
-                      symbol: 'FTM',
-                      decimals: 18
-                    }
-                  }],
-                }).then(() => {
-                }).catch(() => {
-                  console.log("error:wallet_switchEthereumChain")
-                });
-              }
-            });
-          }
-      }).catch((err) => {
-        if (err.code === 4001) {
-          console.log('Please connect to MetaMask.');
-        } else {
-          console.error(err);
-        }
-      });  
-    },/*
-    connect({commit, dispatch}) {
-      window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-      }).then((accounts) => {
-          if(accounts.length==0) {
-              console.log("No connected");
-          } 
-          else {
-            window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x3' }],
-            }).then(() => {
-              console.log("wallet_switchEthereumChain")
-              const account = {
-                address: accounts[0],
-              }
-              commit('set_account',account)
-            }).catch(error => {
-              console.log("error:wallet_switchEthereumChain",error)
-              if (error.code==4902 || error.code==-32603) {
-                window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [{ 
-                    chainId: '0x3', 
-                    chainName: 'Ropsten',
-                    rpcUrls: ['https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-                    blockExplorerUrls: ['https://ropsten.etherscan.io'],
-                    nativeCurrency: {
-                      name: 'Ropsten',
-                      symbol: 'ETH',
-                      decimals: 18
-                    }
-                  }],
-                }).then(() => {
-                }).catch(() => {
-                  console.log("error:wallet_switchEthereumChain")
-                });
-              }
-            });
-          }
-      }).catch((err) => {
-        if (err.code === 4001) {
-          console.log('Please connect to MetaMask.');
-        } else {
-          console.error(err);
-        }
-      });  
     },
-    disconnect({state}) {
-      state.account = null
-    },*/
   }
 };

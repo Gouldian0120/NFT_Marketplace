@@ -5,7 +5,7 @@
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-                    <button type="button" class="close" data-dismiss="modal"
+                    <button type="button" class="close" @click="goToHome()" data-dismiss="modal"
                             aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -15,10 +15,10 @@
                             wallet,
                             now you can start bidding or upload your own art!</p>
                         <div class="d-flex justify-content-center space-x-20">
-                            <button class="btn btn-grad" @click="goTo('marketplace')" data-dismiss="modal">
-                                Discover Assets</button>
-                            <button class="btn btn-grad" @click="goTo('registercollection')" data-dismiss="modal">
-                                Create Collection</button>
+                           <!-- <button class="btn btn-grad" @click="goTo('marketplace')" data-dismiss="modal">
+                                Discover Assets</button>-->
+                            <button class="btn btn-grad" @click="goToHome()" data-dismiss="modal">
+                                Go to Home</button>
                         </div>
                     </div>
                     <div v-if="isMetaMaskInstalled && !isMetaMaskConnected" 
@@ -108,20 +108,17 @@
         },
         methods: {
             async loginMetamask() {
-                this.$loading(true);
                 try {
                     await this.$store.dispatch("user/loginMetamask");
                 } 
                 catch (error) {
-                    this.$failAlert({
-                    text: error,
+                  this.$failAlert({
+                        text: error,
                     });
-                } finally {
-                    this.$loading(false);
                 }
             },
-            goTo(url) {
-                this.$router.push("/" + url);
+            async goToHome() {
+                await this.$store.dispatch("user/loginAppoloServer", this.$store.state.user.account);
             },
         }
     }

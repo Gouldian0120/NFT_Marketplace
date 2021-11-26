@@ -118,23 +118,23 @@
                                         <div class="dropdown__popup">
                                             <ul class="space-y-10">
                                                 <li>
-                                                    <a href=""> <i
-                                                        class="ri-facebook-line"></i>
+                                                    <a href=""> 
+                                                        <i class="ri-facebook-line"></i>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href=""> <i
-                                                        class="ri-messenger-line"></i>
+                                                    <a href=""> 
+                                                        <i class="ri-messenger-line"></i>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href=""> <i
-                                                        class="ri-whatsapp-line"></i>
+                                                    <a href=""> 
+                                                        <i class="ri-whatsapp-line"></i>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href=""> <i
-                                                        class="ri-youtube-line"></i>
+                                                    <a href=""> 
+                                                        <i class="ri-youtube-line"></i>
                                                     </a>
                                                 </li>
                                             </ul>
@@ -165,8 +165,12 @@
                                     <div class="col-lg-6">
                                         <div class="space-y-5">
                                             <p class="color_text">Minimum bid</p>
-                                            <h4>{{ item.minBid || 0 }}<span class="txt_sm color_text">
-                                            ETH/ ($ {{ convertToUSD(item.minBid) }})</span></h4>
+                                            <h4>{{ item.minBid || 0 }}
+                                                <span class="txt_sm color_text">
+                                                    ETH/ ($ {{ convertToUSD(item.minBid) }}
+                                                    )
+                                                </span>
+                                            </h4>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">

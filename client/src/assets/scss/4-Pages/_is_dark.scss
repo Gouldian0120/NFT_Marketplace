@@ -70,6 +70,7 @@
     .header__1 .header__mobile {
         background: #305571;
     }
+
     .color_green {
         color: $color_green !important;
     }
@@ -137,6 +138,9 @@
     .card__item.six .card_body .card_footer {
         background-color: $color_dark !important;
         border: none;
+    }
+    .header__avatar {
+        background-color: $color_black !important;
     }
     .v__line {
         @include before {
@@ -318,5 +322,14 @@
     }
     .overflow_log::before {
         background: linear-gradient(transparent, #0b1b2773, #0b1b27d6, #0b1b27);
+    }
+    .dropdown-menu {
+        background: #183b56 !important
+    }
+
+    .dropdown-menu div {
+        &:hover {
+            background: $color_dark;
+        }
     }
 }
