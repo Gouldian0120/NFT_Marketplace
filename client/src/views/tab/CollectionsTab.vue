@@ -4,7 +4,7 @@
       <div
           v-for="(item, i) in listItems"
           :key="i"
-          class="col-xl-4"
+          class="col-xl-4 col-lg-4 col-md-6 col-sm-6" style="width:295px"
       >
         <collection-card
             text-center

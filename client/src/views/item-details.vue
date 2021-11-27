@@ -409,6 +409,10 @@
 <script>
 
     import ItemCard from "../components/item-card";
+    import Web3 from "web3";
+    import ExchangeV1 from "../assets/abis/ExchangeV1.json";
+    import RaribleToken from "../assets/abis/RaribleToken.json";
+    import { Web3Ultils } from "../utils/Web3Ultils";
     export default {
         components: {ItemCard},
         data() {
@@ -503,7 +507,7 @@
                 this.item = await this.getItem();
             } 
             catch (error) {
-                console.log("error000")
+                console.log("error000111")
             }
             
             try {
@@ -516,7 +520,7 @@
                     }
                 );
             } catch (error) {
-                console.log("error22")
+                console.log("error2211")
             }
 
             await this.$store.dispatch("user/getETHRate");
@@ -569,7 +573,7 @@
                         "item/requestMintSignature",
                         this.item.token_id
                     );
-    /*
+    
                     const isSellItem = await Web3Ultils.sellItem(
                         result,
                         this.item,
@@ -577,14 +581,14 @@
                     );
                     if (isSellItem) {
                         this.$successAlert({
-                        text: "Sell Item Successfull",
+                            text: "Sell Item Successfull",
                         });
-                        this.$router.push("/user-profile");
-                    }*/
-                } catch (error) {/*
+ //                       this.$router.push("/user-profile");
+                    }
+                } catch (error) {
                     this.$failAlert({
                         text: error,
-                    });*/
+                    });
                 }
 
                 this.$loadingModal(false);
@@ -610,7 +614,7 @@
                         "item/requestBuyAsset",
                         this.item.token_id
                     );
-    /*
+    
                     const isBuyItem = await Web3Ultils.buyAsset(
                         result,
                         this.item,
@@ -621,13 +625,13 @@
                         this.$successAlert({
                         text: "Buy Item Successfull",
                         });
-                        this.$router.push("/user-profile");
-                    }*/
+ //                       this.$router.push("/user-profile");
+                    }
                 } 
-                catch (error) {/*
+                catch (error) {
                     this.$failAlert({
                         text: error,
-                    });*/
+                    });
                 }
 
                 this.$loadingModal(false);

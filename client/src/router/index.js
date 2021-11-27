@@ -41,8 +41,12 @@ const routes = [
         component: () => import(/* webpackChunkName: "about" */ '../views/marketplace.vue')
     },
     {
+        path: '/profile/',
+        name: 'profile',
+        component: () => import(/* webpackChunkName: "about" */ '../views/profile.vue')
+    },
+    {
         path: '/profile/:wallet',
-        //path: '/profile/0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7',
         name: 'profile',
         component: () => import(/* webpackChunkName: "about" */ '../views/profile.vue')
     },
@@ -57,7 +61,8 @@ const routes = [
         component: () => import( /* webpackChunkName: "about" */ '../views/createcollection.vue')
     },
     {
-        path: '/editprofile/:wallet',
+ //       path: '/editprofile/:wallet',
+        path: '/editprofile/',
         name: 'editprofile',
         component: () => import( /* webpackChunkName: "about" */ '../views/editprofile.vue')
     },

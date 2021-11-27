@@ -76,9 +76,7 @@ export const UserStore = {
           if (data) {
             let currentUser = data.checkExistUser;
 
-            console.log(6666)
             commit("SET_USER", currentUser);
-            console.log(state.information);
 
             localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
             dispatch("getETHRate");

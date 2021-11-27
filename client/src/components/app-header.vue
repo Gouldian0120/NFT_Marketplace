@@ -20,12 +20,9 @@
                             </li>
                             <li>
                                 <router-link :to="{name:'collections'}" class="color_black"> Collections</router-link>
-                            </li>
-                            <li>
-                                <router-link :to="{name:'profile'}" class="color_black"> Profile</router-link>
                             </li><!--
                             <li>
-                                <router-link :to="{name:'editprofile'}" class="color_black"> editprofile</router-link>
+                                <router-link :to="{name:'profile'}" class="color_black"> Profile</router-link>
                             </li>-->
                             <li>
                                 <router-link :to="{name:'creators'}" class="color_black"> Creators</router-link>
@@ -102,7 +99,7 @@
                                     </router-link>
                                 </div>
                                 <div class="links ml-10 mr-10">
-                                    <router-link :to="'/editprofile/' + this.$store.state.user.account">
+                                    <router-link :to="'/editprofile/'">
                                         <a href="">
                                             <i class="ri-pencil-line"></i> 
                                             <span> Edit Profile</span>
@@ -143,10 +140,10 @@
                                 <li>
                                     <router-link class="color_black" :to="{name:'collections'}"> Collections
                                     </router-link>
-                                </li>
+                                </li><!--
                                 <li>
                                     <router-link class="color_black" :to="{name:'profile'}"> Profile</router-link>
-                                </li>
+                                </li>-->
                                 <li>
                                     <router-link class="color_black" :to="{name:'creators'}"> Creators</router-link>
                                 </li>

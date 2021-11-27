@@ -15,10 +15,11 @@
                             <p><span class="nameInput p-20">Avatar Image*</span></p>
                             <div class="left__part mt-10">
                                 <file-upload
+                                    :inputValue="userData.avatar"
                                     type="image-circle"
                                     @updateImg="
                                     (img) => {
-                                        newCollection.file = img;
+                                        userData.fileAvatar = img;
                                     }
                                         "
                                     />
@@ -29,9 +30,10 @@
                             <div class="left__part mt-10">
                                 <file-upload
                                     type="image-regular"
+                                    :inputValue="userData.banner_img"
                                     @updateImg="
                                         (img) => {
-                                            newCollection.fileBanner = img;
+                                            userData.fileBanner = img;
                                         }
                                     "
                                     />
@@ -44,40 +46,44 @@
                                 <div class="space-y-10">
                                     <span class="nameInput pl-20">Name*</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.name"
+                                            v-model="userData.full_name"
                                             placeholder="Collection Name">
                                 </div>
                                 <div class="space-y-10">
                                     <span class="nameInput pl-20">Description </span>
                                     <textarea class="form-control" spellcheck="true" style="height:160px"
-                                            v-model="newCollection.description"
+                                            v-model="userData.bio"
                                             placeholder="Provide your description for your collection"/>
                                 </div>
                                 <div class="space-y-10">
                                     <span class="nameInput pl-20">Custom URL</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.website"
+                                            v-model="userData.custom_url"
                                             placeholder="https://myproject.com">
                                 </div>
                                 <div class="space-y-10">
                                     <span class="nameInput pl-20">Your Email</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.email"
+                                            v-model="userData.email"
                                             placeholder="contact@project.com">
                                 </div>
                                 <div class="space-y-10">
                                     <span class="nameInput pl-20">Links</span>
+                                    <i class="fab fa-facebook" />
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.socials.discord"
-                                            placeholder="https://discord.gg/xxx">
+                                            v-model="userData.socials.facebook"
+                                            placeholder="https://www.facebook.com/abcdef">
+                                    <i class="fab fa-twitter" />
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.socials.twitter"
+                                            v-model="userData.socials.twitter"
                                             placeholder="@myTwitter">
+                                    <i class="fab fa-instagram" />
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.socials.telegram"
-                                            placeholder="@myTelegram">
+                                            v-model="userData.socials.instagram"
+                                            placeholder="@YourInstagramHandle">
+                                    <i class="fab fa-soundcloud" />
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.socials.medium"
+                                            v-model="userData.socials.medium"
                                             placeholder="https://medium.com/myProject">
                                 </div>
                             </div>
@@ -87,11 +93,11 @@
                 </div>
                 <div class="content justify-content-between mt-40 mb-20_reset" style="margin-left:44%">
                     <div class="mb-20">
-                        <router-link :to="{name:'item-details'}">
-                            <div class="btn btn-grad btn_create"> 
-                                Create item
+    <!--                     <router-link :to="'/profile/' + this.$store.state.user.information.wallet_address">-->
+                            <div class="btn btn-grad btn_create" @click="updateProfile"> 
+                                Update Profile
                             </div>
-                        </router-link>
+     <!--                   </router-link>-->
                     </div>
                 </div>
             </div>
@@ -107,25 +113,18 @@
             FileUpload,
         },
         computed: {
-            listCategory() {
-                return this.$store.state.category.categories;
-            },
             userData() {
                 return this.$store.state.user.information;
             },
-            userWallet() {
-                return this.$route.params.wallet;
-                // return "0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7"
-            },
-        },
+        },/*
         watch: {
             userWallet(newValue, oldValue) {
                 this.reloadData();
             },
-        },
+        },*/
         mounted() {
             if (!this.userData) {
- //               this.$router.push("/connect-wallet");
+                this.$router.push("/connect-wallet");
             }
         },
 
@@ -136,37 +135,21 @@
             };
         },
         methods: {
-            async createCollection() {
-                if (this.userData) {
-                    this.$loading(true);
-                    this.newCollection.wallet_address = this.userData.wallet_address;
-                    try {
-                        const result = await this.$store.dispatch(
-                            "collection/createCollection",
-                            this.newCollection
-                        );
-
-                        this.$loading(false);
-                        if (result) {
-                            await this.$successAlert({
-                                text: "Create Collection Succesfully",
-                            });
-
-                            this.$router.push("/user-profile");
-                        } else {
-                            this.$failAlert({
-                                text: "Create Collection Fail",
-                            });
-                        }
-                    } 
-                    catch (error) {
-                        this.$loading(false);
-                        this.$failAlert({
-                            text: error,
-                        });
-                    }
-                } else {
-                    this.$router.push("/connect-wallet");
+            async updateProfile() {
+                try {
+                    this.$store.dispatch("user/editProfile", this.userData);
+                    /*
+                    await this.$successAlert({
+                        text: "Update Profile Succesfully",
+                    });
+*/
+                    this.$router.push("/profile/" + this.userData.wallet_address);
+                } catch (error) {
+                    /*
+                    this.$loading(false);
+                    this.$failAlert({
+                        text: error,
+                    });*/
                 }
             },
             goTo(url) {

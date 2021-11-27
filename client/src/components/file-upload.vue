@@ -3,7 +3,9 @@
     <template v-if="type === 'image-regular' || type === 'image-circle'">
       <div class="file-input" :class="type">
         <div class="image-container" style="padding:0">
-          <img v-if="inputValue && !hasImage" :src="inputValue" title="" />
+          <img v-if="type === 'image-circle' && inputValue && !hasImage" :src="inputValue" title="" />
+          <img v-if="type === 'image-regular' && inputValue && !hasImage" :src="inputValue" title="" 
+              style="border-radius:10px; height:300px; width:480px"/>
           <img v-else-if="type === 'image-regular'"
             :src="imageRegular" style="border-radius:10px; height:300px; width:480px"
             title="" />
@@ -39,7 +41,7 @@
         </div>
       </div>
     </template>
-<!--
+
     <template v-else-if="type === 'input'">
       <template v-if="!withButton">
         <md-field class="form-file-upload form-file-simple">
@@ -88,7 +90,7 @@
           </md-button>
         </div>
       </template>
-    </template>-->
+    </template>
   </div>
 </template>
 
