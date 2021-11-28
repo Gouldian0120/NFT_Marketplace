@@ -25,6 +25,7 @@
             <div class="d-flex flex-column justify-content-center w-100 space-y-10">
                 <h6 class="card_title">{{showShortName(this.itemName)}}</h6>
                 <div class="hr"></div>
+                <div>Creator:</div>
                 <div class="card_footer d-block space-y-10">
                     <div class="creators space-x-10">
                         <div class="avatars">
@@ -96,7 +97,7 @@
 <style scoped>
     .loadimg {
         width: 100% !important;
-        height: 135px !important;
+        height: 165px !important;
         text-align: center;
         border-radius: 12px;
     }

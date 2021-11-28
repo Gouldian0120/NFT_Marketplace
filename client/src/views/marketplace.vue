@@ -116,6 +116,8 @@
                             :item-name="item.name"
                             :item-minBid="item.minBid"
                             :card-image="item.image"
+                            :item-creator="item.creator"
+                            :item-owner="item.owner"
                         >
                         </item-card>
                     </div>

@@ -1,6 +1,6 @@
 <template>
     <div class="card__item four" style="width:280px">
-        <div class="card_body space-y-10">
+        <div class="card_body space-y-10"><!--
             <div class="creators space-x-10">
                 <div class="avatars space-x-3">
                     <router-link :to="{name:'profile'}">
@@ -10,7 +10,7 @@
                             class="avatar avatar-sm"/>
                     </router-link>
                     <router-link :to="{name:'profile'}">
-                        <p class="avatars_name txt_xs">@mickel_fenn</p>
+                        <p class="avatars_name txt_xs">{{showShortName(this.itemCreator)}}</p>
                     </router-link>
                 </div>
                 <div class="avatars space-x-3">
@@ -21,10 +21,10 @@
                             class="avatar avatar-sm"/>
                     </router-link>
                     <router-link :to="{name:'profile'}">
-                        <p class="avatars_name txt_xs">@danil_pannini</p>
+                        <p class="avatars_name txt_xs">{{showShortName(this.itemOwner)}}</p>
                     </router-link>
                 </div>
-            </div>
+            </div>-->
             <div class="card_head h-auto">
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
@@ -61,15 +61,15 @@
                 <div class="d-flex
                             align-items-center
                             space-x-10
-                            justify-content-between">
-                    <div class="d-flex align-items-center space-x-5">
+                            justify-content-between mt-3">
+                    <div class="d-flex align-items-center space-x-5"><!--
                         <i class="ri-history-line"></i>
                         <router-link :to="{name:'home'}" data-toggle="modal"
                                      data-target="#popup_history">
                             <p class="color_text txt_sm view_history" style="width: auto">
                                 View History
                             </p>
-                        </router-link>
+                        </router-link>-->
                     </div>
                     <router-link :to="{name:'home'}" class="btn btn-sm btn-primary"
                         data-toggle="modal"
@@ -90,6 +90,8 @@
             itemName: String,
             itemMinBid: Number,
             cardImage: String,
+            itemCreator:String,
+            itemOwner:String
         },
         data() {
             return {

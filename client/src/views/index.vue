@@ -461,7 +461,6 @@
                     {
                         skip: 0,
                         limit: 12,
-                        sortBy: "updated_at",
                     }
                 );
 
