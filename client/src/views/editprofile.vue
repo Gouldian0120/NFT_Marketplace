@@ -93,11 +93,9 @@
                 </div>
                 <div class="content justify-content-between mt-40 mb-20_reset" style="margin-left:44%">
                     <div class="mb-20">
-    <!--                     <router-link :to="'/profile/' + this.$store.state.user.information.wallet_address">-->
-                            <div class="btn btn-grad btn_create" @click="updateProfile"> 
-                                Update Profile
-                            </div>
-     <!--                   </router-link>-->
+                        <div class="btn btn-grad btn_create" @click="updateProfile"> 
+                            Update Profile
+                        </div>
                     </div>
                 </div>
             </div>

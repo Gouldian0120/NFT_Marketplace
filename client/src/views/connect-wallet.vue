@@ -103,6 +103,7 @@
                 return Boolean(ethereum && ethereum.isMetaMask)
             },
             isMetaMaskConnected() {
+                console.log(this.$store.state.user.account)
                 return this.$store.state.user.account != null;
             },
         },

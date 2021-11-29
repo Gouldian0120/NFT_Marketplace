@@ -52,10 +52,9 @@
                         <div class="col-lg-auto">
                             <div class="d-flex space-x-10 align-items-center">
                                 <span class="color_text txt_sm" style="min-width:
-                                    max-content;"> FILTER BY: </span>   
+                                    max-content;"> FILTER BY : </span>   
                                 <ul class="menu_categories space-x-20">
                                     <li class="d-flex space-x-10 switch_item">
-
                                         <input type="checkbox" id="switch1"/><label
                                             for="switch1">Toggle</label>
                                         <span> Has list price </span>
@@ -83,7 +82,7 @@
                         </div>
                         <div class="col-lg-auto">
                             <div class="d-flex space-x-10 align-items-center sm:mt-20">
-                                <span class="color_text txt_sm"> SORT BY: </span>
+                                <span class="color_text txt_sm"> SORT BY : </span>
                                 <div class="dropdown">
                                     <button class="btn btn-dark btn-sm dropdown-toggle"
                                             type="button"
@@ -102,7 +101,19 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="listItems && listItems.length > 0" class="row mb-30_reset">
+                <div v-if="this.collectionid != null">
+                    <span class="color_text txt_sm" > COLLECTION : </span> 
+                    <span class="collection_bar ml-20" >
+                        <img width="25px" height="25px"
+                            :src="this.collectionitem.image">
+                        <span class="color_green p-10 txt_sm mr-20">{{this.collectionitem.name}}</span>
+                        <img width="23px" height="23px" 
+                            :src="require('@/assets/img/close1.svg')" 
+                            @click="getAll()" class="cursor-pointer"
+                            alt="">
+                    </span>
+                </div>
+                <div v-if="listItems && listItems.length > 0" class="row mt-10 mb-30_reset">
                     <div
                         v-for="(item, i) in listItems"
                         :key="i"
@@ -148,6 +159,7 @@
                     rangeSlider: [101, 700],
                 },
                 filters: {},
+                collectionitem: null
             };
         },
         async mounted() {
@@ -165,6 +177,9 @@
         computed: {
             listCategory() {
                 return this.$store.state.category.categories;
+            },
+            collectionid() {
+                return this.$route.params.collectionid;
             },
         },
         methods: {
@@ -195,16 +210,25 @@
                 }
             },
             async getItems() {
-                this.listItems = await this.$store.dispatch(
-                    this.filterName == "All"
-                            ? "item/getAllItems"
-                            : "item/getItemsByCategory",
-                    {
-                        skip: 0,
-                        limit: 16,
-                        keySearch: this.categoryID,
-                    }
-                );
+
+                if (this.collectionid)
+                {
+                    this.collectionitem = await this.getCollectionItem();
+                    this.listItems = this.collectionitem.items;
+                }
+                else
+                {
+                    this.listItems = await this.$store.dispatch(
+                        this.filterName == "All"
+                                ? "item/getAllItems"
+                                : "item/getItemsByCategory",
+                        {
+                            skip: 0,
+                            limit: 16,
+                            keySearch: this.categoryID,
+                        }
+                    );
+                }
 
                 if (this.listItems.length == this.filterData.limit) {
                     this.filterData.skip += this.listItems.length;
@@ -215,10 +239,32 @@
             async getCategories() {
                 await this.$store.dispatch("category/getCategories");
             },
+            async getCollectionItem() {
+                return this.$store.dispatch("collection/getDetailCollection", { id: this.collectionid });
+            },
+            async getAll() {
+                this.$loading(true);
+                this.listItems = await this.$store.dispatch(
+                    this.filterName == "All"
+                            ? "item/getAllItems"
+                            : "item/getItemsByCategory",
+                    {
+                        skip: 0,
+                        limit: 16,
+                        keySearch: this.categoryID,
+                    }
+                );
+                this.$loading(false);
+                this.$router.push("/marketplace");
+            }
         },
     }
 </script>
 
 <style scoped>
-
+    .collection_bar {
+        border:1px solid #fff; 
+        border-radius:5px; 
+        padding:10px
+    }
 </style>

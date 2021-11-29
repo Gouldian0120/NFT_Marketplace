@@ -41,6 +41,11 @@ const routes = [
         component: () => import(/* webpackChunkName: "about" */ '../views/marketplace.vue')
     },
     {
+        path: '/marketplace/:collectionid',
+        name: 'marketplace',
+        component: () => import(/* webpackChunkName: "about" */ '../views/marketplace.vue')
+    },
+    {
         path: '/profile/',
         name: 'profile',
         component: () => import(/* webpackChunkName: "about" */ '../views/profile.vue')
@@ -61,7 +66,11 @@ const routes = [
         component: () => import( /* webpackChunkName: "about" */ '../views/createcollection.vue')
     },
     {
- //       path: '/editprofile/:wallet',
+        path: '/edititem/:id',
+        name: 'edititem',
+        component: () => import( /* webpackChunkName: "about" */ '../views/edititem.vue')
+    },
+    {
         path: '/editprofile/',
         name: 'editprofile',
         component: () => import( /* webpackChunkName: "about" */ '../views/editprofile.vue')

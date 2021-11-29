@@ -35,9 +35,11 @@
                                 <div class="card_body space-y-10">
                                     <div class="card_head h-auto">
                                         <div class="img-box zoom-box">
-                                            <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-                                                <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
-                                            </div>
+                                            <router-link :to="'/marketplace/' + item._id">
+                                                <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
+                                                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
+                                                </div>
+                                            </router-link>
                                         </div>
                                     </div>
                                     <h6 class="card_title">
@@ -242,9 +244,11 @@
                                 <div class="card_body space-y-10">
                                     <div class="card_head h-auto">
                                         <div class="img-box zoom-box">
-                                            <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-                                                <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
-                                            </div>
+                                            <router-link :to="'/marketplace/' + item._id">
+                                                <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
+                                                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
+                                                </div>
+                                            </router-link>
                                         </div>
                                     </div>
                                     <h6 class="card_title">

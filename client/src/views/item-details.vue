@@ -104,11 +104,27 @@
                             </div>
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="d-flex space-x-20">
-                                <a href="" class="btn btn-primary btn-lg" data-toggle="modal"
-                                   data-target="#popup_buy"> Buy Now</a>
-                                <a href="" class="btn btn-grad btn-lg" data-toggle="modal"
-                                   data-target="#popup_bid"> Place bid</a>
-                            </div>
+                                    <a href="" v-if="item.owner == metaMaskAddress && !item.sellOrder" 
+                                        class="btn btn-primary btn-lg" 
+                                        data-toggle="modal"
+                                        data-target="#popup_buy"
+                                        @click="sellItem" > Sell</a>
+                                    <a href="" v-else-if="item.owner == metaMaskAddress && item.sellOrder"
+                                        class="btn btn-primary btn-lg" 
+                                        data-toggle="modal"
+                                        data-target="#popup_buy"
+                                        @click="editItem"> Edit Item</a>
+                                    <a href="" v-else-if="item.isPutOnMarket"
+                                        class="btn btn-primary btn-lg" 
+                                        data-toggle="modal"
+                                        data-target="#popup_buy"
+                                        @click="buyItem"> Buy Now</a>
+                                    <a href="" v-else
+                                        class="btn btn-grad btn-lg" 
+                                        data-toggle="modal"
+                                        data-target="#popup_bid"
+                                        @click="placeBid"> Place a bid</a>
+                                </div>
                                 <div class="space-x-10 d-flex align-items-center">
                                     <div class="share">
                                         <div class="icon">
@@ -412,7 +428,7 @@
     import Web3 from "web3";
     import ExchangeV1 from "../assets/abis/ExchangeV1.json";
     import RaribleToken from "../assets/abis/RaribleToken.json";
-    import { Web3Ultils } from "../utils/Web3Ultils";
+    import Web3Ultils from "../utils/Web3Ultils";
     export default {
         components: {ItemCard},
         data() {
