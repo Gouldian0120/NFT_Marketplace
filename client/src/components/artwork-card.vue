@@ -29,7 +29,7 @@
                 <div class="card_footer d-block space-y-10">
                     <div class="creators space-x-10">
                         <div class="avatars">
-                            <router-link :to="{name:'profile'}">
+                            <router-link :to="'/profile/' + this.itemCreator">
                                 <img
                                     :src="require('@/assets/img/avatars/avatar_4.png')"
                                     alt="Avatar"
@@ -37,7 +37,7 @@
                                 />
                             </router-link>
                         </div>
-                        <router-link :to="{name:'profile'}">
+                        <router-link :to="'/profile/' + this.itemCreator">
                             <p class="avatars_name txt_sm">{{showShortName(this.itemCreator)}}</p>
                         </router-link>
                     </div>
@@ -45,12 +45,12 @@
                                 align-items-center
                                 justify-content-between
                                 space-x-3">
-                        <a
+                        <a  v-if="this.itemIsputonmarket"
                             class="btn btn-sm btn-primary"
                             href="#"
                             data-toggle="modal"
                             data-target="#popup_bid">Place Bid</a>
-                        <span class="color_green txt_sm text-right">{{this.itemMinBid || 0}} ETH</span>
+                        <span  v-if="this.itemIsputonmarket" class="color_green txt_sm text-right">{{this.itemMinBid || 0}} ETH</span>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,8 @@
             itemName: String,
             itemMinBid: Number,
             cardImage: String,
-            itemCreator: String
+            itemCreator: String,
+            itemIsputonmarket: Boolean
         },
         data() {
             return {

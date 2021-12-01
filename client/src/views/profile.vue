@@ -28,9 +28,10 @@
                                             <span class="color_text">
                                                 {{showShortName(viewUser.wallet_address)}}
                                             </span>
-                                            <a href="#" @click="copyToClipboard">
-                                                <i class="ri-file-copy-line color_text"></i>
-                                            </a>
+                                            <i  @click="copyToClipboard"
+                                                class="ri-file-copy-line color_text cursor-pointer" 
+                                                title="Copy to clipboard"
+                                                ></i>
                                         </div>
                                     </div>
                                     <div class="d-flex flex-wrap align-items-center space-x-20">
@@ -238,16 +239,25 @@
         },
         methods: {
             copyToClipboard() {
-                var input = document.createElement("input");
-                input.setAttribute("value", this.profileName);
-                document.body.appendChild(input);
-                input.select();
-                var result = document.execCommand("copy");
-                document.body.removeChild(input);
+                if (!navigator.clipboard){
+                    var input = document.createElement("input");
+                    input.setAttribute("value", this.profileName);
+                    document.body.appendChild(input);
+                    input.select();
+                    var result = document.execCommand("copy");
+                    document.body.removeChild(input);
 
-                this.$successAlert({
-                    text: "Copy to clipboard successfull",
-                });
+                    this.$successAlert({
+                        text: "Copy to clipboard successfull",
+                    });
+                } else{
+                    navigator.clipboard.writeText(this.profileName).then(
+                        console.log("success clipboard")
+                    )
+                    .catch(
+                        console.log("error clipboard")
+                    )
+                }  
             },
             async reloadData() {
                 this.$loading(true);
@@ -305,7 +315,6 @@
 </script>
 
 <style scoped>
-
     .avatarloadimg {
         width: 80px !important;
         height: 80px !important;
@@ -315,5 +324,31 @@
     .bannerloadimg {
         width: 100% !important;
         height: 270px !important;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+        top: -5px;
+        left: 105%;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
     }
 </style>

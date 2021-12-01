@@ -80,7 +80,8 @@
                                         :item-name="item.name"
                                         :itemMinBid="item.minBid"
                                         :item-creator="item.creator"
-                                        :card-image="item.image">
+                                        :card-image="item.image"
+                                        :item-isputonmarket="item.isPutOnMarket">
                                     </artwork-card>
                                 </div>
                             </div>
@@ -202,6 +203,7 @@
                                         :item-name="item.name"
                                         :item-minBid="item.minBid"
                                         :card-image="item.image"
+                                        :item-isputonmarket="item.isPutOnMarket"
                                     >
                                     </item-card>
                                 </div>
@@ -289,7 +291,8 @@
                                         :item-name="item.name"
                                         :itemMinBid="item.minBid"
                                         :item-creator="item.creator"
-                                        :card-image="item.image">
+                                        :card-image="item.image"
+                                        :item-isputonmarket="item.isPutOnMarket">
                                     </artwork-card>
                                 </div>
                             </div>
@@ -522,8 +525,8 @@
 
 <style scoped>
     .loadimg {
-        width: 250px !important;
-        height: 250px !important;
+        width: 100% !important;
+        height: 252px !important;
         border-radius: 12px;
     }
 

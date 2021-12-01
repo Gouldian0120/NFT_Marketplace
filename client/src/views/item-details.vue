@@ -342,14 +342,14 @@
                                         <div class="avatars space-x-5">
                                             <div><p>Owner</p></div>
                                             <div class="media">
-                                                <router-link :to="{name:'profile'}">
+                                                <router-link :to="'/profile/' + item.owner">
                                                     <img
                                                         :src="require('@/assets/img/avatars/avatar_3.png')"
                                                         alt="Avatar" class="avatar avatar-sm">
                                                 </router-link>
                                             </div>
                                             <div>
-                                                <router-link :to="{name:'profile'}">
+                                                <router-link :to="'/profile/' + item.owner">
                                                     <p class="avatars_name color_black">{{ showShortName(item.owner) }}</p>
                                                 </router-link>
                                             </div>
@@ -364,14 +364,14 @@
                                                         :src="require('@/assets/img/icons/Badge.svg')"
                                                         alt="">
                                                 </div>
-                                                <router-link :to="{name:'profile'}">
+                                                <router-link :to="'/profile/' + item.creator">
                                                     <img
                                                         :src="require('@/assets/img/avatars/avatar_2.png')"
                                                         alt="Avatar" class="avatar avatar-sm">
                                                 </router-link>
                                             </div>
                                             <div>
-                                                <router-link :to="{name:'profile'}">
+                                                <router-link :to="'/profile/' + item.creator">
                                                     <p class="avatars_name color_black">{{ showShortName(item.creator) }}</p>
                                                 </router-link>
                                             </div>

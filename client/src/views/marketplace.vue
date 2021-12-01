@@ -129,6 +129,8 @@
                             :card-image="item.image"
                             :item-creator="item.creator"
                             :item-owner="item.owner"
+                            :item-isputonmarket="item.isPutOnMarket"
+                            :item-sellOrder="item.sellOrder"
                         >
                         </item-card>
                     </div>

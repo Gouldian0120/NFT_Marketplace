@@ -71,11 +71,24 @@
                             </p>
                         </router-link>-->
                     </div>
-                    <router-link :to="{name:'home'}" class="btn btn-sm btn-primary"
-                        data-toggle="modal"
-                        data-target="#popup_bid">
-                        Place Bid
-                    </router-link>
+                    <div class="d-flex align-items-center space-x-5" style="height:30px">
+                        <!--
+                        <a href="" v-if="this.itemOwner == metaMaskAddress && !this.itemSellOrder" 
+                            class="btn btn-sm btn-primary" 
+                            data-toggle="modal"
+                            data-target="#popup_buy"
+                            @click="sellItem" > Sell</a>
+                        <a href="" v-else-if="this.itemOwner == metaMaskAddress && this.itemSellOrder"
+                            class="btn btn-sm btn-primary" 
+                            data-toggle="modal"
+                            data-target="#popup_buy"
+                            @click="editItem"> Edit Item</a>-->
+                        <a href="" v-if="this.itemIsputonmarket"
+                            class="btn btn-sm btn-primary" 
+                            data-toggle="modal"
+                            data-target="#popup_buy"
+                            > Buy Now</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,7 +104,9 @@
             itemMinBid: Number,
             cardImage: String,
             itemCreator:String,
-            itemOwner:String
+            itemOwner:String,
+            itemIsputonmarket: Boolean,
+            itemSellOrder: Boolean
         },
         data() {
             return {
@@ -103,6 +118,14 @@
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
             })
+        },
+       computed: {
+            userData() {
+                return this.$store.state.user?.information;
+            },
+            metaMaskAddress() {
+                return this.userData?.wallet_address;
+            },
         },
         methods: {
             showShortName(name) {
