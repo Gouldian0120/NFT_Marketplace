@@ -8,7 +8,7 @@
                 <div class="row sm:space-y-20">
                     <div class="col-md-6">
                         <div style="background-color:#fff"
-                             class="img-box item_img p-1">
+                             class="item_img p-1">
                              <div v-lazy-container="{ selector: 'img' }">
                                 <img class="img"
                                     :data-src="item.image"
@@ -343,14 +343,12 @@
                                             <div><p>Owner</p></div>
                                             <div class="media">
                                                 <router-link :to="'/profile/' + item.owner">
-                                                    <img
-                                                        :src="require('@/assets/img/avatars/avatar_3.png')"
-                                                        alt="Avatar" class="avatar avatar-sm">
-                                                </router-link>
-                                            </div>
-                                            <div>
-                                                <router-link :to="'/profile/' + item.owner">
-                                                    <p class="avatars_name color_black">{{ showShortName(item.owner) }}</p>
+                                                    <div v-lazy-container="{ selector: 'img' }">
+                                                        <img class="avatar avatar-sm" 
+                                                            :data-src="viewOwner.avatar || avatarimage" 
+                                                            :data-loading="loadimage"/>
+                                                        <span class="avatars_name color_black ml-1">{{ showWalletSeller(item.owner) }}</span>
+                                                    </div>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -359,20 +357,13 @@
                                         <div class="avatars space-x-5">
                                             <div><p>Creator</p></div>
                                             <div class="media">
-                                                <div class="badge">
-                                                    <img class="badge"
-                                                        :src="require('@/assets/img/icons/Badge.svg')"
-                                                        alt="">
-                                                </div>
                                                 <router-link :to="'/profile/' + item.creator">
-                                                    <img
-                                                        :src="require('@/assets/img/avatars/avatar_2.png')"
-                                                        alt="Avatar" class="avatar avatar-sm">
-                                                </router-link>
-                                            </div>
-                                            <div>
-                                                <router-link :to="'/profile/' + item.creator">
-                                                    <p class="avatars_name color_black">{{ showShortName(item.creator) }}</p>
+                                                    <div v-lazy-container="{ selector: 'img' }">
+                                                        <img class="avatar avatar-sm" 
+                                                            :data-src="viewCreator.avatar || avatarimage" 
+                                                            :data-loading="loadimage"/>
+                                                        <span class="avatars_name color_black ml-1">{{ showWalletSeller(item.creator) }}</span>
+                                                    </div>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -387,22 +378,19 @@
                 <div class="avatars space-x-5">
                     <h3>More from this collection &nbsp;&nbsp;&nbsp;</h3>
                     <div class="media">
-                        <router-link :to="{name:'profile'}">
+                        <router-link :to="'/marketplace/' + this.item.collection_id">
                             <div v-lazy-container="{ selector: 'img' }">
                                 <img class="loadimg avatar avatar-sm" :data-src="collectionItems.image" :data-loading="loadimage"/>
+                                <span class="avatars_name color_green ml-1">{{ collectionItems.name }}</span>
+                                <span class="color_green text-sm"> ( {{this.collectionItems.items.length}} items )</span>
                             </div>
-                        </router-link>
-                    </div>
-                    <div>
-                        <router-link :to="{name:'profile'}">
-                            <h4><p class="avatars_name color_green">{{ collectionItems.name }}</p></h4>
                         </router-link>
                     </div>
                 </div>
             </div>
-            <div v-if="collectionItems.items && collectionItems.items.length > 0" class="row mb-30_reset">
+            <div v-if="collectionItems.items && collectionItems.items.length - 1 > 0" class="row mb-30_reset">
                 <div
-                    v-for="(item1, i) in collectionItems.items"
+                    v-for="(item1, i) in collectionItems.items.slice(this.from, this.to)"
                     :key="i"
                     class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
                 >
@@ -416,6 +404,15 @@
                         :card-image="item1.image"
                     >
                     </item-card>
+                </div>
+            </div>
+            <div class="section__head mt-5 text-align:center">
+                <div 
+                    class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                    @click="loadNextItems"
+                    v-if="this.isShowMore"
+                    >
+                        Show More
                 </div>
             </div>
         </div>
@@ -435,12 +432,19 @@
             return {
                 tab: 1,
                 loadimage: require("@/assets/img/loading.gif"),
+                avatarimage: require("@/assets/img/avatars/avatar_4.png"),
                 item: null,
                 collectionItems: null,
                 carouselItems: [],
                 listItems: [],
                 selectColor: "rose",
-                selectSize: "small",/*
+                selectSize: "small",
+                viewCreator: {},
+                viewOwner: {},
+                isShowMore: true,
+                from: 0,
+                to: 12,
+                limit: 12/*
                 tableData: [
                     {
                     id: 1,
@@ -513,14 +517,24 @@
             };
         },
         async mounted() {
-            this.$loading(true);
+            this.$loading(true);/*
             let box = document.querySelectorAll('.img-box');
             box.forEach(el => {
                 el.style.height = el.offsetWidth * 0.75 + 'px'
             })
-
+*/
             try {
                 this.item = await this.getItem();
+
+                this.viewCreator = await this.$store.dispatch(
+                    "user/getUserProfile",
+                    this.item.creator
+                );
+
+                this.viewOwner = await this.$store.dispatch(
+                    "user/getUserProfile",
+                    this.item.owner
+                );
             } 
             catch (error) {
                 console.log("error000111")
@@ -531,10 +545,13 @@
                     "collection/getDetailCollection", 
                     {
                         skip: 0,
-                        limit: 16,
+                        limit: 1,
                         id: this.item.collection_id 
                     }
                 );
+
+                if (this.collectionItems.items.length <= this.limit)
+                    this.isShowMore = false;
             } catch (error) {
                 console.log("error2211")
             }
@@ -571,6 +588,13 @@
                 name.substring(name.length - 8, name.length)
                 );
             },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 6) +
+                    "..." +
+                    wallet.substring(wallet.length - 8, wallet.length)
+                );
+            },
             shadowImageBlog(image) {
                 return {
                 backgroundImage: `url(${image})`,
@@ -579,6 +603,19 @@
             },
             getItem() {
                 return this.$store.dispatch("item/getDetailItem", { id: this.itemId });
+            },
+            async loadNextItems() {
+                try {
+                    let totalCount = this.collectionItems.items.length;
+                    this.to += this.limit;
+
+                    if (this.to >= totalCount) {
+                        this.to = totalCount;
+                        this.isShowMore = false;
+                    }
+                } catch (error) {
+                    console.log(121212)
+                }
             },
             async sellItem() {
                 await this.$store.dispatch("global/setLoadingTitle", "Sell Item");
@@ -618,7 +655,6 @@
                 else
                     return price.substr(0, 10);
             },
-
             editItem() {
                 this.$router.push("/editItem/" + this.itemId);
             },
@@ -659,8 +695,7 @@
 <style scoped>
 
     .img {
-        width: 100% !important;
-        height: 422px !important;
+        max-height: 600px;
         text-align: center;
         border-radius: 12px;
     }

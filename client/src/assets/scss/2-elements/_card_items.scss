@@ -497,9 +497,8 @@
 .item_details {
     .item_img {
         border-radius: $border-radius;
-        width: 100%;
-        height: 100%;
         object-fit: cover;
+        text-align: center;
     }
     .likes {
         background: $color_white;

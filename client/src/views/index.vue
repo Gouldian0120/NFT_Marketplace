@@ -24,48 +24,30 @@
         <div class="hero__3">
             <div class="container">
                 <div class="wrapper">
-                    <h2 class="section__title mb-20">Recent Collection</h2>
+                    <div class="section__head">
+                        <div class="d-flex justify-content-between sm-column align-items-center mb-20">
+                            <h2 class="section__title"> Recent Collection</h2>
+                            <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
+                                View All
+                            </router-link>
+                        </div>
+                    </div>
                     <div class="row">
                         <div
                             v-for="(item, k) in carousel"
                             :key="k"
                             class="col-lg-4"
                         >
-                            <div class="card__item two">
-                                <div class="card_body space-y-10">
-                                    <div class="card_head h-auto">
-                                        <div class="img-box zoom-box">
-                                            <router-link :to="'/marketplace/' + item._id">
-                                                <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-                                                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
-                                                </div>
-                                            </router-link>
-                                        </div>
-                                    </div>
-                                    <h6 class="card_title">
-                                        <router-link :to="'item-details'" class="color_black">
-                                            {{showShortName(item.name)}}
-                                        </router-link>
-                                    </h6>
-                                    <div class="hr"></div>
-                                    <div class="card_footer justify-content-between">
-                                        <router-link :to="{name:'profile'}" class="creators space-x-10">
-                                            <div class="avatars -space-x-20">
-                                                <img
-                                                        :src="require('@/assets/img/avatars/avatar_1.png')"
-                                                        alt="Avatar" class="avatar avatar-sm">
-                                            </div>
-                                            <p class="avatars_name txt_sm">
-                                                @xander_hall...
-                                            </p>
-                                        </router-link>
-                                        <router-link :to="{name:'home'}" class="space-x-3">
-                                            <p class="color_green txt_sm">
-                                                {{getRecentCollectionItems.length}} items</p>
-                                        </router-link>
-                                    </div>
-                                </div>
-                            </div>
+                            <collection-card-lg 
+                                text-center
+                                class="mt-3"
+                                card-plain
+                                :item-id="item._id"
+                                :item-name="item.name"
+                                :creator="item.creator"
+                                :card-image="item.image"
+                                :item-count="getRecentCollectionItems.length">
+                            </collection-card-lg>
                         </div>
                         <div class="col-lg-8">
                             <div class="row">
@@ -107,7 +89,12 @@
                                     <a class="dropdown-item" href="#">Action</a>
                                     <a class="dropdown-item" href="#">Another action</a>
                                     <a class="dropdown-item" href="#">Something else here</a>
-                                </div>
+                                </div><!--
+                                <div class="dropdown-menu space-y-10">
+                                    <div class="links ml-10 mr-10" href="#">Action</div>
+                                    <div class="links ml-10 mr-10" href="#">Another action</div>
+                                    <div class="links ml-10 mr-10" href="#">Something else here</div>
+                                </div>-->
                             </div>
                         </div>
                         <div class="box">
@@ -137,7 +124,7 @@
                                             >
                                                 <h4 class="comment-heading show-name">
                                                     {{
-                                                    item.full_name || showWalletSeller(item.wallet_address)
+                                                    showShortName(item.full_name) || showWalletSeller(item.wallet_address)
                                                     }}
                                                 </h4>
                                             </a>
@@ -158,27 +145,6 @@
                         <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
                             View All
                         </router-link>
-                    </div>
-                    <div class="d-flex space-x-10">
-                        <span class="color_text txt_sm" style="min-width: max-content;">
-                            FILTER BY: </span>
-                        <ul class="menu_categories space-x-20">
-                            <li class="d-flex space-x-10 switch_item">
-                                <input type="checkbox" id="switch1" checked=""><label
-                                    for="switch1">Toggle</label>
-                                <span> Has list price </span>
-                            </li>
-                            <li class="d-flex space-x-10 switch_item">
-                                <input type="checkbox" id="switch2"><label
-                                    for="switch2">Toggle</label>
-                                <span> Has open offer </span>
-                            </li>
-                            <li class="d-flex space-x-10 switch_item">
-                                <input type="checkbox" id="switch3"><label
-                                    for="switch3">Toggle</label>
-                                <span> Has sold </span>
-                            </li>
-                        </ul>
                     </div>
                 </div>
                 <div class="row">
@@ -235,48 +201,30 @@
         <div class="hero__3">
             <div class="container">
                 <div class="wrapper">
-                    <h2 class="section__title mb-20">Top artworks</h2>
+                    <div class="section__head">
+                        <div class="d-flex justify-content-between sm-column align-items-center mb-20">
+                            <h2 class="section__title"> Top artworks</h2>
+                            <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
+                                View All
+                            </router-link>
+                        </div>
+                    </div>
                     <div class="row">
                         <div
                             v-for="(item, k) in topColllections"
                             :key="k"
                             class="col-lg-4"
                         >
-                            <div class="card__item two">
-                                <div class="card_body space-y-10">
-                                    <div class="card_head h-auto">
-                                        <div class="img-box zoom-box">
-                                            <router-link :to="'/marketplace/' + item._id">
-                                                <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-                                                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>
-                                                </div>
-                                            </router-link>
-                                        </div>
-                                    </div>
-                                    <h6 class="card_title">
-                                        <router-link :to="'item-details'" class="color_black">
-                                            {{showShortName(item.name)}}
-                                        </router-link>
-                                    </h6>
-                                    <div class="hr"></div>
-                                    <div class="card_footer justify-content-between">
-                                        <router-link :to="{name:'profile'}" class="creators space-x-10">
-                                            <div class="avatars -space-x-20">
-                                                <img
-                                                    :src="require('@/assets/img/avatars/avatar_1.png')"
-                                                    alt="Avatar" class="avatar avatar-sm">
-                                            </div>
-                                            <p class="avatars_name txt_sm">
-                                                @xander_hall...
-                                            </p>
-                                        </router-link>
-                                        <router-link :to="{name:'home'}" class="space-x-3">
-                                            <p class="color_green txt_sm">
-                                                {{getTopCollectionItems.length}} items</p>
-                                        </router-link>
-                                    </div>
-                                </div>
-                            </div>
+                            <collection-card-lg 
+                                    text-center
+                                    class="mt-3"
+                                    card-plain
+                                    :item-id="item._id"
+                                    :item-name="item.name"
+                                    :creator="item.creator"
+                                    :card-image="item.image"
+                                    :item-count="getRecentCollectionItems.length">
+                            </collection-card-lg>
                         </div>
                         <div class="col-lg-8">
                             <div class="row">
@@ -386,9 +334,10 @@
 
     import ItemCard from "../components/item-card";
     import ArtworkCard from "../components/artwork-card";
+    import CollectionCardLg from "../components/collection-card-lg";
 
     export default {
-        components: {ArtworkCard, ItemCard},
+        components: {ArtworkCard, ItemCard, CollectionCardLg},
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
@@ -491,12 +440,8 @@
                         sortBy: "created_at",
                     }
                 );
-                
-                for (let index = 0; index < this.listColllections.length; index++) {
-                    if (index >= this.listColllections.length - 1) {
-                        this.carousel.push(this.listColllections[index]);
-                    }
-                }
+
+                this.carousel.push(this.listColllections[this.listColllections.length - 1]);
             },
             async getTopCollections() {
                 this.topColllections = await this.$store.dispatch(

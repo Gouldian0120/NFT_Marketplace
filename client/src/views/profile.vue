@@ -13,10 +13,12 @@
                         <div class="row flex-wrap align-items-center justify-content-between">
                             <div class="col-md-auto mr-20">
                                 <div class="avatars d-flex space-x-20 align-items-center">
-                                    <div v-lazy-container="{ selector: 'img' }">
-                                        <img class="avatarloadimg" 
-                                            :data-src="viewUser.avatar || avatarimage" 
-                                            :data-loading="loadimage"/>
+                                    <div class="media has_border">
+                                        <div v-lazy-container="{ selector: 'img' }">
+                                            <img class="avatarloadimg" 
+                                                :data-src="viewUser.avatar || avatarimage" 
+                                                :data-loading="loadimage"/>
+                                        </div>
                                     </div>
                                     <h5>{{viewUser.full_name}}</h5>
                                 </div>
@@ -26,7 +28,7 @@
                                     <div class="mb-20">
                                         <div class="copy">
                                             <span class="color_text">
-                                                {{showShortName(viewUser.wallet_address)}}
+                                                {{showWalletSeller(viewUser.wallet_address)}}
                                             </span>
                                             <i  @click="copyToClipboard"
                                                 class="ri-file-copy-line color_text cursor-pointer" 
@@ -215,9 +217,15 @@
                 return this.$route.params.wallet;
                 // return "0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7"
             },
+            userData() {
+                return this.$store.state.user?.information;
+            },
         },
         watch: {
             userWallet(newValue, oldValue) {
+                this.reloadData();
+            },
+            userData(newValue, oldValue) {
                 this.reloadData();
             },
         },
@@ -267,6 +275,8 @@
                             "user/getUserProfile",
                             this.userWallet
                         );
+
+                        console.log(this.viewUser)
                         this.profileName = this.viewUser?.wallet_address;
 
                         let Items = await this.$store.dispatch(
@@ -309,6 +319,13 @@
                 }
                 return "";
             },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 8) +
+                    "..." +
+                    wallet.substring(wallet.length - 8, wallet.length)
+                );
+            },
         },
     };
 
@@ -326,29 +343,4 @@
         height: 270px !important;
     }
 
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        border-bottom: 1px dotted black;
-    }
-
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 120px;
-        background-color: black;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
-        
-        /* Position the tooltip */
-        position: absolute;
-        z-index: 1;
-        top: -5px;
-        left: 105%;
-    }
-
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-    }
 </style>

@@ -5,21 +5,11 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-                            <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
+        <!--                    <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
                         </div>
                     </div>
                 </router-link>
-                <div class="details d-flex justify-content-between"><!--
-                    <div class="progress">
-                        <div
-                            class="progress-bar"
-                            role="progressbar"
-                            style="width: 80%"
-                            aria-valuenow="80"
-                            aria-valuemin="0"
-                            aria-valuemax="100">
-                        </div>
-                    </div>-->
+                <div class="details d-flex justify-content-between">
                 </div>
             </div>
             <div class="d-flex flex-column justify-content-center w-100 space-y-10">
@@ -30,16 +20,14 @@
                     <div class="creators space-x-10">
                         <div class="avatars">
                             <router-link :to="'/profile/' + this.itemCreator">
-                                <img
-                                    :src="require('@/assets/img/avatars/avatar_4.png')"
-                                    alt="Avatar"
-                                    class="avatar avatar-sm"
-                                />
+                                <div v-lazy-container="{ selector: 'img' }">
+                                    <img class="avatar avatar-sm" 
+                                        :data-src="viewUser.avatar || avatarimage" 
+                                        :data-loading="loadimage"/>
+                                    <span class="avatars_name txt_sm ml-1">{{showWalletSeller(this.itemCreator)}}</span>
+                                </div>
                             </router-link>
                         </div>
-                        <router-link :to="'/profile/' + this.itemCreator">
-                            <p class="avatars_name txt_sm">{{showShortName(this.itemCreator)}}</p>
-                        </router-link>
                     </div>
                     <div class="d-flex
                                 align-items-center
@@ -72,13 +60,20 @@
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
+                avatarimage: require("@/assets/img/avatars/avatar_4.png"),
+                viewUser: {},
             };
         },
-        mounted() {
+        async mounted() {
             let box = document.querySelectorAll('.img-box');
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
             })
+
+            this.viewUser = await this.$store.dispatch(
+                            "user/getUserProfile",
+                            this.itemCreator
+            );
         },
         methods: {
             showShortName(name) {
@@ -86,10 +81,17 @@
                     return name;
                 else
                     return (
-                        name.substring(0, 6) +
+                        name.substring(0, 5) +
                         "..." +
-                        name.substring(name.length - 8, name.length)
+                        name.substring(name.length - 5, name.length)
                     );
+            },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 6) +
+                    "..." +
+                    wallet.substring(wallet.length - 7, wallet.length)
+                );
             },
         },
     }
@@ -97,7 +99,6 @@
 
 <style scoped>
     .loadimg {
-        width: 100% !important;
         height: 165px !important;
         text-align: center;
         border-radius: 12px;

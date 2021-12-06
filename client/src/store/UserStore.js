@@ -112,11 +112,8 @@ export const UserStore = {
           return;
         }
 
-        console.log(2222)
-
         if (err != null || !accounts || accounts.length == 0)
         {
-          console.log(3333)
           await dispatch("logoutUser");
           failAlert({
             text: "Please log in to your metamask to continue with this app.",
@@ -124,7 +121,6 @@ export const UserStore = {
         }
         else
         {
-          console.log(4444)
           commit("SET_ACCOUNT", accounts[0]);
 /*
           if (!state.information || state.information.wallet_address != accounts[0])
@@ -137,7 +133,7 @@ export const UserStore = {
         }
       });
     },
-    loginAppoloServer: async ({ dispatch, state }, data) => {
+    loginApolloServer: async ({ dispatch, state }, data) => {
       if (!state.information || state.information.wallet_address != data)
       {
  //       clearInterval(state.AccountInterval);
@@ -148,7 +144,6 @@ export const UserStore = {
     loginMetamask: async ({ commit, dispatch, state }) => {
       if (window.ethereum) {
         try {
-          console.log(1111)
           state.web3 = new Web3(window.ethereum);
           await window.ethereum.enable();
           await dispatch("checkAccounts");
@@ -160,7 +155,6 @@ export const UserStore = {
       }
       else if (window.web3) {
         try {
-          console.log(2222)
           state.web3 = new Web3(window.web3.currentProvider);
           await dispatch("checkAccounts");
         } catch (error) {
@@ -170,7 +164,6 @@ export const UserStore = {
         }
       }
       else {
-        console.log(3333)
         state.web3 = null;
  /*       failAlert({
           text: "Please install metamask for this application",

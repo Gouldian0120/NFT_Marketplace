@@ -84,13 +84,13 @@
                                     <span>
                                         {{showWalletSeller(this.$store.state.user.account)}}
                                     </span>
-                                    <a href="/" class="ml-2">
-                                        <i class="ri-file-copy-line"></i>
-                                    </a>
+                                    <i  @click="copyToClipboard"
+                                            class="ri-file-copy-line color_text cursor-pointer" 
+                                            title="Copy to clipboard"
+                                    ></i>
                                 </div>
                                 <div class="hr"></div>
                                 <div class="links ml-10 mr-10">
-                                    
                                     <router-link :to="'/profile/' + this.$store.state.user.account">
                                         <a href="">
                                             <i class="ri-landscape-line"></i> 
@@ -213,6 +213,27 @@
                     "..." +
                     wallet.substring(wallet.length - 5, wallet.length)
                 );
+            },
+            copyToClipboard() {
+                if (!navigator.clipboard){
+                    var input = document.createElement("input");
+                    input.setAttribute("value", this.profileName);
+                    document.body.appendChild(input);
+                    input.select();
+                    var result = document.execCommand("copy");
+                    document.body.removeChild(input);
+
+                    this.$successAlert({
+                        text: "Copy to clipboard successfull",
+                    });
+                } else{
+                    navigator.clipboard.writeText(this.profileName).then(
+                        console.log("success clipboard")
+                    )
+                    .catch(
+                        console.log("error clipboard")
+                    )
+                }  
             },
         },
     }

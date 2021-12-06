@@ -1,25 +1,34 @@
 <template>
-    <div class="creator_item creator_card space-y-10 is_big">
+    <div class="creator_item creator_card space-y-20 mb-20">
         <div class="avatars flex-column space-y-10">
+            <div class="cover">
+                <router-link :to="'/profile/' + this.itemWallet">
+                    <div v-lazy-container="{ selector: 'img' }">
+                        <img class="img-fluid" :data-src="itemBanner || bannerimage" :data-loading="loadimage"/>
+                    </div>
+                </router-link>
+            </div>
             <div class="media has_border">
                 <router-link :to="'/profile/' + this.itemWallet">
-                        <div v-lazy-container="{ selector: 'img' }">
-                            <img class="loadimg" :data-src="itemAvatar || avatarimage" :data-loading="loadimage"/>
-                        </div>
+                    <div v-lazy-container="{ selector: 'img' }">
+                        <img class="loadimg" :data-src="itemAvatar || avatarimage" :data-loading="loadimage"/>
+                    </div>
                 </router-link>
-                <div class="has_number">
-                    {{index + 1}}
-                </div>
             </div>
-            <div class="text-center">
-                <router-link :to="'/profile/' + this.itemWallet">
-                    <p class="avatars_name large color_black">
-                        {{
-                            showShortName(itemName) || showWalletSeller(itemWallet)
-                        }}
-                    </p>
-                </router-link>
-                <span class="sales color_text">4 sales on 14.28 ETH</span>
+            <div class="details text-center">
+                <div>
+                    <p class="color_black txt_lg">191
+                        <span class="txt_sm">ETH</span></p>
+                    <p class="color_black txt_sm">Sold</p>
+                </div>
+                <div>
+                    <p class="color_black txt_lg">345</p>
+                    <p class="color_black txt_sm">Collections</p>
+                </div>
+                <div>
+                    <p class="color_black txt_lg">17,005</p>
+                    <p class="color_black txt_sm">Views</p>
+                </div>
             </div>
         </div>
     </div>
@@ -36,12 +45,14 @@
             itemId: String,
             itemName: String,
             itemAvatar: String,
+            itemBanner: String,
             itemWallet: String
         },
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
                 avatarimage: require("@/assets/img/avatars/avatar_1.png"),
+                bannerimage: require('@/assets/img/bg/prrofile.png'),
             };
         },
         mounted() {

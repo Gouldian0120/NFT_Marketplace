@@ -5,7 +5,7 @@
                 <div class="img-box zoom-box">
                     <router-link :to="'/marketplace/' + item._id">
                         <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-        <!--                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>-->
+    <!--                        <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>-->
                         </div>
                     </router-link>
                 </div>
@@ -38,12 +38,13 @@
 
 <script>
     export default {
-        name: "collection-card",
+        name: "collection-card-lg",
         props: {
             itemId: String,
             itemName: String,
             cardImage: String,
-            creator: String
+            creator: String,
+            itemCount: Number
         },
         data() {
             return {
@@ -72,16 +73,16 @@
                     return name;
                 else
                     return (
-                        name.substring(0, 6) +
+                        name.substring(0, 8) +
                         "..." +
                         name.substring(name.length - 8, name.length)
                     );
             },
             showWalletSeller(wallet) {
                 return (
-                    wallet.substring(0, 5) +
+                    wallet.substring(0, 8) +
                     "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
+                    wallet.substring(wallet.length - 8, wallet.length)
                 );
             },
             getItem() {
@@ -93,9 +94,7 @@
 
 <style scoped>
     .loadimg {
-        width: 100% !important;
-        height: 178px !important;
-        text-align: center;
+        height: 255px !important;
         border-radius: 12px;
     }
 </style>

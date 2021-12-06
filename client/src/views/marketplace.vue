@@ -18,7 +18,9 @@
                                 getItems();
                                 }
                             ">
-                                <button class="btn btn-sm" style="border:solid 1px #345a77"> All </button>
+                                <button class="btn btn-sm category"> 
+                                    <i class="ri-file-search-line"></i>
+                                    All </button>
                             </a>
                         </li>
                         <li
@@ -38,7 +40,10 @@
                                 }
                             "
                             >
-                            <button class="btn btn-sm" style="border:solid 1px #345a77">{{ category.name }}</button>
+                            <button class="btn btn-sm category">
+                                <i :class="iconlist[i]"></i>
+                                {{ category.name }}
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -108,7 +113,7 @@
                             :src="this.collectionitem.image">
                         <span class="color_green p-10 txt_sm mr-20">{{this.collectionitem.name}}</span>
                         <img width="23px" height="23px" 
-                            :src="require('@/assets/img/close1.svg')" 
+                            :src="require('@/assets/img/close.svg')" 
                             @click="getAll()" class="cursor-pointer"
                             alt="">
                     </span>
@@ -137,12 +142,20 @@
                 </div>
             </div>
         </div>
+        <div class="section__head mt-5 text-align:center">
+            <div 
+                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                @click="loadNextItems"
+                v-if="this.isShowMore"
+                >
+                    Show More
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
     import ItemCard from "../components/item-card";
-//  import CollectionCard from "../components/collection-card";
     
     export default {
         name: "merketplace",
@@ -157,11 +170,19 @@
                     keySearch: null,
                 },
                 categoryID: null,
-                sliders: {
-                    rangeSlider: [101, 700],
-                },
                 filters: {},
-                collectionitem: null
+                collectionitem: null,
+                isShowMore: true,
+                iconlist: [
+                    "ri-brush-line",
+                    "ri-camera-line",
+                    "ri-gamepad-line",
+                    "ri-global-line",
+                    "ri-music-line",
+                    "ri-emotion-laugh-line",
+                    "ri-global-line",
+                    "ri-run-line"
+                ]
             };
         },
         async mounted() {
@@ -185,13 +206,10 @@
             },
         },
         methods: {
-            newValue(e) {
-                this.sliders.rangeSlider[0] = e[0];
-                this.sliders.rangeSlider[1] = e[1];
-            },
             async loadNextItems() {
                 try {
                     this.filterData.keySearch = this.categoryID;
+
                     let newData = await this.$store.dispatch(
                         this.filterName == "All"
                             ? "item/getAllItems"
@@ -201,12 +219,14 @@
                     if (newData && newData.length > 0) {
                         this.listItems.push.apply(this.listItems, newData);
 
-                    if (newData.length == this.filterData.limit) {
-                        this.filterData.skip += newData.length;
-                    } else {
-                        this.skip = 0;
+                        if (newData.length == this.filterData.limit) {
+                            this.filterData.skip += newData.length;
+                        } else {
+                            this.isShowMore = false;
+                        }
                     }
-                    }
+                    else
+                        this.isShowMore = false;
                 } catch (error) {
                     console.log(121212)
                 }
@@ -235,7 +255,7 @@
                 if (this.listItems.length == this.filterData.limit) {
                     this.filterData.skip += this.listItems.length;
                 } else {
-                    this.skip = 0;
+                    this.isShowMore = false;
                 }
             },
             async getCategories() {
@@ -268,5 +288,10 @@
         border:1px solid #fff; 
         border-radius:5px; 
         padding:10px
+    }
+
+    .category {
+        border:solid 1px #345a77; 
+        font-size:12px;
     }
 </style>

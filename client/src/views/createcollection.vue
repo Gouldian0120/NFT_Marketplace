@@ -148,8 +148,6 @@
                 return this.$store.state.category.categories;
             },
             userData() {
-                console.log(34343434)
-                console.log(this.$store.state.user.information)
                 return this.$store.state.user.information;
             },
         },

@@ -1,5 +1,5 @@
 <template>
-    <div class="card__item four" style="width:280px">
+    <div class="card__item four" style="">
         <div class="card_body space-y-10"><!--
             <div class="creators space-x-10">
                 <div class="avatars space-x-3">
@@ -10,7 +10,7 @@
                             class="avatar avatar-sm"/>
                     </router-link>
                     <router-link :to="{name:'profile'}">
-                        <p class="avatars_name txt_xs">{{showShortName(this.itemCreator)}}</p>
+                        <p class="avatars_name txt_xs">{{showWalletSeller(this.itemCreator)}}</p>
                     </router-link>
                 </div>
                 <div class="avatars space-x-3">
@@ -21,7 +21,7 @@
                             class="avatar avatar-sm"/>
                     </router-link>
                     <router-link :to="{name:'profile'}">
-                        <p class="avatars_name txt_xs">{{showShortName(this.itemOwner)}}</p>
+                        <p class="avatars_name txt_xs">{{showWalletSeller(this.itemOwner)}}</p>
                     </router-link>
                 </div>
             </div>-->
@@ -29,7 +29,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-                            <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
+    <!--                        <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
                         </div>
                     </div>
                 </router-link>
@@ -137,6 +137,13 @@
                         "..." +
                         name.substring(name.length - 8, name.length)
                     );
+            },
+            showWalletSeller(wallet) {
+                return (
+                    wallet.substring(0, 5) +
+                    "..." +
+                    wallet.substring(wallet.length - 5, wallet.length)
+                );
             },
         },
     };

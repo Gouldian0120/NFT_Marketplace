@@ -4,58 +4,7 @@
             <div class="container">
                 <h1>Artwork Collections</h1>
             </div>
-        </div><!--
-        <div class="filters bg_white border-b py-20">
-            <div class="container">
-                <div class="row justify-content-between align-items-center">
-                    <div class="col-lg-auto">
-                        <div class="d-flex space-x-10 align-items-center">
-                            <span class="color_text txt_sm"> FILTER BY: </span>
-                            <ul class="menu_categories space-x-20">
-                                <li class="d-flex space-x-10 switch_item">
-                                    <input type="checkbox" id="switch1" />
-                                    <label for="switch1">Toggle</label>
-                                    <span> Has list price </span>
-                                </li>
-                                <li class="d-flex space-x-10 switch_item">
-                                    <input type="checkbox" id="switch2" checked/>
-                                    <label for="switch2">Toggle</label>
-                                    <span> Has open offer </span>
-                                </li>
-                                <li class="d-flex space-x-10 switch_item">
-                                    <input type="checkbox" id="switch3" />
-                                    <label for="switch3">Toggle</label>
-                                    <span> Owned by creator </span>
-                                </li>
-                                <li class="d-flex space-x-10 switch_item">
-                                    <input type="checkbox" id="switch4" />
-                                    <label for="switch4">Toggle</label>
-                                    <span> Has sold </span>
-                                </li>
-                            </ul>                
-                        </div>
-                    </div>
-                    <div class="col-lg-auto">
-                        <div class="d-flex space-x-10 align-items-center sm:mt-20">
-                            <span class="color_text txt_sm"> SORT BY: </span>
-                            <div class="dropdown">
-                                <button class="btn btn-dark btn-sm dropdown-toggle"
-                                    type="button"
-                                    data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
-                                    Recent Active
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>-->
+        </div>
         <div class="seaction mt-100">
             <div class="container">
                 <div class="justify-content-center mb-30_reset">
@@ -83,6 +32,15 @@
                 </div> 
             </div>
         </div>
+        <div class="section__head mt-5 text-align:center">
+            <div 
+                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                @click="loadNextItems"
+                v-if="this.isShowMore"
+                >
+                    Show More
+            </div>
+        </div>
     </div>
 </template>
 
@@ -97,9 +55,10 @@ export default {
             filterName: "All",
             filterData: {
                 skip: 0,
-                limit: 16,
+                limit: 12,
                 keySearch: null,
             },
+            isShowMore: true,
         };
     },
     async mounted() {
@@ -118,16 +77,34 @@ export default {
     methods: {
         async getItems() {
             this.listItems = await this.$store.dispatch("collection/getAllCollections",
-                {
-                    skip: 0,
-                    limit: 16,
-                }
+                this.filterData
             );
 
             if (this.listItems.length == this.filterData.limit) {
                 this.filterData.skip += this.listItems.length;
             } else {
-                this.skip = 0;
+                this.isShowMore = false;
+            }
+        },
+        async loadNextItems() {
+            try {
+                let newData = await this.$store.dispatch(
+                    "collection/getAllCollections",
+                    this.filterData
+                );
+
+                if (newData && newData.length > 0) {
+                    if (newData.length == this.filterData.limit) {
+                        this.filterData.skip += newData.length;
+                    } else {
+                        this.isShowMore = false;
+                    }
+                    this.listItems.push.apply(this.listItems, newData);
+                }
+                else
+                    this.isShowMore = false;
+            } catch (error) {
+                console.log(1212)
             }
         },
     },

@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="container">
-            <div class="row">
+            <div class="row"><!--
                 <div class="col-lg-3 mb-4"  
                     v-for="(item, i) in listUsers"
                     :key="i">
@@ -33,9 +33,19 @@
                         :item-name="item.full_name"
                         :item-wallet="item.wallet_address">
                     </creator-card>
+                </div>-->
+                <div class="col-lg-3 mb-4"  
+                    v-for="n in 8" :key="n">
+                    <creator-card 
+                        :index="n-1"
+                        item-id="123123"
+                        :item-avatar="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/avatar/avatar_1638152056627'"
+                        item-name="Anna"
+                        item-wallet="0xFC242f42127494934efc79386ec03DCc8991d095">
+                    </creator-card>
                 </div>
             </div>
-        </div><!--
+        </div>
         <div class="section__creators mt-100">
             <div class="container">
                 <div class="space-y-30">
@@ -52,7 +62,7 @@
                                         <i class="ri-search-line"></i>
                                     </button>
                                 </div>
-                            </div>
+                            </div><!--
                             <div class="col-lg-auto">
                                 <div class="dropdown">
                                     <button class="btn btn-primary btn-sm dropdown-toggle"
@@ -67,75 +77,62 @@
                                         <a class="dropdown-item" href="#">Something else here</a>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                     <div class="section__body space-y-20">
                         <div class="row mb-20_reset">
                             <div class="col-lg-4" v-for="n in 6" :key="n">
-                                <div class="creator_item creator_card space-y-20 mb-20">
-                                    <div class="avatars flex-column space-y-10">
-                                        <div class="cover">
-                                            <img
-                                                :src="require('@/assets/img/items/cover_1.png')"
-                                                alt="Avatar" class="img-fluid">
-                                        </div>
-                                        <div class="media">
-                                            <router-link :to="{name:'profile'}">
-                                                <img
-                                                    :src="require('@/assets/img/avatars/avatar_5.png')"
-                                                    alt="Avatar" class="avatar avatar-md">
-                                            </router-link>
-                                        </div>
-                                        <div class="details text-center">
-                                            <div>
-                                                <p class="color_black txt_lg">191
-                                                    <span class="txt_sm">ETH</span></p>
-                                                <p class="color_black txt_sm">Sold</p>
-                                            </div>
-                                            <div>
-                                                <p class="color_black txt_lg">345</p>
-                                                <p class="color_black txt_sm">Collections</p>
-                                            </div>
-                                            <div>
-                                                <p class="color_black txt_lg">17,005</p>
-                                                <p class="color_black txt_sm">Views</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <creator-detail-card 
+                                    :index="n-1"
+                                    item-id="123123"
+                                    :item-avatar="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/avatar/avatar_1637952083624'"
+                                    :item-banner="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/banner-user/banner-user_1637957938940'"
+                                    item-name="Danche"
+                                    item-wallet="0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7">
+                                </creator-detail-card>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>-->
+        </div>
+        <div class="section__head mt-5 text-align:center">
+            <div 
+                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                v-if="this.isShowMore"
+                @click="loadNextItems"
+            >
+                Show More
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
     import CreatorCard from "../components/creator-card";
-    import CreatorAvatarCard from "../components/creator-avatar-card";
+    import CreatorDetailCard from "../components/creator-detail-card";
+    //import CreatorAvatarCard from "../components/creator-avatar-card";
 
     export default {
         name: "creators",
-        components: {CreatorCard},
+        components: {CreatorCard, CreatorDetailCard},
         data() {
             return {
                 wallet: null,
                 listUsers: [],
-                listSearchResult: []
+                listSearchResult: [],
+                isShowMore: true,
+                filterData: {
+                    skip: 0,
+                    limit: 12,
+                    keySearch: null,
+                },
             };
         },
         async mounted() {
             this.$loading(true);
-            try {
-                this.listUsers = await this.$store.dispatch("user/getAllUsers")
-            } catch (error) {/*
-                this.$failAlert({
-                    text: error,
-                });*/
-            }
+            this.getItems()
             this.$loading(false);
         },
         computed: {
@@ -165,6 +162,44 @@
                             id: this.wallet,
                         }
                     )
+            },
+            async getItems() {
+                try {
+                    this.listUsers = await this.$store.dispatch("user/getAllUsers", 
+                        this.filterData
+                    );
+                } catch (error) {/*
+                    this.$failAlert({
+                        text: error,
+                    });*/
+                }
+
+                if (this.listUsers.length == this.filterData.limit) {
+                    this.filterData.skip += this.listUsers.length;
+                } else {
+                    this.isShowMore = false;
+                }
+            },
+            async loadNextItems() {
+                try {
+                    let newData = await this.$store.dispatch(
+                        "user/getAllUsers",
+                        this.filterData
+                    );
+
+                    if (newData && newData.length > 0) {
+                        if (newData.length == this.filterData.limit) {
+                            this.filterData.skip += newData.length;
+                        } else {
+                            this.isShowMore = false;
+                        }
+                        this.listUsers.push.apply(this.listUsers, newData);
+                    }
+                    else
+                        this.isShowMore = false;
+                } catch (error) {
+                    console.log(1212)
+                }
             },
         },
     }

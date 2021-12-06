@@ -18,6 +18,15 @@
         </item-card>
       </div>
     </div>
+    <div class="section__head mt-5 text-align:center">
+        <div 
+            class="btn btn-dark btn-sm d-flex align-items-center mx-auto"
+            @click="loadNextItems"
+            v-if="this.isShowMore"
+        >
+            Show More
+        </div>
+    </div>
   </div>
 </template>
 
@@ -52,7 +61,7 @@
         carouselItems: [],
         filterData: {
           skip: 0,
-          limit: 20,
+          limit: 12,
         },
         isShowMore: true,
         profileName: "",
@@ -85,16 +94,17 @@
         try {
           this.profileName = newValue;
           this.filterData.skip = 0;
-          this.filterData.limit = 20;
+          this.filterData.limit = 12;
           this.filterData.wallet_address = newValue;
           this.listItems = await this.$store.dispatch(
             "item/getItemCreated",
             this.filterData
           );
 
-          if (this.listItems.length != this.filterData.limit) {
-            this.isShowMore = false;
-          }
+          if (this.listItems.length == this.filterData.limit) {
+              this.filterData.skip += this.listItems.length;
+          } else
+              this.isShowMore = false;
 
           for (let index = 0; index < this.listItems.length; index++) {
               let tmp = Math.floor(index / 3);

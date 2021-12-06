@@ -33,8 +33,6 @@
         </div>
         <div class="effect">
             <div class="container">
-                <a href="/" class="btn btn-white btn-sm mt-20">
-                    Back to home</a>
                 <div class="hero__wallets pt-20 pb-20">
                     <div class="space-y-20 d-flex flex-column align-items-center">
                         <div class="logo">
@@ -103,7 +101,6 @@
                 return Boolean(ethereum && ethereum.isMetaMask)
             },
             isMetaMaskConnected() {
-                console.log(this.$store.state.user.account)
                 return this.$store.state.user.account != null;
             },
         },
@@ -119,7 +116,7 @@
                 }
             },
             async goToHome() {
-                await this.$store.dispatch("user/loginAppoloServer", this.$store.state.user.account);
+                await this.$store.dispatch("user/loginApolloServer", this.$store.state.user.account);
             },
         }
     }
