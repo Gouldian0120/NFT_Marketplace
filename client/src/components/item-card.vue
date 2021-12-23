@@ -29,7 +29,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-    <!--                        <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
+                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
                         </div>
                     </div>
                 </router-link>
@@ -82,12 +82,12 @@
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
-                            @click="editItem"> Edit Item</a>-->
+                            @click="editItem"> Edit Item</a>
                         <a href="" v-if="this.itemIsputonmarket"
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
-                            > Buy Now</a>
+                            > Buy Now</a>-->
                     </div>
                 </div>
             </div>
@@ -99,14 +99,13 @@
     export default {
         name: "item-card",
         props: {
-            itemId: String,
+            itemId: Number,
             itemName: String,
             itemMinBid: Number,
             cardImage: String,
             itemCreator:String,
             itemOwner:String,
             itemIsputonmarket: Boolean,
-            itemSellOrder: Boolean
         },
         data() {
             return {

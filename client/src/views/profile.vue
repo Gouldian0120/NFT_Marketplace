@@ -276,7 +276,6 @@
                             this.userWallet
                         );
 
-                        console.log(this.viewUser)
                         this.profileName = this.viewUser?.wallet_address;
 
                         let Items = await this.$store.dispatch(

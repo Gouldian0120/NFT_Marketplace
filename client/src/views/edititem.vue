@@ -131,7 +131,7 @@
                                         <option style="font-size:15px"
                                             v-for="(item, i) in listCategory"
                                             :key="i"
-                                            :value="item._id"
+                                            :value="item.id"
                                             >
                                             {{ item.name }}
                                         </option>
@@ -150,7 +150,7 @@
                                         <option style="font-size:15px"
                                             v-for="(item, i) in listCollections"
                                             :key="i"
-                                            :value="item._id"
+                                            :value="item.id"
                                             >
                                             {{ item.name }}
                                         </option>
@@ -206,8 +206,6 @@
             this.$loading(true);
             try {
                 this.item = await this.getItem();
-
-                console.log(this.item.isMarketOption)
 
                 this.sigleItem.isMarketOption = this.item.isMarketOption;
             } catch (error) {

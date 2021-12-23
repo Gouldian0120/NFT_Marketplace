@@ -18,7 +18,7 @@
                                     type="image-circle"
                                     @updateImg="
                                     (img) => {
-                                        userData.fileAvatar = img;
+                                        newCollection.fileAvatar = img;
                                     }
                                         "
                                     />
@@ -81,7 +81,7 @@
                                         <option style="font-size:15px"
                                             v-for="(item, i) in listCategory"
                                             :key="i"
-                                            :value="item._id"
+                                            :value="item.id"
                                             >
                                             {{ item.name }}
                                         </option>
@@ -114,7 +114,7 @@
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Your Email</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.email"
+                                            v-model="newCollection.creator_email"
                                             placeholder="contact@project.com">
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                             this.newCollection
                         );
 
-                        this.$loading(false);
+                        this.$loading(false);/*
                         if (result) {
                             await this.$successAlert({
                                 text: "Create Collection Succesfully",
@@ -185,7 +185,7 @@
                             this.$failAlert({
                                 text: "Create Collection Fail",
                             });
-                        }
+                        }*/
                     } 
                     catch (error) {
                         this.$loading(false);

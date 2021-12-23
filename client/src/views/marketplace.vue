@@ -35,7 +35,7 @@
                             @click="
                                 () => {
                                 filterName = category.name;
-                                categoryID = category._id;
+                                categoryID = category.id;
                                 getItems();
                                 }
                             "
@@ -128,14 +128,13 @@
                             text-center
                             class="mt-3"
                             card-plain
-                            :item-id="item._id"
+                            :item-id="item.id"
                             :item-name="item.name"
                             :item-minBid="item.minBid"
-                            :card-image="item.image"
-                            :item-creator="item.creator"
+                            :card-image="changeImagePath(item.image)"
+                            :item-creator="item.created_by"
                             :item-owner="item.owner"
-                            :item-isputonmarket="item.isPutOnMarket"
-                            :item-sellOrder="item.sellOrder"
+                            :item-isputonmarket="item.is_on_market"
                         >
                         </item-card>
                     </div>
@@ -206,6 +205,14 @@
             },
         },
         methods: {
+            changeImagePath(name) {
+                if (name.substring(0, 7) == "ipfs://") {
+                    let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
+                    return url;
+                }
+                else
+                    return name;
+            },
             async loadNextItems() {
                 try {
                     this.filterData.keySearch = this.categoryID;
@@ -247,7 +254,9 @@
                         {
                             skip: 0,
                             limit: 16,
-                            keySearch: this.categoryID,
+                            filter: {
+                                category_id: this.categoryID,
+                            }
                         }
                     );
                 }

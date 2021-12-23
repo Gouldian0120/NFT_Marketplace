@@ -10,7 +10,7 @@
             text-center
             class="mt-3"
             card-plain
-            :item-id="item._id"
+            :item-id="item.id"
             :item-name="item.name"
             :card-image="item.image"
             :card-bannerimage="item.banner_img"

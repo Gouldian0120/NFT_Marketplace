@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { apolloClient } from "../utils/ApolloClient";
 import { EDIT_USER, LOGIN_USER } from "./graphql/user/mutation";
 import { GET_ALL_USER } from "./graphql/user/query";
@@ -26,14 +27,20 @@ export const UserStore = {
     },
   },
   actions: {
-    getAllUsers: ({ commit }) => {
+    getAllUsers: async ({ commit }, data) => {/*
       return apolloClient
         .mutate({
           mutation: GET_ALL_USER,
         })
-        .then(({ data }) => data.getAllUsers);
+        .then(({ data }) => data.getAllUsers);*/
+
+        const result = await axios.get('http://192.168.107.91:3000/api/user/all', {
+          skip:data.skip, 
+          limit:data.limit, 
+          orderby:['name','ASC'], 
+        })
     },
-    getUserProfile: ({ commit }, data) => {
+    getUserProfile: async ({ commit }, data) => {/*
       return apolloClient
         .mutate({
           mutation: LOGIN_USER,
@@ -41,9 +48,18 @@ export const UserStore = {
             wallet_address: data,
           },
         })
-        .then(({ data }) => data.checkExistUser);
+        .then(({ data }) => data.checkExistUser);*/
+        const result = await axios.get('http://192.168.107.91:3000/api/user/all', {
+          skip:data.skip, 
+          limit:data.limit, 
+          orderby:['name','ASC'], 
+          filter:{
+            wallet_address:data.wallet_address
+          }
+        })
     },
     editProfile: ({ commit }, data) => {
+      /*
       return apolloClient
         .mutate({
           mutation: EDIT_USER,
@@ -53,7 +69,48 @@ export const UserStore = {
           let currentUser = data.updateProfile;
           commit("SET_USER", currentUser);
           localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
-        });
+        });*/
+        axios.put(`http://192.168.107.91:3000/api/user/${data.wallet_address}`, {
+          filter:{
+            name:data.name,
+            description:data.description,
+            short_url:data.short_url,
+            user_email:data.user_email,
+            Socials1:data.Socials1,
+            Socials2:data.Socials2,
+            Socials3:data.Socials3,
+            Socials4:data.Socials4,
+            avatar_img:data.avatar_img,
+            logo_img:data.logo_img,
+          }
+        })
+    },
+    createProfile: ({ commit }, data) => {
+      /*
+      return apolloClient
+        .mutate({
+          mutation: EDIT_USER,
+          variables: data,
+        })
+        .then(({ data }) => {
+          let currentUser = data.updateProfile;
+          commit("SET_USER", currentUser);
+          localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
+        });*/
+        axios.put(`http://192.168.107.91:3000/api/user/`, {
+          filter:{
+            name:data.name,
+            description:data.description,
+            short_url:data.short_url,
+            user_email:data.user_email,
+            Socials1:data.Socials1,
+            Socials2:data.Socials2,
+            Socials3:data.Socials3,
+            Socials4:data.Socials4,
+            avatar_img:data.avatar_img,
+            logo_img:data.logo_img,
+          }
+        })
     },
     getETHRate: ({ commit }) => {/*
       return Request()

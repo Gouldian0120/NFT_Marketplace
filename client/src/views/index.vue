@@ -42,13 +42,13 @@
                                 text-center
                                 class="mt-3"
                                 card-plain
-                                :item-id="item._id"
+                                :item-id="item.id"
                                 :item-name="item.name"
-                                :creator="item.creator"
+                                :creator="item.created_by"
                                 :card-image="item.image"
                                 :item-count="getRecentCollectionItems.length">
                             </collection-card-lg>
-                        </div>
+                        </div><!--
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-6"
@@ -58,7 +58,7 @@
                                         text-center
                                         class="mt-3"
                                         card-plain
-                                        :item-id="item._id"
+                                        :item-id="item.id"
                                         :item-name="item.name"
                                         :itemMinBid="item.minBid"
                                         :item-creator="item.creator"
@@ -67,7 +67,7 @@
                                     </artwork-card>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
@@ -89,12 +89,7 @@
                                     <a class="dropdown-item" href="#">Action</a>
                                     <a class="dropdown-item" href="#">Another action</a>
                                     <a class="dropdown-item" href="#">Something else here</a>
-                                </div><!--
-                                <div class="dropdown-menu space-y-10">
-                                    <div class="links ml-10 mr-10" href="#">Action</div>
-                                    <div class="links ml-10 mr-10" href="#">Another action</div>
-                                    <div class="links ml-10 mr-10" href="#">Something else here</div>
-                                </div>-->
+                                </div>
                             </div>
                         </div>
                         <div class="box">
@@ -165,7 +160,7 @@
                                         text-center
                                         class="mt-3"
                                         card-plain
-                                        :item-id="item._id"
+                                        :item-id="item.id"
                                         :item-name="item.name"
                                         :item-minBid="item.minBid"
                                         :card-image="item.image"
@@ -219,13 +214,13 @@
                                     text-center
                                     class="mt-3"
                                     card-plain
-                                    :item-id="item._id"
+                                    :item-id="item.id"
                                     :item-name="item.name"
-                                    :creator="item.creator"
+                                    :creator="item.created_by"
                                     :card-image="item.image"
                                     :item-count="getRecentCollectionItems.length">
                             </collection-card-lg>
-                        </div>
+                        </div><!--
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-6"
@@ -235,7 +230,7 @@
                                         text-center
                                         class="mt-3"
                                         card-plain
-                                        :item-id="item._id"
+                                        :item-id="item.id"
                                         :item-name="item.name"
                                         :itemMinBid="item.minBid"
                                         :item-creator="item.creator"
@@ -244,7 +239,7 @@
                                     </artwork-card>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
@@ -333,11 +328,11 @@
 <script>
 
     import ItemCard from "../components/item-card";
-    import ArtworkCard from "../components/artwork-card";
+ //   import ArtworkCard from "../components/artwork-card";
     import CollectionCardLg from "../components/collection-card-lg";
 
     export default {
-        components: {ArtworkCard, ItemCard, CollectionCardLg},
+        components: { ItemCard, CollectionCardLg},
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
@@ -356,7 +351,7 @@
             };
         },
         async mounted() {
-            this.$loading(true);
+        //    this.$loading(true);
             let box = document.querySelectorAll('.img-box');
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
@@ -367,16 +362,19 @@
                 await this.getRecentListCollections()
                 await this.getTopCollections()
 
-                this.recentCollectionitem = await this.getDetailCollection(this.carousel[0]._id)
+                this.recentCollectionitem = await this.getDetailCollection(this.carousel[0].id)
                 await this.getTopCollectionsItems()
 
-                this.listUsers = await this.$store.dispatch("user/getAllUsers")
-            } catch (error) {/*
+         //       this.listUsers = await this.$store.dispatch("user/getAllUsers")
+            } catch (error) {
+                this.$loading(false);
+                console.log("error 121212")
+                /*
                 this.$failAlert({
                     text: error,
                 });*/
             }
-            this.$loading(false);
+        //    this.$loading(false);
         },
         computed: {
             getRecentCollectionItems() {
@@ -416,20 +414,19 @@
                     "item/getAllItemsOnSale",
                     {
                         skip: 0,
-                        limit: 12,
+                        limit: 16,
+                        filter:{
+                            is_on_market:1
+                        }
                     }
                 );
 
-                const saleItemsSigned = this.listItemsOnSale.filter(
-                    (x) => x.isPutOnMarket && x.sellOrder
-                );
-
-                for (let index = 0; index < saleItemsSigned.length; index++) {
+                for (let index = 0; index < this.listItemsOnSale.length; index++) {
                     let tmp = Math.floor(index / 4);
                     if (this.carouselItems.length == tmp) {
                         this.carouselItems.push([]);
                     }
-                    this.carouselItems[tmp].push(saleItemsSigned[index]);
+                    this.carouselItems[tmp].push(this.listItemsOnSale[index]);
                 }
             },
             async getRecentListCollections() {
@@ -437,6 +434,7 @@
                     "collection/getAllCollections",
                     {
                         skip: 0,
+                        limit: 1,
                         sortBy: "created_at",
                     }
                 );
@@ -447,7 +445,7 @@
                 this.topColllections = await this.$store.dispatch(
                     "collection/getAllCollections",
                     {
-                        skip: 4,
+                        skip: 0,
                         limit: 1,
                     }
                 );
@@ -456,7 +454,7 @@
                 return await this.$store.dispatch("collection/getDetailCollection", { id: collectionid });
             },
             async getTopCollectionsItems() {
-                this.topCollectionItem = await this.getDetailCollection(this.topColllections[0]._id)
+                this.topCollectionItem = await this.getDetailCollection(this.topColllections[0].id)
 
                 for (let index = 0; index < this.topCollectionItem.items.length; index++) {
                     if (index < 4) {

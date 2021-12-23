@@ -11,7 +11,7 @@
                              class="item_img p-1">
                              <div v-lazy-container="{ selector: 'img' }">
                                 <img class="img"
-                                    :data-src="item.image"
+                                    :data-src="changeImagePath(item.image)"
                                     :data-loading="loadimage"
                                 />
                             </div>
@@ -50,7 +50,7 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Collection</span>
-                                                <span class="row-right">{{ item.collection[0].name }}</span>
+                                                <span class="row-right">{{/* item.collection[0].name*/ }}</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Network</span>
@@ -78,11 +78,11 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Royalty</span>
-                                                <span class="row-right">{{ item.royalties / 100 }}%</span>
+                                                <span class="row-right">{{ item.royalties }}%</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Recipient</span>
-                                                <span class="row-right">0xA9a12a373Ac3ddcF4Ab52b7c9bFb9107f4AfA91e</span>
+                                                <span class="row-right">{{ item.fee_recipient }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="space-y-20">
+                        <div class="space-y-20"><!--
                             <div class="d-flex justify-content-between flex-wrap">
                                 <h3><span style="color:#f8f810">{{ item.name }}</span></h3>
                                 <div class="space-x-10 d-flex align-items-center">
@@ -101,29 +101,29 @@
                                         <span class="txt_sm">2.1k</span>
                                     </a>
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="d-flex space-x-20">
-                                    <a href="" v-if="item.owner == metaMaskAddress && !item.sellOrder" 
+                                    <a href="" v-if="item.owner == metaMaskAddress && !item.is_on_market" 
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="sellItem" > Sell</a>
-                                    <a href="" v-else-if="item.owner == metaMaskAddress && item.sellOrder"
+                                    <a href="" v-else-if="item.owner == metaMaskAddress && item.is_on_market"
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="editItem"> Edit Item</a>
-                                    <a href="" v-else-if="item.isPutOnMarket"
+                                    <a href="" v-else-if="item.is_on_market && item.is_market_option"
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="buyItem"> Buy Now</a>
-                                    <a href="" v-else
+                                    <a href="" v-else-if="item.is_on_market && !item.is_market_option"
                                         class="btn btn-grad btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_bid"
-                                        @click="placeBid"> Place a bid</a>
+                                        > Place a bid</a>
                                 </div>
                                 <div class="space-x-10 d-flex align-items-center">
                                     <div class="share">
@@ -258,7 +258,7 @@
                                         <div :class="{'active':tab===1}" v-if="tab===1" class="tab-pane active" id="tabs-1" role="tabpanel">
                                             <div class="row-detail">
                                                 <span class="row-left">Contract Address</span>
-                                                <span class="row-right">{{ item._id }}</span>
+                                                <span class="row-right">{{ item.id }}</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Token ID</span>
@@ -382,15 +382,15 @@
                             <div v-lazy-container="{ selector: 'img' }">
                                 <img class="loadimg avatar avatar-sm" :data-src="collectionItems.image" :data-loading="loadimage"/>
                                 <span class="avatars_name color_green ml-1">{{ collectionItems.name }}</span>
-                                <span class="color_green text-sm"> ( {{this.collectionItems.items.length}} items )</span>
+                                <span class="color_green text-sm"> ( {{this.collectionItems.count_items}} items )</span>
                             </div>
                         </router-link>
                     </div>
                 </div>
             </div>
-            <div v-if="collectionItems.items && collectionItems.items.length - 1 > 0" class="row mb-30_reset">
+            <div v-if="listOtherItems && listOtherItems.length - 1 > 0" class="row mb-30_reset">
                 <div
-                    v-for="(item1, i) in collectionItems.items.slice(this.from, this.to)"
+                    v-for="(item1, i) in listOtherItems.slice(this.from, this.to)"
                     :key="i"
                     class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
                 >
@@ -398,10 +398,10 @@
                         text-center
                         class="mt-3"
                         card-plain
-                        :item-id="item1._id"
+                        :item-id="item1.id"
                         :item-name="item1.name"
                         :itemMinBid="item1.minBid"
-                        :card-image="item1.image"
+                        :card-image="changeImagePath(item1.image)"
                     >
                     </item-card>
                 </div>
@@ -434,6 +434,7 @@
                 loadimage: require("@/assets/img/loading.gif"),
                 avatarimage: require("@/assets/img/avatars/avatar_4.png"),
                 item: null,
+                listOtherItems: null,
                 collectionItems: null,
                 carouselItems: [],
                 listItems: [],
@@ -525,7 +526,7 @@
 */
             try {
                 this.item = await this.getItem();
-
+/*
                 this.viewCreator = await this.$store.dispatch(
                     "user/getUserProfile",
                     this.item.creator
@@ -534,29 +535,43 @@
                 this.viewOwner = await this.$store.dispatch(
                     "user/getUserProfile",
                     this.item.owner
-                );
+                );*/
             } 
             catch (error) {
                 console.log("error000111")
             }
             
             try {
+                this.listOtherItems = await this.$store.dispatch("item/getAllItems",
+                    {
+                        skip: 0,
+                        limit: 16,
+                        filter: {
+                            collection_id: this.item.collection_id,
+                        }
+                    }
+                );
+
                 this.collectionItems = await this.$store.dispatch(
                     "collection/getDetailCollection", 
                     {
                         skip: 0,
-                        limit: 1,
-                        id: this.item.collection_id 
+                        limit: 16,
+                        filter: {
+                            collection_id: this.item.collection_id,
+                        }
                     }
                 );
 
-                if (this.collectionItems.items.length <= this.limit)
+                console.log(this.collectionItems)
+
+                if (this.listOtherItems.length <= this.limit)
                     this.isShowMore = false;
             } catch (error) {
                 console.log("error2211")
             }
 
-            await this.$store.dispatch("user/getETHRate");
+//            await this.$store.dispatch("user/getETHRate");
             this.$loading(false);
         },
         computed: {
@@ -581,6 +596,14 @@
             },
         },
         methods: {
+            changeImagePath(name) {
+                if (name.substring(0, 7) == "ipfs://") {
+                    let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
+                    return url;
+                }
+                else
+                    return name;
+            },
             showShortName(name) {
                 return (
                 name.substring(0, 6) +

@@ -28,7 +28,7 @@
                     :key="i">
                     <creator-card 
                         :index="i"
-                        :item-id="item._id"
+                        :item-id="item.id"
                         :item-avatar="item.avatar"
                         :item-name="item.full_name"
                         :item-wallet="item.wallet_address">

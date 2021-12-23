@@ -3,7 +3,7 @@
         <div class="card_body space-y-10">
             <div class="card_head h-auto">
                 <div class="img-box zoom-box">
-                    <router-link :to="'/marketplace/' + item._id">
+                    <router-link :to="'/marketplace/' + this.itemId">
                         <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
     <!--                        <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>-->
                         </div>
@@ -11,8 +11,8 @@
                 </div>
             </div>
             <h6 class="card_title">
-                <router-link :to="'/marketplace/' + item._id">
-                    {{showShortName(item.name)}}
+                <router-link :to="'/marketplace/' + this.itemId">
+                    {{showShortName(this.itemName)}}
                 </router-link>
             </h6>
             <div class="hr"></div>
@@ -40,7 +40,7 @@
     export default {
         name: "collection-card-lg",
         props: {
-            itemId: String,
+            itemId: Number,
             itemName: String,
             cardImage: String,
             creator: String,
@@ -57,11 +57,11 @@
         async mounted() {
            try {
                 this.item = await this.getItem();
-
+/*
                 this.viewUser = await this.$store.dispatch(
                             "user/getUserProfile",
                             this.creator
-                        );
+                        );*/
             } 
             catch (error) {
                 console.log("error11")

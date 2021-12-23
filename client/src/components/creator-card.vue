@@ -45,7 +45,6 @@
             };
         },
         mounted() {
-            console.log(this.itemWallet)
         },
         methods: {
             showShortName(name) {
