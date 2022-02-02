@@ -11,6 +11,8 @@ export const GlobalStore = {
     },
     currentLang: "",
     walletAddress: "",
+    messageContent: null,
+    messageType: null,
   },
   actions: {
     setLoading: ({ commit }, loading) => {
@@ -25,6 +27,9 @@ export const GlobalStore = {
     setLang: ({ commit }, currentLang) => {
       commit("SET_LANG", currentLang);
     },
+    showMessage: ({ commit }, data) => {
+      commit(data.kind, data.content);
+    }
   },
   mutations: {
     SET_LOADING(state, data) {
@@ -38,6 +43,22 @@ export const GlobalStore = {
     },
     SET_LANG(state, data) {
       state.currentLang = data;
+    },
+    show_info(state,message) {
+      state.messageContent = message
+      state.messageType = 'info'
+    },
+    show_success(state,message) {
+        state.messageContent = message
+        state.messageType = 'success'
+    },
+    show_error(state,message) {
+        state.messageContent = message
+        state.messageType = 'error'
+    },
+    show_warning(state,message) {
+        state.messageContent = message
+        state.messageType = 'warning'
     },
   },
 };

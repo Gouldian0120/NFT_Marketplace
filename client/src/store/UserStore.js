@@ -1,10 +1,7 @@
 import axios from 'axios'
-import { apolloClient } from "../utils/ApolloClient";
-import { EDIT_USER, LOGIN_USER } from "./graphql/user/mutation";
-import { GET_ALL_USER } from "./graphql/user/query";
 import { Request } from "../utils/Request";
 import Web3 from "web3";
-import { failAlert, successAlert } from "../utils/ComponentUtils";
+import ipfsHttpClient from 'ipfs-http-client'
 
 export const UserStore = {
   namespaced: true,
@@ -14,6 +11,8 @@ export const UserStore = {
     information: null,
     web3: null,
     AccountInterval: null,
+    messageContent: null,
+    messageType: null,
   },
   mutations: {
     SET_ACCOUNT(state,account) {
@@ -25,129 +24,140 @@ export const UserStore = {
     SET_ETH_RATE(state, data) {
       state.ETHRate = data;
     },
+    show_info(state,message) {
+      state.messageContent = message
+      state.messageType = 'info'
+    },
+    show_success(state,message) {
+        state.messageContent = message
+        state.messageType = 'success'
+    },
+    show_error(state,message) {
+        state.messageContent = message
+        state.messageType = 'error'
+    },
+    show_warning(state,message) {
+        state.messageContent = message
+        state.messageType = 'warning'
+    },
   },
   actions: {
-    getAllUsers: async ({ commit }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: GET_ALL_USER,
-        })
-        .then(({ data }) => data.getAllUsers);*/
+    getAllUsers: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/user/all";
 
-        const result = await axios.get('http://192.168.107.91:3000/api/user/all', {
-          skip:data.skip, 
-          limit:data.limit, 
-          orderby:['name','ASC'], 
-        })
-    },
-    getUserProfile: async ({ commit }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: LOGIN_USER,
-          variables: {
-            wallet_address: data,
-          },
-        })
-        .then(({ data }) => data.checkExistUser);*/
-        const result = await axios.get('http://192.168.107.91:3000/api/user/all', {
-          skip:data.skip, 
-          limit:data.limit, 
-          orderby:['name','ASC'], 
+      const result = await axios.get(url, {
+        params: {
+          skip:data.skip,
+          limit:data.limit,
+          orderby:['first_name','ASC'],
           filter:{
-            wallet_address:data.wallet_address
           }
-        })
+        }
+      })
+
+      return result.data.data
     },
-    editProfile: ({ commit }, data) => {
-      /*
-      return apolloClient
-        .mutate({
-          mutation: EDIT_USER,
-          variables: data,
-        })
-        .then(({ data }) => {
-          let currentUser = data.updateProfile;
-          commit("SET_USER", currentUser);
-          localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
-        });*/
-        axios.put(`http://192.168.107.91:3000/api/user/${data.wallet_address}`, {
+    getUserProfileByAddress: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/user/all";
+
+      const result = await axios.get(url, {
+        params: {
           filter:{
-            name:data.name,
-            description:data.description,
-            short_url:data.short_url,
-            user_email:data.user_email,
-            Socials1:data.Socials1,
-            Socials2:data.Socials2,
-            Socials3:data.Socials3,
-            Socials4:data.Socials4,
-            avatar_img:data.avatar_img,
-            logo_img:data.logo_img,
+            address:data.keysearch
           }
-        })
+        }
+      })
+
+      return result.data.data
+    },
+    editProfile: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/user/" + `${data.address}`;
+      let ipfs = await ipfsHttpClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+      
+      if (data.fileAvatar) {
+        const reader = new FileReader()
+        reader.readAsArrayBuffer(data.fileAvatar)
+        reader.onload = async function(file) {
+            const filebytes = file.target.result
+            let ipfsreturn = await ipfs.add(filebytes)
+            let ipfsavatar = 'https://ipfs.io/ipfs/' + ipfsreturn.path
+
+            axios.put(url, {
+              avatar:ipfsavatar,
+            })
+        }
+      }
+
+      if (data.fileBanner) {
+        const reader = new FileReader()
+        reader.readAsArrayBuffer(data.fileBanner)
+        reader.onload = async function(file) {
+            const filebytes = file.target.result
+            let ipfsreturn = await ipfs.add(filebytes)
+            let ipfsbanner_img = 'https://ipfs.io/ipfs/' + ipfsreturn.path
+
+            axios.put(url, {
+              banner_img:ipfsbanner_img,
+            })
+        }
+      }
+
+      axios.put(url, {
+          first_name:data.first_name,
+          last_name:data.last_name,
+          description:data.description,
+          custom_url:data.custom_url,
+          email:data.email,
+          social_link1:data.social_link1,
+          social_link2:data.social_link2,
+          social_link3:data.social_link3,
+          social_link4:data.social_link4,
+      })
+
+      commit('show_success', 'Update user profile successfully!');
     },
     createProfile: ({ commit }, data) => {
-      /*
-      return apolloClient
-        .mutate({
-          mutation: EDIT_USER,
-          variables: data,
-        })
-        .then(({ data }) => {
-          let currentUser = data.updateProfile;
-          commit("SET_USER", currentUser);
-          localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
-        });*/
-        axios.put(`http://192.168.107.91:3000/api/user/`, {
-          filter:{
-            name:data.name,
-            description:data.description,
-            short_url:data.short_url,
-            user_email:data.user_email,
-            Socials1:data.Socials1,
-            Socials2:data.Socials2,
-            Socials3:data.Socials3,
-            Socials4:data.Socials4,
-            avatar_img:data.avatar_img,
-            logo_img:data.logo_img,
-          }
-        })
+      let url = process.env.VUE_APP_SERVER + "/api/user/";
+
+      axios.post(url, {
+          address:data
+      })
     },
-    getETHRate: ({ commit }) => {/*
+    getETHRate: ({ commit }) => {
       return Request()
         .get(
           "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
         )
         .then((res) => {
           commit("SET_ETH_RATE", res.data.ethereum.usd);
-        });*/
-    },
-    loginUser: ({ state, commit, dispatch }, data) => {
-      apolloClient
-        .mutate({
-          mutation: LOGIN_USER,
-          variables: {
-            wallet_address: data,
-          },
-        })
-        .then(({ data }) => {
-          if (data) {
-            let currentUser = data.checkExistUser;
-
-            commit("SET_USER", currentUser);
-
-            localStorage.setItem("metaMaskAddress", currentUser.wallet_address);
-            dispatch("getETHRate");
-
-            successAlert({
-              text: `Login success with address \n ${currentUser.wallet_address}`,
-            });
-          }
         });
+    },
+    loginUser: async ({ state, commit, dispatch }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/user/all";
+
+      const result = await axios.get(url, {
+        params: {
+          filter:{
+            address:data
+          }
+        }
+      })
+
+      if (result.data.data.length > 0) {
+        let currentUser = result.data.data[0];
+
+        commit("SET_USER", currentUser);
+        localStorage.setItem("metaMaskAddress", currentUser.address);
+//      dispatch("getETHRate");
+      }
+      else {
+        await dispatch("createProfile", data);
+      }
     },
     logoutUser: ({ commit, state }) => {
       localStorage.removeItem("metaMaskAddress");
 
-      clearInterval(state.AccountInterval);
+//    clearInterval(state.AccountInterval);
       commit("SET_USER", null);
       commit("SET_ACCOUNT", null);
     },
@@ -161,20 +171,16 @@ export const UserStore = {
       state.web3.eth.getAccounts(async (err, accounts) => {
         const netID = state.web3.utils.hexToNumber(window.ethereum.chainId); //User MetaMask's current status
 
-        if (netID != 3) {
+        if (netID != 4002) {
           await dispatch("logoutUser");
-          failAlert({
-            text: "Current web working with testnet Ropsten",
-          });
+          commit('show_error', 'Current web working with Fantom Testnet');
           return;
         }
 
         if (err != null || !accounts || accounts.length == 0)
         {
           await dispatch("logoutUser");
-          failAlert({
-            text: "Please log in to your metamask to continue with this app.",
-          });
+          commit('show_error', 'Please log in to your metamask to continue with this app.');
         }
         else
         {
@@ -190,12 +196,13 @@ export const UserStore = {
         }
       });
     },
-    loginApolloServer: async ({ dispatch, state }, data) => {
+    loginServer: async ({ dispatch, state, commit }, data) => {
       if (!state.information || state.information.wallet_address != data)
       {
- //       clearInterval(state.AccountInterval);
+ //     clearInterval(state.AccountInterval);
         await dispatch("loginUser", data);
-  //      await dispatch("web3TimerCheck");
+        commit('show_success', 'Login successfully!');
+  //    await dispatch("web3TimerCheck");
       }
     },
     loginMetamask: async ({ commit, dispatch, state }) => {
@@ -205,9 +212,7 @@ export const UserStore = {
           await window.ethereum.enable();
           await dispatch("checkAccounts");
         } catch (error) {
- /*         failAlert({
-            text: error,
-          });*/
+          commit('show_error', 'login metamask error.');
         }
       }
       else if (window.web3) {
@@ -215,16 +220,12 @@ export const UserStore = {
           state.web3 = new Web3(window.web3.currentProvider);
           await dispatch("checkAccounts");
         } catch (error) {
- /*         failAlert({
-            text: error,
-          });*/
+          commit('show_error', 'login metamask error.');
         }
       }
       else {
         state.web3 = null;
- /*       failAlert({
-          text: "Please install metamask for this application",
-        });*/
+        commit('show_error', '"Please install metamask for this application');
       }
     },
   }

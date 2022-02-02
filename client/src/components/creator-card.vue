@@ -15,7 +15,7 @@
                 <router-link :to="'/profile/' + this.itemWallet">
                     <p class="avatars_name large color_black">
                         {{
-                            showShortName(itemName) || showWalletSeller(itemWallet)
+                            showShortName(itemFirstname + " " + itemLastname) || showWalletSeller(itemWallet)
                         }}
                     </p>
                 </router-link>
@@ -34,7 +34,8 @@
                 default:1
             },
             itemId: String,
-            itemName: String,
+            itemFirstname: String,
+            itemLastname: String,
             itemAvatar: String,
             itemWallet: String
         },
@@ -58,11 +59,14 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 5) +
+                        "..." +
+                        wallet.substring(wallet.length - 5, wallet.length)
+                    );
             },
         },
     }

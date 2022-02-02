@@ -1,266 +1,759 @@
 import Web3 from "web3";
+import MarketPlace from "../assets/abis/MarketPlace.json";
 import ExchangeV1 from "../assets/abis/ExchangeV1.json";
 import RaribleToken from "../assets/abis/RaribleToken.json";
 import WETH from "../assets/abis/WETH.json";
-import { failAlert } from "./ComponentUtils";
 import store from "../store";
 
 import { ZERO_ADDRESS, ONE_ETHER, ASSET_TYPE } from "./Constants";
 
 export const Web3Ultils = {
-  sellItem: async function (result, item, metaMaskAddress) {
-    if (window.ethereum && process.env.VUE_APP_RARIBLE_ADDRESS) {
+  sellItem: async function (item, nftAddress, status, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
       window.web3 = new Web3(window.ethereum);
       try {
         await window.ethereum.enable();
 
-        const myContractRaribleToken = new window.web3.eth.Contract(
-          RaribleToken,
-          process.env.VUE_APP_RARIBLE_ADDRESS
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
         );
-        //Mint Item
-        if (!result.isMinted) {
-          await store.dispatch("global/setLoadingTitle", "Mint Asset");
-          await this.mintItem(
-            result,
-            item,
-            myContractRaribleToken,
-            metaMaskAddress
-          );
+
+        await store.dispatch("global/setLoadingTitle", "Create Order");
+
+        const createOrder = await myContractMarketPlace.methods
+                  .createOrder(
+                    nftAddress,
+                    item.token_id,
+                    item.min_bid,
+                    item.expire_bid,
+                    item.is_market_option
+                  ).send({ from: metaMaskAddress });
+  
+        if (createOrder) {
+          item.sell_transaction_hash = createOrder.transactionHash;
+          await store.dispatch("item/editItem", item);
+          await store.dispatch("auction/createOrder", 
+          {
+            collection_id: item.collection_id,
+            token_id: item.token_id,
+            owner: item.owner,
+            min_bid: item.min_bid,
+            start_at: item.start_at,
+            expires_at: item.expires_at,
+          });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "List",
+                price: item.min_bid,
+                from: metaMaskAddress,
+                to: process.env.VUE_APP_ZEROADDRESS
+              });
         }
 
-        //Approve
-        if (process.env.VUE_APP_TRANSFER_PROXY) {
-          await store.dispatch("global/setLoadingTitle", "Approve Asset");
-          await this.approveItem(myContractRaribleToken, metaMaskAddress);
+        return true;
 
-          //Sign Order
-          if (process.env.VUE_APP_WETH && !item.sellOrder) {
-            await store.dispatch("global/setLoadingTitle", "Sign Order Asset");
-            await this.signOrder(result, item, metaMaskAddress);
-          }
-          return true;
-        }
       } catch (error) {
         if (error.message) {
-          failAlert({
-            text: error.message,
-          });
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
         } else {
-          failAlert({
-            text: error,
-          });
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
         }
         return false;
       }
     } else {
-      failAlert({
-        text:
-          "Non-Ethereum browser detected. You should consider trying MetaMask!",
-      });
+      this.$store.dispatch("global/showMessage",
+          {   
+              kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
       return false;
     }
   },
 
-  mintItem: async function (
-    result,
-    item,
-    myContractRaribleToken,
-    metaMaskAddress
-  ) {
-    const mint = await myContractRaribleToken.methods
-      .mint(
-        result.token_id,
-        result.v,
-        result.r,
-        result.s,
-        [
-          {
-            recipient: metaMaskAddress,
-            value: item.royalties,
-          },
-        ],
-        item.total_quantity,
-        `/test_${result.token_id}`
-      )
-      .send({ from: metaMaskAddress }); // return mint address
-    item.id = item._id;
-    item.mintTransactionHash = mint.transactionHash;
-    item.wallet_address = metaMaskAddress;
-    store.dispatch("item/editItem", item);
-  },
-
-  approveItem: async function (myContractRaribleToken, metaMaskAddress) {
-    const isApprove = await myContractRaribleToken.methods
-      .isApprovedForAll(metaMaskAddress, process.env.VUE_APP_TRANSFER_PROXY)
-      .call();
-
-    if (!isApprove) {
-      await myContractRaribleToken.methods
-        .setApprovalForAll(process.env.VUE_APP_TRANSFER_PROXY, true)
-        .send({ from: metaMaskAddress });
-    }
-  },
-
-  signOrder: async function (result, item, metaMaskAddress) {
-    const sellOrder = {
-      key: {
-        owner: metaMaskAddress,
-        salt: new Date().getTime(),
-        sellAsset: {
-          token: process.env.VUE_APP_RARIBLE_ADDRESS,
-          tokenId: result.token_id,
-          assetType: ASSET_TYPE.ERC1155,
-        },
-        buyAsset: {
-          // token: process.env.VUE_APP_WETH, //WETH
-          token: ZERO_ADDRESS,
-          tokenId: 0,
-          // assetType: ASSET_TYPE.ERC20, // ERC20 use with WETH
-          assetType: ASSET_TYPE.ETH,
-        },
-      },
-      selling: 1,
-      buying: `${item.minBid * ONE_ETHER}`,
-      // sellerFee: 2500,//charge fee 25%
-      sellerFee: process.env.VUE_APP_SELL_FEE,
-    };
-
-    const hash = window.web3.utils.keccak256(
-      window.web3.eth.abi.encodeParameters(
-        [
-          {
-            Order: {
-              key: {
-                owner: "address",
-                salt: "uint256",
-                sellAsset: {
-                  token: "address",
-                  tokenId: "uint256",
-                  assetType: "uint",
-                },
-                buyAsset: {
-                  token: "address",
-                  tokenId: "uint256",
-                  assetType: "uint",
-                },
-              },
-              selling: "uint256",
-              buying: "uint256",
-              sellerFee: "uint256",
-            },
-          },
-        ],
-        [sellOrder]
-      )
-    );
-
-    const signature = await window.web3.eth.personal.sign(
-      hash.slice(2),
-      metaMaskAddress
-    );
-
-    if (signature) {
-      item.signature = signature;
-      item.wallet_address = metaMaskAddress;
-      item.id = item._id;
-      item.isPutOnMarket = true;
-      item.sellOrder = JSON.stringify(sellOrder);
-      store.dispatch("item/editItem", item);
-    }
-  },
-  convertSignature: async function (signature) {
-    return {
-      r: signature.substring(0, 66),
-      s: `0x${signature.substring(66, 130)}`,
-      v: `0x${signature.substring(130, 132)}`,
-    };
-  },
-  buyAsset: async function (result, item, metaMaskAddress) {
-    if (window.ethereum && process.env.VUE_APP_EXCHANGE_V1) {
+  updateOrder: async function (item, nftAddress, price, auctionId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
       window.web3 = new Web3(window.ethereum);
       try {
         await window.ethereum.enable();
 
-        //Approve exchange token
-
-        // await store.dispatch(
-        //   "global/setLoadingTitle",
-        //   "Approve Exchange Token"
-        // );
-        // await this.approveToken(item.minBid, metaMaskAddress);
-
-        const exchangeV1 = new window.web3.eth.Contract(
-          ExchangeV1,
-          process.env.VUE_APP_EXCHANGE_V1
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
         );
 
-        const signature = await this.convertSignature(result.signature);
-        const buyerFeeSignature = await this.convertSignature(
-          result.buyerFeeSignature
+        await store.dispatch("global/setLoadingTitle", "Update Order");
+
+        const updateOrder = await myContractMarketPlace.methods
+                  .updateOrder(
+                    nftAddress,
+                    item.token_id,
+                    price
+                  ).send({ from: metaMaskAddress });
+  
+        if (updateOrder) {
+          item.sell_transaction_hash = updateOrder.transactionHash;
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              min_bid: price
+            }
+          );
+
+          await store.dispatch("auction/updateOrder", 
+          {
+            id: auctionId,
+            min_bid: price,
+          });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Update List",
+                price: price,
+                from: metaMaskAddress,
+                to: process.env.VUE_APP_ZEROADDRESS
+              });
+        }
+
+        return true;
+
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   
+              kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  cancelOrder: async function (item, nftAddress, auctionId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
         );
-        const sellOrder = JSON.parse(result.sellOrder);
+
+        await store.dispatch("global/setLoadingTitle", "Cancel Order");
+
+        const cancelOrder = await myContractMarketPlace.methods
+                  .cancelOrder(
+                    nftAddress,
+                    item.token_id
+                  ).send({ from: metaMaskAddress });
+  
+        if (cancelOrder) {
+          item.sell_transaction_hash = cancelOrder.transactionHash;
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              is_on_market: 0
+            }
+          );
+
+          await store.dispatch("auction/updateOrder", 
+          {
+            id: auctionId,
+            closed: 2,
+          });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Cancel List",
+                price: 0,
+                from: metaMaskAddress,
+                to: process.env.VUE_APP_ZEROADDRESS
+              });
+        }
+
+        return true;
+
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   
+              kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  buyItem: async function (item, nftAddress, auctionId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
 
         //Sign Exchange
-        await store.dispatch("global/setLoadingTitle", "Sign Exchange");
-        const exchangeResult = await exchangeV1.methods
-          .exchange(
-            [
-              [
-                sellOrder.key.owner,
-                sellOrder.key.salt,
-                [
-                  sellOrder.key.sellAsset.token,
-                  sellOrder.key.sellAsset.tokenId,
-                  sellOrder.key.sellAsset.assetType,
-                ],
-                [
-                  sellOrder.key.buyAsset.token,
-                  sellOrder.key.buyAsset.tokenId,
-                  sellOrder.key.buyAsset.assetType,
-                ],
-              ],
-              sellOrder.selling,
-              sellOrder.buying,
-              sellOrder.sellerFee,
-            ],
-            [window.web3.utils.hexToNumber(signature.v), signature.r, signature.s],
-            result.buyerFee,
-            [
-              window.web3.utils.hexToNumber(buyerFeeSignature.v),
-              buyerFeeSignature.r,
-              buyerFeeSignature.s,
-            ],
-            1,
-            metaMaskAddress
-          )
-          .send({ from: metaMaskAddress, value: `${item.minBid * ONE_ETHER}` });
+        await store.dispatch("global/setLoadingTitle", "Buy Item");
+        const buyItem = await myContractMarketPlace.methods
+                .Buy(nftAddress, item.token_id)
+                .send({ from: metaMaskAddress, value: `${item.minBid * ONE_ETHER}` });
 
-        if (exchangeResult) {
+        if (buyItem) {
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              last_bid: item.min_bid,
+              owner: metaMaskAddress,
+            }
+          );
+
           await store.dispatch("item/updateOwner", {
+            id: item.id,
+            owner: metaMaskAddress,
+          });
+
+          await store.dispatch("auction/updateOrder", 
+          {
+            id: auctionId,
+            last_bid: item.min_bid,
+            winner: metaMaskAddress,
+            closed: 1
+          });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Sell",
+                price: item.last_bid,
+                from: metaMaskAddress,
+                to: item.owner
+              });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Transfer",
+                price: 0,
+                from: item.owner,
+                to: metaMaskAddress
+              });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  placeBid: async function (item, nftAddress, price, startAt, expiresAt, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Place Bid");
+        const placeBid = await myContractMarketPlace.methods
+              .placeBid(nftAddress, item.token_id)
+              .send({ from: metaMaskAddress, value: `${price * ONE_ETHER}` });
+
+        if (placeBid) {
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              hasBid: 1,
+            }
+          );
+
+          await store.dispatch("auction/addOffer", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                proposed_by: metaMaskAddress,
+                price: price,
+                startAt: startAt,
+                expiresAt: expiresAt,   // = oder.expiresAt + 7 days
+                type: 0,                // 0 -> bid, 1 -> offer
+                closed: 0               // 0 -> open, 1 -> accept, 2 -> cancel
+              });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Bid",
+                price: price,
+                from: metaMaskAddress,
+                to: process.env.VUE_APP_ZEROADDRESS
+              });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  cancelBid: async function (item, nftAddress, bidID, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Cancel bid");
+        const cancelBid = await myContractMarketPlace.methods
+          .cancelBid(nftAddress, item.token_id)
+          .send({ from: metaMaskAddress});
+
+        if (cancelBid) {
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              hasBid: 0,
+            }
+          );
+
+          await store.dispatch("auction/updateOffer", 
+              {
+                id: bidID,
+                closed: 2               // 0 -> open, 1 -> accept, 2 -> cancel
+              });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Cancel Bid",
+                price: item.last_bid,
+                from: metaMaskAddress,
+                to: process.env.VUE_APP_ZEROADDRESS
+              });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message26jy62xw
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  acceptBid: async function (item, nftAddress, price, buyer, bidId, auctionId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Accept Bid");
+        const acceptBid = await myContractMarketPlace.methods
+          .acceptBid(nftAddress, item.token_id, price)
+          .send({ from: metaMaskAddress });
+
+        if (acceptBid) {
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              last_bid: price,
+              owner: buyer,
+            }
+          );
+
+          await store.dispatch("auction/updateOrder", 
+          {
+            id: auctionId,
+            last_bid: price,
+            winner: buyer,
+            closed: 1
+          });
+
+          await store.dispatch("auction/updateOffer", {
+            id: bidId,
+            closed: 1               // 0 -> open, 1 -> accept, 2 -> cancel
+          });
+
+          await store.dispatch("activity/addActivity", {
+            collection_id: item.collection_id,
             token_id: item.token_id,
-            wallet_address: metaMaskAddress,
+            event: "Sell",
+            price: item.last_bid,
+            from: buyer,
+            to: metaMaskAddress
+          });
+
+          await store.dispatch("activity/addActivity", {
+            collection_id: item.collection_id,
+            token_id: item.token_id,
+            event: "Transfer",
+            price: 0,
+            from: metaMaskAddress,
+            to: buyer
           });
         }
 
         return true;
       } catch (error) {
         if (error.message) {
-          failAlert({
-            text: error.message,
-          });
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
         } else {
-          failAlert({
-            text: error,
-          });
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
         }
         return false;
       }
     } else {
-      failAlert({
-        text:
-          "Non-Ethereum browser detected. You should consider trying MetaMask!",
-      });
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  makeOffer: async function (item, nftAddress, price, startAt, expiresAt, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Make Offer");
+        const makeOffer = await myContractMarketPlace.methods
+              .makeOffer(nftAddress, item.token_id, price, expiresAt)
+              .send({ from: metaMaskAddress});
+
+        if (makeOffer) {
+          await store.dispatch("auction/addOffer", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                proposed_by: metaMaskAddress,
+                price: price,
+                startAt: startAt,
+                expiresAt: expiresAt,   // = oder.expiresAt + 7 days
+                type: 1,                // 0 -> bid, 1 -> offer
+                closed: 0               // 0 -> open, 1 -> accept, 2 -> cancel
+              });
+          
+          await store.dispatch("activity/addActivity", 
+          {
+            collection_id: item.collection_id,
+            token_id: item.token_id,
+            event: "Offer",
+            price: price,
+            from: metaMaskAddress,
+            to: process.env.VUE_APP_ZEROADDRESS
+          });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  cancelOffer: async function (item, nftAddress, index, price, offerId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Cancel Offer");
+        const cancelOffer = await myContractMarketPlace.methods
+          .cancelOffer(nftAddress, item.token_id, index)
+          .send({ from: metaMaskAddress});
+
+        if (cancelOffer) {
+          await store.dispatch("auction/updateOffer", {
+            id: offerId,
+            closed: 2               // 0 -> open, 1 -> accept, 2 -> cancel
+          });
+
+          await store.dispatch("activity/addActivity", 
+          {
+            collection_id: item.collection_id,
+            token_id: item.token_id,
+            event: "Cancel Offer",
+            price: price,
+            from: metaMaskAddress,
+            to: process.env.VUE_APP_ZEROADDRESS
+          });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
+      return false;
+    }
+  },
+
+  acceptOffer: async function (item, nftAddress, buyer, price, index, offerId, auctionId, metaMaskAddress) {
+    if (window.ethereum && process.env.VUE_APP_MARKETPLACE) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.enable();
+
+        const myContractMarketPlace = new window.web3.eth.Contract(
+          MarketPlace,
+          process.env.VUE_APP_MARKETPLACE
+        );
+
+        await store.dispatch("global/setLoadingTitle", "Accept Offer");
+        const acceptOffer = await myContractMarketPlace.methods
+            .acceptOffer(nftAddress, item.token_id, index)
+            .send({ from: metaMaskAddress});
+
+        if (acceptOffer) {
+          await store.dispatch("item/editItem", 
+            {
+              id: item.id,
+              last_bid: price,
+              owner: buyer,
+            }
+          );
+
+          await store.dispatch("auction/updateOffer", {
+            id: offerId,
+            closed: 1               // 0 -> open, 1 -> accept, 2 -> cancel
+          });
+
+          await store.dispatch("auction/updateOrder", 
+          {
+            id: auctionId,
+            last_bid: price,
+            winner: buyer,
+            closed: 1
+          });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Sell",
+                price: price,
+                from: buyer,
+                to: metaMaskAddress
+              });
+
+          await store.dispatch("activity/addActivity", 
+              {
+                collection_id: item.collection_id,
+                token_id: item.token_id,
+                event: "Transfer",
+                price: 0,
+                from: metaMaskAddress,
+                to: buyer
+              });
+        }
+
+        return true;
+      } catch (error) {
+        if (error.message) {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error.message
+              }
+          );
+        } else {
+          store.dispatch("global/showMessage",
+              {   kind:'show_error',
+                  content: error
+              }
+          );
+        }
+        return false;
+      }
+    } else {
+      this.$store.dispatch("global/showMessage",
+          {   kind:'show_error',
+              content: 'Non-Ethereum browser detected. You should consider trying MetaMask!'
+          }
+      );
       return false;
     }
   },
@@ -272,16 +765,15 @@ export const Web3Ultils = {
     );
 
     const allowance = await wethContract.methods
-      .allowance(metaMaskAddress, process.env.VUE_APP_ERC20_TRANSFER_PROXY)
+      .allowance(metaMaskAddress, process.env.VUE_APP_MARKETPLACE)
       .call();
 
     const totalSupply = await wethContract.methods.totalSupply().call();
 
     if (allowance < price * ONE_ETHER) {
       const approve = await wethContract.methods
-        .approve(process.env.VUE_APP_ERC20_TRANSFER_PROXY, totalSupply)
+        .approve(process.env.VUE_APP_MARKETPLACE, totalSupply)
         .send({ from: metaMaskAddress });
-
     }
   },
 };

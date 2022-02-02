@@ -8,34 +8,27 @@
 <div class="bg_white border-b py-20">
     <div class="container">
         <div class="d-flex justify-content-center">
-            <ul class="menu_activity space-x-20">
-                <li> <a href="#">
-                        <i class="ri-gamepad-line"></i> <span> Games </span>
-                    </a>
-                </li>
-                <li> <a href="#">
+            <ul class="menu_categories space-x-20">
+                <li class="btn btn-white btn-sm">
                         <i class="ri-brush-line"></i> <span> Art </span>
-                    </a>
                 </li>
-                <li> <a href="#">
+                <li class="btn btn-white btn-sm">
+                        <i class="ri-gamepad-line"></i> <span> Games </span>
+                </li>
+                <li class="btn btn-white btn-sm">
                         <i class="ri-stock-line"></i> <span> Trading Cards </span>
-                    </a>
                 </li>
-                <li> <a href="#">
+                <li class="btn btn-white btn-sm">
                         <i class="ri-music-line"></i> <span> Music </span>
-                    </a>
                 </li>
-                <li> <a href="#">
+                <li class="btn btn-white btn-sm">
                         <i class="ri-global-line"></i> <span> Domain Names </span>
-                    </a>
                 </li>
-                <li> <a href="#">
+                <li class="btn btn-white btn-sm">
                         <i class="ri-emotion-laugh-line"></i> <span> Memes </span>
-                    </a>
                 </li>
-                <li> <a href="#">
+                <li class="btn btn-white btn-sm">
                         <i class="ri-layout-4-line"></i> <span> Collectibles </span>
-                    </a>
                 </li>
             </ul>        </div>
     </div>
@@ -47,17 +40,28 @@
                     mb-20">
                     <a href="#">Mark all read</a>
                     <div class="dropdown">
-                        <button class="btn btn-dark btn-sm dropdown-toggle"
-                            type="button"
-                            data-toggle="dropdown" aria-haspopup="true"
-                            aria-expanded="false">
+                        <button class="btn-white btn-sm dropdown-toggle" type="button"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
                             Recent Active
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else
-                                here</a>
+                            <div class="links ml-10 mr-10">
+                                <a href="">
+                                    <span class="p-2">Action</span>
+                                </a>
+                            </div>
+                            <div class="links ml-10 mr-10">
+                                <a href="">
+                                    <span class="p-2">Another action</span>
+                                </a>
+                            </div>
+                            <div class="links ml-10 mr-10">
+                                <a href="">
+                                    <span class="p-2">Something else</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

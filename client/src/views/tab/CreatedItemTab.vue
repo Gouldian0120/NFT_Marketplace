@@ -12,15 +12,18 @@
             card-plain
             :item-id="item.id"
             :item-name="item.name"
-            :item-minBid="item.minBid"
-            :card-image="item.image"
+            :item-minBid="item.min_bid"
+            :card-image="changeImagePath(item.image)"
+            :item-owner="item.owner"
+            :item-isonmarket="item.is_on_market"
+            :item-favoritecount="item.favorite_count"
         >
         </item-card>
       </div>
     </div>
     <div class="section__head mt-5 text-align:center">
         <div 
-            class="btn btn-dark btn-sm d-flex align-items-center mx-auto"
+            class="btn btn-white btn-sm d-flex align-items-center mx-auto"
             @click="loadNextItems"
             v-if="this.isShowMore"
         >
@@ -44,7 +47,6 @@
           this.loadFirst(newValue);
         } else {
           this.profileName = null;
-          this.filterData.wallet_address = null;
           this.listItems = [];
         }
       },
@@ -68,10 +70,18 @@
       };
     },
     methods: {
+      changeImagePath(name) {
+          if (name.substring(0, 7) == "ipfs://") {
+              let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
+              return url;
+          }
+          else
+              return name;
+      },
       async loadNextItems() {
         try {
           let newData = await this.$store.dispatch(
-            "item/getItemCreated",
+            "item/getItemForCreator",
             this.filterData
           );
 
@@ -93,11 +103,9 @@
         this.$loading(true);
         try {
           this.profileName = newValue;
-          this.filterData.skip = 0;
-          this.filterData.limit = 12;
-          this.filterData.wallet_address = newValue;
+          this.filterData.keysearch = newValue;
           this.listItems = await this.$store.dispatch(
-            "item/getItemCreated",
+            "item/getItemForCreator",
             this.filterData
           );
 

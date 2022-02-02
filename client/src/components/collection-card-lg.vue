@@ -5,7 +5,7 @@
                 <div class="img-box zoom-box">
                     <router-link :to="'/marketplace/' + this.itemId">
                         <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-    <!--                        <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>-->
+                            <img class="loadimg" :data-src="this.cardImage" :data-loading="loadimage"/>
                         </div>
                     </router-link>
                 </div>
@@ -79,11 +79,14 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 8) +
-                    "..." +
-                    wallet.substring(wallet.length - 8, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 8) +
+                        "..." +
+                        wallet.substring(wallet.length - 8, wallet.length)
+                    );
             },
             getItem() {
                 return this.$store.dispatch("collection/getDetailCollection", { id: this.itemId });
@@ -94,7 +97,7 @@
 
 <style scoped>
     .loadimg {
-        height: 255px !important;
+        height: 303px !important;
         border-radius: 12px;
     }
 </style>

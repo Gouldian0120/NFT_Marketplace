@@ -5,6 +5,20 @@
       <img style="width: 50px" :src="loadimage" />
       <span class="pl-10" style="color:yellow; font-size:30px"> Loading...</span>
     </div>
+    <div class="modal modal-bg show" v-show="loadingModal.isShow">
+      <modal>
+        <template slot="header">
+          <h4 class="modal-title">
+            Authorizing your account for {{ loadingModal.title }}
+          </h4>
+        </template>
+        <template slot="body">
+          <p>{{ loadingModal.description }}</p>
+          <img style="width: 100%" src="./assets/img/modelImg.png" />
+          <img style="width: 50px" :src="loadimage" />
+        </template>
+      </modal>
+    </div>
     <router-view/>
     <app-footer></app-footer>
     <bid></bid>
@@ -24,8 +38,9 @@
   import BidSuccess from "./components/modals/bidSuccess";
   import History from "./components/modals/history";
   import Report from "./components/modals/report";
+  import Modal from "./components/modals/modal.vue";
   export default {
-    components: {Report, History, BidSuccess, Bid, AppFooter, AppHeader},
+    components: {Report, History, BidSuccess, Bid, AppFooter, AppHeader, Modal},
     data: () => ({
         layout: null,
         hasRole: true,
@@ -35,6 +50,9 @@
     computed: {
         loading() {
           return this.$store.state.global.loading;
+        },
+        loadingModal() {
+          return this.$store.state.global.loadingModal;
         },
     },
   }

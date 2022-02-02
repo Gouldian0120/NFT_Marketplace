@@ -3,16 +3,16 @@
         <div class="card_body space-y-10">
             <div class="card_head h-auto">
                 <div class="img-box zoom-box">
-                    <router-link :to="'/marketplace/' + item._id">
+                    <router-link :to="'/marketplace/' + this.itemId">
                         <div v-lazy-container="{ selector: 'img' }" style="text-align:center">
-        <!--                    <img class="loadimg" :data-src="item.image" :data-loading="loadimage"/>-->
+                            <img class="loadimg" :data-src="this.cardImage" :data-loading="loadimage"/>
                         </div>
                     </router-link>
                 </div>
             </div>
             <h6 class="card_title">
-                <router-link :to="'/marketplace/' + item._id">
-                    {{showShortName(item.name)}}
+                <router-link :to="'/marketplace/' + this.itemId">
+                    {{showShortName(this.itemName)}}
                 </router-link>
             </h6>
             <div class="hr"></div>
@@ -32,6 +32,29 @@
                 <span class="color_green txt_sm">
                     {{this.itemCount}} items</span>
             </div>
+            <div class="d-flex
+                            align-items-center
+                            space-x-10
+                            justify-content-between mt-3">
+                <div class="d-flex align-items-center space-x-5">
+                    <i class="ri-history-line"></i>
+                    <router-link :to="{name:'home'}" data-toggle="modal"
+                                    data-target="#popup_history">
+                        <p class="color_text txt_sm view_history" style="width: auto">
+                            View History
+                        </p>
+                    </router-link>
+                </div>
+                <div  v-if="this.creator == metaMaskAddress && this.editable" 
+                        class="d-flex align-items-center space-x-5">
+                    <router-link :to="'/editcollection/' + this.itemId">
+                        <div class="btn btn-sm btn-primary" 
+                            data-toggle="modal"
+                            data-target="#popup_buy"
+                            > Edit</div>
+                    </router-link>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -40,10 +63,12 @@
     export default {
         name: "collection-card",
         props: {
-            itemId: String,
+            itemId: Number,
             itemName: String,
             cardImage: String,
-            creator: String
+            creator: String,
+            itemCount: Number,
+            editable: Boolean
         },
         data() {
             return {
@@ -56,15 +81,25 @@
         async mounted() {
            try {
                 this.item = await this.getItem();
-
-                this.viewUser = await this.$store.dispatch(
-                            "user/getUserProfile",
+                let creator;
+                creator = await this.$store.dispatch(
+                            "user/getUserProfileByAddress",
                             this.creator
                         );
+
+                this.viewUser = creator[0];
             } 
             catch (error) {
                 console.log("error11")
             }
+        },
+       computed: {
+            userData() {
+                return this.$store.state.user?.information;
+            },
+            metaMaskAddress() {
+                return this.userData?.address;
+            },
         },
         methods: {
             showShortName(name) {
@@ -78,14 +113,17 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 5) +
+                        "..." +
+                        wallet.substring(wallet.length - 5, wallet.length)
+                    );
             },
             getItem() {
-                return this.$store.dispatch("collection/getDetailCollection", { id: this.itemId });
+                return this.$store.dispatch("collection/getDetailCollection", { keysearch: this.itemId });
             },
         },
     }
@@ -93,9 +131,7 @@
 
 <style scoped>
     .loadimg {
-        width: 100% !important;
-        height: 178px !important;
-        text-align: center;
+        height: 211px !important;
         border-radius: 12px;
     }
 </style>

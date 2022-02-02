@@ -15,9 +15,9 @@
                             wallet,
                             now you can start bidding or upload your own art!</p>
                         <div class="d-flex justify-content-center space-x-20">
-                           <!-- <button class="btn btn-grad" @click="goTo('marketplace')" data-dismiss="modal">
-                                Discover Assets</button>-->
-                            <button class="btn btn-grad" @click="goToHome()" data-dismiss="modal">
+                           <button class="btn btn-grad" @click="goTo('marketplace')" data-dismiss="modal">
+                                Discover Assets</button>
+                            <button class="btn btn-grad" @click="goTo('')" data-dismiss="modal">
                                 Go to Home</button>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
         },
         computed: {
             metaMaskAddress() {
-                return this.$store.state.user.information?.wallet_address;
+                return this.$store.state.user.information?.address;
             },
             isMetaMaskInstalled() {
                 const {ethereum} = window;
@@ -115,8 +115,9 @@
                     });
                 }
             },
-            async goToHome() {
-                await this.$store.dispatch("user/loginApolloServer", this.$store.state.user.account);
+            async goTo(url) {
+                await this.$store.dispatch("user/loginServer", this.$store.state.user.account);
+                this.$router.push("/" + url);
             },
         }
     }

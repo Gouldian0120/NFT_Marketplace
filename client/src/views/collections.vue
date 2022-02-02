@@ -21,10 +21,10 @@
                                 :item-id="item.id"
                                 :item-name="item.name"
                                 :card-image="item.image"
-                                :card-bannerimage="item.banner_img"
-                                :creator="item.creator"
+                                :card-bannerimage="item.banner_image"
+                                :creator="item.created_by"
                                 :category-id="item.category_id"
-                                :user-info="item.user_info"
+                                :item-count="item.count_items"
                             >
                             </collection-card>
                         </div>
@@ -34,7 +34,7 @@
         </div>
         <div class="section__head mt-5 text-align:center">
             <div 
-                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                class="btn btn-white btn-sm d-flex align-items-center mx-auto" 
                 @click="loadNextItems"
                 v-if="this.isShowMore"
                 >
@@ -56,7 +56,7 @@ export default {
             filterData: {
                 skip: 0,
                 limit: 12,
-                keySearch: null,
+                keysearch: null,
             },
             isShowMore: true,
         };
@@ -66,9 +66,12 @@ export default {
         try {
             await this.getItems();
         } catch (error) {
-/*              this.$failAlert({
-                text: error,
-            });*/
+            this.$store.dispatch("global/showMessage",
+                {   
+                    kind:'show_error',
+                    content: error
+                }
+            );
         }
         this.$loading(false);
     },

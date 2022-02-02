@@ -8,12 +8,14 @@ import VueAwesomeSwiper from 'vue-awesome-swiper';
 import VueLazyload from "vue-lazyload";
 import LoadScript from 'vue-plugin-load-script';
 import MaterialKit from "./plugins/material-kit";
+import Toast from "vue-toastification";
 
 import "./assets/css/plugins/remixicon.css";
 import "./assets/css/plugins/bootstrap.min.css";
 import "swiper/css/swiper.css";
 import "./assets/scss/style.scss";
 import "./assets/css/plugins/swiper-bundle.min.css";
+import "vue-toastification/dist/index.css";
 
 Vue.use(VueAwesomeSwiper, /* { default options with global component } */)
 Vue.config.productionTip = false;
@@ -29,6 +31,12 @@ Vue.use(VueLazyload, {
     error: errorimage,
     loading: loadimage,
     attempt: 2,
+  });
+
+Vue.use(Toast, {
+    transition: "Vue-Toastification__bounce",
+    maxToasts: 20,
+    newestOnTop: true
   });
 
 Vue.loadScript("js/jquery-3.6.0.js");

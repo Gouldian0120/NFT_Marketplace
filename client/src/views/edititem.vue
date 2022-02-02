@@ -14,21 +14,21 @@
                         <div>
                             <p><span class="nameInput p-20">Image</span></p>
                             <div class="left__part mt-10">
-                               <img :src="item.image" />
+                               <img class="loadimg" :src="changeImagePath(item.image)" />
                             </div>
                         </div>
                         <div class="space-y-5 mt-40">
                             <span class="nameInput pl-20">Put on Marketplace</span>
                             <div class="d-flex space-x-10 switch_item">
-                                <input type="checkbox" id="switch5" v-model="item.isPutOnMarket"/>
+                                <input type="checkbox" id="switch5" v-model="item.is_on_market"/>
                                 <label for="switch5"></label>
                             </div>
                         </div>
-                        <div class="md-layout" v-if="item.isPutOnMarket">
+                        <div class="md-layout" v-if="item.is_on_market">
                             <div
                                 class="layout-item size-45"
                                 :class="
-                                    sigleItem.isMarketOption == 1
+                                    item.is_market_option == 1
                                     ? 'is-choose'
                                     : 'is-not-choose'
                                 "
@@ -37,7 +37,7 @@
                                     icon-color="info"
                                     icon="sell"
                                     text-center
-                                    @click.native="sigleItem.isMarketOption = 1"
+                                    @click.native="item.is_market_option = 1"
                                 >
                                     <h4 slot="title" class="info-title">
                                     Fixed Price
@@ -47,7 +47,7 @@
                             <div
                                 class="layout-item size-45"
                                 :class="
-                                    sigleItem.isMarketOption == 2
+                                    item.is_market_option == 2
                                     ? 'is-choose'
                                     : 'is-not-choose'
                                 "
@@ -56,7 +56,7 @@
                                     icon-color="success"
                                     icon="access_time"
                                     text-center
-                                    @click.native="sigleItem.isMarketOption = 2"
+                                    @click.native="item.is_market_option = 2"
                                 >
                                     <h4 slot="title" class="info-title">
                                     Timed Auction
@@ -67,17 +67,17 @@
                         <div class="mt-20 space-y-5">
                             <span class="nameInput pl-20">Price</span>
                             <input type="number" class="form-control"
-                                    v-model="item.minBid" min="0"
+                                    v-model="item.min_bid" min="0"
                                     placeholder="">
-                            <p>**Bids below this amount won’t be allowed.</p>
+                            <p class="pl-20 pb-20">**Bids below this amount won’t be allowed.</p>
                         </div>
-                        <div class="mt-20 space-y-10 row">
+                        <div class="mt-20 space-y-10 row"  v-if="item.is_on_market">
                             <div class="col-xl-6">
                                 <span class="pl-20">Starting Date</span>
                                 <div>
                                     <datepicker  
-                                        v-model="customDate" format="yyyy-MM-dd"></datepicker>
-                                    <p>
+                                        v-model="item.start_bid" format="yyyy-MM-dd"></datepicker>
+                                    <p class="pl-20">
                                         **Any bid placed in the last 10 minutes extends
                                         the auction by 10 minutes.
                                     </p>
@@ -88,7 +88,7 @@
                                 <div>
                                     <select
                                         id="selectExpiration"
-                                        v-model="item.expireBid"
+                                        v-model="item.expire_bid"
                                         name="selectExpiration"
                                         placeholder="Select Expiration"
                                     >
@@ -96,15 +96,21 @@
                                         <option :value="2"> 2 days </option>
                                         <option :value="3"> 3 days </option>
                                         <option :value="4"> 4 days </option>
+                                        <option :value="5"> 5 days </option>
+                                        <option :value="6"> 6 days </option>
+                                        <option :value="7"> 7 days </option>
+                                        <option :value="8"> 8 days </option>
+                                        <option :value="9"> 9 days </option>
+                                        <option :value="10"> 10 days </option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="form-group space-y-20">
+                        <div class="form-group space-y-10">
                             <div class="space-y-20">
-                                <div class="space-y-5">
+                                <div class="space-y-10">
                                     <span class="nameInput pl-20">Name*</span>
                                     <input type="text" class="form-control"
                                             v-model="item.name"
@@ -119,42 +125,18 @@
                                             readonly disabled/>
                                 </div>
                                 <div class="space-y-5">
-                                    <span class="variationInput p-20">Choose Category</span>
-                                    <select 
-                                        class="form-select custom-select"
-                                        id="selectCategory"
-                                        v-model="item.category_id"
-                                        name="selectCategory"
-                                        placeholder="Select Category"
-                                        aria-label="Default select example"
-                                        readonly disabled>
-                                        <option style="font-size:15px"
-                                            v-for="(item, i) in listCategory"
-                                            :key="i"
-                                            :value="item.id"
-                                            >
-                                            {{ item.name }}
-                                        </option>
-                                    </select>
+                                    <span class="variationInput p-20">Category</span>
+                                    <input type="text" class="form-control"
+                                            v-model="categoryItem.name"
+                                            placeholder="item category name"
+                                            readonly disabled>
                                 </div>
                                 <div class="space-y-5">
-                                    <span class="variationInput p-20">Choose Collection</span>
-                                    <select 
-                                        class="form-select custom-select"
-                                        id="selectCollection"
-                                        v-model="item.collection_id"
-                                        name="selectCategory"
-                                        placeholder="Select Category"
-                                        aria-label="Default select example"
-                                        readonly disabled>
-                                        <option style="font-size:15px"
-                                            v-for="(item, i) in listCollections"
-                                            :key="i"
-                                            :value="item.id"
-                                            >
-                                            {{ item.name }}
-                                        </option>
-                                    </select>
+                                    <span class="variationInput p-20">Collection</span>
+                                    <input type="text" class="form-control"
+                                            v-model="collectionItem.name"
+                                            placeholder="item collection name"
+                                            readonly disabled>
                                 </div>
                             </div>
                         </div>
@@ -175,15 +157,25 @@
 <script>
     import InfoAreas from "../components/InfoAreas";
     import Datepicker from 'vuejs-datepicker';
+    import Web3Ultils from "../utils/Web3Ultils";
 
     export default {
         components: {
             InfoAreas,
             Datepicker
         },
+        data() {
+            return {
+                collectionItem: null,
+                categoryItem: null,
+                image: require("@/assets/img/bg7.jpg"),
+                item: null,
+                status: null
+            };
+        },
         computed: {
             itemId() {
-                return "6195a326b7eeac0f3a685b06"; //this.$route.params.id;
+                return this.$route.params.id;
             },
             listCategory() {
                 return this.$store.state.category.categories;
@@ -192,7 +184,7 @@
                 return this.$store.state.user.information;
             },
             wallet_address() {
-                return "0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7"; //this.userData?.wallet_address;
+                return this.userData?.address;
             },
         },
         watch: {
@@ -206,78 +198,78 @@
             this.$loading(true);
             try {
                 this.item = await this.getItem();
-
-                this.sigleItem.isMarketOption = this.item.isMarketOption;
+                this.status = this.item.is_on_market;
             } catch (error) {
                 this.$loading(false);
-                this.$failAlert({
-                    text: error,
-                });
+                this.$store.dispatch("global/showMessage",
+                    { 
+                        kind:'show_error',
+                        content: error
+                    }
+                );
                 this.$router.go(-1);
             }
 
             if (this.wallet_address) {
-                try {
-                    this.listCollections = await this.$store.dispatch(
-                        "collection/getCollectionForUser",
-                        { wallet_address: this.wallet_address }
-                    );
-                } catch (error) {
-                        this.$failAlert({
-                        text: error,
-                    });
-                }
+                this.collectionItem = await this.$store.dispatch(
+                    "collection/getDetailCollection", 
+                    {
+                        keysearch: this.item.collection_id,
+                    }
+                );
+
+                this.categoryItem = await this.$store.dispatch(
+                    "category/getCategoriesById", 
+                    {
+                        keysearch: this.collectionItem.category_id,
+                    }
+                );
             } else {
                 this.$router.push("/connect-wallet");
             }
 
             this.$loading(false);
         },
-        data() {
-            return {
-                listCollections: [],
-                image: require("@/assets/img/bg7.jpg"),
-                item: null,
-                customDate: new Date(),
-                sigleItem: {
-                    isMarketOption: 0,
-                    isPutOnMarket: false,
-                    category_id: "",
-                    startBid: new Date(),
-                    expireBid: 1,
-                    minBid: 1,
-                    total_quantity: 1,
-                    royalties: 10,
-                    traits: [],
-                },
-            };
-        },
         methods: {
+            changeImagePath(name) {
+                if (name.substring(0, 7) == "ipfs://") {
+                    let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
+                    return url;
+                }
+                else
+                    return name;
+            },
             getItem() {
                 return this.$store.dispatch("item/getDetailItem", { id: this.itemId });
             },
             async editItem() {
                 if (this.userData) {
-                    this.item.id = this.item._id;
-                    this.item.wallet_address = this.userData.wallet_address;
-                    this.item.total_quantity = Number(this.item.total_quantity);
-                    this.item.minBid = Number(this.item.minBid);
+                    await this.$store.dispatch("global/setLoadingTitle", "Sell Item");
+                    this.$loadingModal(true);
+
                     try {
-                        await this.$store.dispatch("item/editItem", this.item);
-                        this.$loading(false);
+                        const isSellItem = await Web3Ultils.sellItem(
+                            this.item,
+                            this.collectionItem.address,
+                            this.wallet_address,
+                            this.status
+                        );
 
-                        await this.$successAlert({
-                            text: "Create Collection Succesfully",
-                        });
-
-                        this.$router.push("/profile/" + this.userData.wallet_address);
+                        if (isSellItem) {
+                            this.$router.push("/profile/" + this.userData.address);
+                        }
                     } catch (error) {
-                        this.$loading(false);
-                        this.$failAlert({
-                            text: error,
-                        });
+                        this.$store.dispatch("global/showMessage",
+                            { 
+                                kind:'show_error',
+                                content: error
+                            }
+                        );
                     }
-                } else {
+
+                    this.$loadingModal(false);
+                }
+                else {
                     this.$router.push("/connect-wallet");
                 }
             },
@@ -286,6 +278,11 @@
 </script>
 
 <style scoped>
+    .loadimg {
+        max-height: 500px;
+        border-radius: 12px;
+    }
+
     .layout-item.size-45 {
         min-width: 45%;
         max-width: 45%;

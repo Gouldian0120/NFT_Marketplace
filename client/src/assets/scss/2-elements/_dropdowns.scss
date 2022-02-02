@@ -2,8 +2,17 @@
     border: 1px solid $color_stroke !important;
     box-shadow: $shadow_2;
     border-radius: 10px;
-    color:black
+    color: $color-dark !important;
 }
+
+.dropdown-menu div {
+    &:hover {
+        background: $color_stroke;
+    }
+    color: $color-dark !important;
+    border-radius: 3px;
+}
+
 .share {
     position: relative;
     .icon {

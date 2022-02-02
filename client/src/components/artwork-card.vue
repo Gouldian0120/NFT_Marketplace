@@ -5,7 +5,7 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-        <!--                    <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
+ <!--                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
                         </div>
                     </div>
                 </router-link>
@@ -32,13 +32,18 @@
                     <div class="d-flex
                                 align-items-center
                                 justify-content-between
-                                space-x-3">
-                        <a  v-if="this.itemIsputonmarket"
+                                space-x-3" style="min-height:30px">
+                        <a  v-if="this.itemIsonmarket && itemIsmarketoption == 2"
                             class="btn btn-sm btn-primary"
                             href="#"
                             data-toggle="modal"
                             data-target="#popup_bid">Place Bid</a>
-                        <span  v-if="this.itemIsputonmarket" class="color_green txt_sm text-right">{{this.itemMinBid || 0}} ETH</span>
+                        <a  v-if="this.itemIsonmarket && itemIsmarketoption == 1"
+                            class="btn btn-sm btn-primary"
+                            href="#"
+                            data-toggle="modal"
+                            data-target="#popup_bid">Buy Now</a>
+                        <span  v-if="this.itemIsonmarket" class="color_green txt_sm text-right">{{this.itemMinbid || 0}} ETH</span>
                     </div>
                 </div>
             </div>
@@ -50,12 +55,13 @@
     export default {
         name: "artwork-card",
         props: {
-            itemId: String,
+            itemId: Number,
             itemName: String,
-            itemMinBid: Number,
+            itemMinbid: Number,
             cardImage: String,
-            itemCreator: String,
-            itemIsputonmarket: Boolean
+            itemCreator:String,
+            itemIsonmarket: Number,
+            itemIsmarketoption: Number
         },
         data() {
             return {
@@ -70,10 +76,11 @@
                 el.style.height=el.offsetWidth*0.75+'px'
             })
 
+/*
             this.viewUser = await this.$store.dispatch(
                             "user/getUserProfile",
                             this.itemCreator
-            );
+            );*/
         },
         methods: {
             showShortName(name) {
@@ -87,11 +94,14 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 6) +
-                    "..." +
-                    wallet.substring(wallet.length - 7, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 6) +
+                        "..." +
+                        wallet.substring(wallet.length - 7, wallet.length)
+                    );
             },
         },
     }

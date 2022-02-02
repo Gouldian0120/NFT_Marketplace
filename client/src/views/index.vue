@@ -27,14 +27,14 @@
                     <div class="section__head">
                         <div class="d-flex justify-content-between sm-column align-items-center mb-20">
                             <h2 class="section__title"> Recent Collection</h2>
-                            <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
+                            <router-link :to="{name:'marketplace'}" class="btn-white btn-sm">
                                 View All
                             </router-link>
                         </div>
                     </div>
                     <div class="row">
                         <div
-                            v-for="(item, k) in carousel"
+                            v-for="(item, k) in recentCollections"
                             :key="k"
                             class="col-lg-4"
                         >
@@ -46,13 +46,13 @@
                                 :item-name="item.name"
                                 :creator="item.created_by"
                                 :card-image="item.image"
-                                :item-count="getRecentCollectionItems.length">
+                                :item-count="item.count_items">
                             </collection-card-lg>
-                        </div><!--
+                        </div>
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-6"
-                                    v-for="(item, k) in getRecentCollectionItems"
+                                    v-for="(item, k) in itemsInRecentCollection"
                                     :key="k">
                                     <artwork-card 
                                         text-center
@@ -60,14 +60,15 @@
                                         card-plain
                                         :item-id="item.id"
                                         :item-name="item.name"
-                                        :itemMinBid="item.minBid"
-                                        :item-creator="item.creator"
-                                        :card-image="item.image"
-                                        :item-isputonmarket="item.isPutOnMarket">
+                                        :item-minbid="item.min_bid"
+                                        :item-creator="item.created_by"
+                                        :card-image="changeImagePath(item.image)"
+                                        :item-isonmarket="item.is_on_market"
+                                        :item-ismarketoption="item.is_market_option">
                                     </artwork-card>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,16 +80,28 @@
                         <div class="section_head d-flex justify-content-between align-items-center">
                             <h2 class="section__title mb-20">Hot Sellers</h2>
                             <div class="dropdown">
-                                <button class="btn btn-white btn-sm dropdown-toggle"
-                                        type="button"
-                                        data-toggle="dropdown" aria-haspopup="true"
+                                <button class="btn-white btn-sm dropdown-toggle" type="button"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true"
                                         aria-expanded="false">
                                     Recent Active
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
+                                    <div class="links ml-10 mr-10">
+                                        <a href="">
+                                            <span class="p-2">Action</span>
+                                        </a>
+                                    </div>
+                                    <div class="links ml-10 mr-10">
+                                        <a href="">
+                                            <span class="p-2">Another action</span>
+                                        </a>
+                                    </div>
+                                    <div class="links ml-10 mr-10">
+                                        <a href="">
+                                            <span class="p-2">Something else</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +114,7 @@
                                 >
                                     <div class="avatars space-x-10">
                                         <div class="media has_border">
-                                            <router-link :to="'/profile/' + item.wallet_address">
+                                            <router-link :to="'/profile/' + item.address">
                                                 <div v-lazy-container="{ selector: 'img' }">
                                                     <img class="avatarloadimg"
                                                         :data-src="item.avatar || avatarimage"
@@ -113,16 +126,13 @@
                                             </router-link>
                                         </div>
                                         <div class="">
-                                            <a
-                                                class="float-left"
-                                                :href="`#/user-profile/${item.wallet_address}`"
-                                            >
+                                            <router-link :to="'/profile/' + item.address">
                                                 <h4 class="comment-heading show-name">
                                                     {{
-                                                    showShortName(item.full_name) || showWalletSeller(item.wallet_address)
+                                                    showShortName(item.first_name + " " + item.last_name) || showWalletSeller(item.address)
                                                     }}
                                                 </h4>
-                                            </a>
+                                            </router-link>
                                         </div>
                                     </div>
                                 </div>
@@ -137,7 +147,7 @@
                 <div class="section__head">
                     <div class="d-flex justify-content-between sm-column align-items-center mb-20">
                         <h2 class="section__title"> Live Autions</h2>
-                        <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
+                        <router-link :to="{name:'marketplace'}" class="btn-white btn-sm">
                             View All
                         </router-link>
                     </div>
@@ -162,9 +172,11 @@
                                         card-plain
                                         :item-id="item.id"
                                         :item-name="item.name"
-                                        :item-minBid="item.minBid"
-                                        :card-image="item.image"
-                                        :item-isputonmarket="item.isPutOnMarket"
+                                        :item-minbid="item.min_bid"
+                                        :card-image="changeImagePath(item.image)"
+                                        :item-owner="item.owner"
+                                        :item-isonmarket="item.is_on_market"
+                                        :item-favoritecount="item.favorite_count"
                                     >
                                     </item-card>
                                 </div>
@@ -188,7 +200,7 @@
                         <p class="text-center">your bid <span class="color_text txt
                         _bold">(16ETH) </span> has been listing
                             to our database</p>
-                        <a href="#" class="btn btn-dark w-full"> Watch the listings</a>
+                        <a href="#" class="btn-white w-full"> Watch the listings</a>
                     </div>
                 </div>
             </div>
@@ -199,7 +211,7 @@
                     <div class="section__head">
                         <div class="d-flex justify-content-between sm-column align-items-center mb-20">
                             <h2 class="section__title"> Top artworks</h2>
-                            <router-link :to="{name:'marketplace'}" class="btn btn-dark btn-sm">
+                            <router-link :to="{name:'marketplace'}" class="btn-white btn-sm">
                                 View All
                             </router-link>
                         </div>
@@ -218,9 +230,9 @@
                                     :item-name="item.name"
                                     :creator="item.created_by"
                                     :card-image="item.image"
-                                    :item-count="getRecentCollectionItems.length">
+                                    :item-count="item.count_items">
                             </collection-card-lg>
-                        </div><!--
+                        </div>
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-6"
@@ -232,14 +244,15 @@
                                         card-plain
                                         :item-id="item.id"
                                         :item-name="item.name"
-                                        :itemMinBid="item.minBid"
-                                        :item-creator="item.creator"
-                                        :card-image="item.image"
-                                        :item-isputonmarket="item.isPutOnMarket">
+                                        :item-minbid="item.min_bid"
+                                        :item-creator="item.created_by"
+                                        :card-image="changeImagePath(item.image)"
+                                        :item-isonmarket="item.is_on_market"
+                                        :item-ismarketoption="item.is_market_option">
                                     </artwork-card>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +271,7 @@
                                 is used by multiple websites to provide the users the
                                 best
                                 possible experience.</p>
-                            <router-link to="/connect-wallet" class="btn btn-primary">Start
+                            <router-link to="/connect-wallet" class="btn btn-white">Start
                                 Collecting
                             </router-link>
                         </div>
@@ -328,11 +341,11 @@
 <script>
 
     import ItemCard from "../components/item-card";
- //   import ArtworkCard from "../components/artwork-card";
+    import ArtworkCard from "../components/artwork-card";
     import CollectionCardLg from "../components/collection-card-lg";
 
     export default {
-        components: { ItemCard, CollectionCardLg},
+        components: { ArtworkCard, ItemCard, CollectionCardLg},
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
@@ -344,14 +357,16 @@
                 subscribe: null,
                 filterName: "All",
                 carousel: [],
+                recentCollections: [],
+                recentCollectionItems: [],
                 topColllections: [],
+                topCollectionItems: [],
+                itemsInRecentCollection: [],
                 itemsInTopCollection: [],
-                recentCollectionitem: null,
-                topCollectioonItem: null,
             };
         },
         async mounted() {
-        //    this.$loading(true);
+            this.$loading(true);
             let box = document.querySelectorAll('.img-box');
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
@@ -359,13 +374,16 @@
 
             try {
                 await this.getItemsOnSale()
-                await this.getRecentListCollections()
-                await this.getTopCollections()
 
-                this.recentCollectionitem = await this.getDetailCollection(this.carousel[0].id)
+                await this.getRecentCollection()
+                this.recentCollectionItems = await this.getItemsByCollection(this.recentCollections[0].id)
+                await this.getRecentCollectionsItems();
+
+                await this.getTopCollection()
+                this.topCollectionItems = await this.getItemsByCollection(this.topColllections[0].id)
                 await this.getTopCollectionsItems()
 
-         //       this.listUsers = await this.$store.dispatch("user/getAllUsers")
+                this.listUsers = await this.getAllUser()
             } catch (error) {
                 this.$loading(false);
                 console.log("error 121212")
@@ -374,18 +392,18 @@
                     text: error,
                 });*/
             }
-        //    this.$loading(false);
+            this.$loading(false);
         },
         computed: {
             getRecentCollectionItems() {
                 if (this.recentCollectionitem == null)
                     return 0
-                return this.recentCollectionitem.items
+                return 10;//this.recentCollectionitem.items
             },
             getTopCollectionItems() {
                 if (this.topCollectionItem == null)
                     return 0
-                return this.topCollectionItem.items
+                return 10; //this.topCollectionItem.items
             }
         },
         methods: {
@@ -403,21 +421,36 @@
                 this.$router.push("/" + url);
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 5) +
+                        "..." +
+                        wallet.substring(wallet.length - 5, wallet.length)
+                    );
+            },
+            changeImagePath(name) {
+                if (name.substring(0, 7) == "ipfs://") {
+                    let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
+                    return url;
+                }
+                else
+                    return name;
+            },
+            async getAllUser() {
+                return await this.$store.dispatch("user/getAllUsers", {
+                    skip: 0,
+                    limit: 8,
+                    keysearch: null,
+                });
             },
             async getItemsOnSale() {
                 this.listItemsOnSale = await this.$store.dispatch(
                     "item/getAllItemsOnSale",
                     {
                         skip: 0,
-                        limit: 16,
-                        filter:{
-                            is_on_market:1
-                        }
+                        limit: 8,
                     }
                 );
 
@@ -429,36 +462,26 @@
                     this.carouselItems[tmp].push(this.listItemsOnSale[index]);
                 }
             },
-            async getRecentListCollections() {
-                this.listColllections = await this.$store.dispatch(
-                    "collection/getAllCollections",
-                    {
-                        skip: 0,
-                        limit: 1,
-                        sortBy: "created_at",
-                    }
-                );
-
-                this.carousel.push(this.listColllections[this.listColllections.length - 1]);
+            async getRecentCollection() {
+                this.recentCollections = await this.$store.dispatch("collection/getRecentCollections");
             },
-            async getTopCollections() {
-                this.topColllections = await this.$store.dispatch(
-                    "collection/getAllCollections",
-                    {
-                        skip: 0,
-                        limit: 1,
-                    }
-                );
+            async getTopCollection() {
+                this.topColllections = await this.$store.dispatch("collection/getTopCollections");
             },
-            async getDetailCollection(collectionid) {
-                return await this.$store.dispatch("collection/getDetailCollection", { id: collectionid });
+            async getItemsByCollection(collectionid) {
+                return await this.$store.dispatch("item/getItemsByCollection", { keysearch: collectionid });
+            },
+            async getRecentCollectionsItems() {
+                for (let index = 0; index < this.recentCollectionItems.length; index++) {
+                    if (index < 4) {
+                        this.itemsInRecentCollection.push(this.recentCollectionItems[index]);
+                    }
+                }
             },
             async getTopCollectionsItems() {
-                this.topCollectionItem = await this.getDetailCollection(this.topColllections[0].id)
-
-                for (let index = 0; index < this.topCollectionItem.items.length; index++) {
+                for (let index = 0; index < this.topCollectionItems.length; index++) {
                     if (index < 4) {
-                        this.itemsInTopCollection.push(this.topCollectionItem.items[index]);
+                        this.itemsInTopCollection.push(this.topCollectionItems[index]);
                     }
                 }               
             },

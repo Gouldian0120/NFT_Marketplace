@@ -3,7 +3,7 @@
         <div class="hero__upload">
             <div class="container">
                 <div class="space-y-20">
-                    <h2 class="title">Create Collection</h2>
+                    <h2 class="title">Edit Collection</h2>
                 </div>
             </div>
         </div>
@@ -15,23 +15,25 @@
                             <p><span class="nameInput p-20">Logo Image*</span></p>
                             <div class="left__part mt-10">
                                 <file-upload
+                                    :inputValue="currentCollection.image"
                                     type="image-circle"
                                     @updateImg="
                                     (img) => {
-                                        newCollection.fileAvatar = img;
+                                        currentCollection.fileAvatar = img;
                                     }
                                         "
                                     />
                             </div>
-                        </div>      
+                        </div>
                         <div class="mt-70" style="height:505px">
                             <p><span class="nameInput p-20">Banner Image*</span></p>
                             <div class="left__part mt-10">
                                 <file-upload
+                                    :inputValue="currentCollection.banner_image"
                                     type="image-regular"
                                     @updateImg="
                                         (img) => {
-                                            newCollection.fileBanner = img;
+                                            currentCollection.fileBanner = img;
                                         }
                                     "
                                     >
@@ -41,16 +43,16 @@
                         <div class="space-y-10 mt-100">
                             <span class="nameInput p-20">Links</span>
                             <input type="text" class="form-control"
-                                    v-model="newCollection.socials.facebook"
+                                    v-model="currentCollection.social_link1"
                                     placeholder="https://www.facebook.com/abcdef">
                             <input type="text" class="form-control"
-                                    v-model="newCollection.socials.twitter"
+                                    v-model="currentCollection.social_link2"
                                     placeholder="@YourTwitterHandle">
                             <input type="text" class="form-control"
-                                    v-model="newCollection.socials.instagram"
+                                    v-model="currentCollection.social_link3"
                                     placeholder="@YourInstagramHandle">
                             <input type="text" class="form-control"
-                                    v-model="newCollection.socials.medium"
+                                    v-model="currentCollection.social_link4"
                                     placeholder="@YourMediumHandle">
                         </div>
                     </div>
@@ -60,13 +62,13 @@
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Name*</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.name"
+                                            v-model="currentCollection.name"
                                             placeholder="Collection Name">
                                 </div>
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Description </span>
                                     <textarea class="form-control" spellcheck="true" style="height:190px"
-                                            v-model="newCollection.description"
+                                            v-model="currentCollection.description"
                                             placeholder="Provide your description for your collection"/>
                                 </div>
                                 <div class="space-y-5">
@@ -74,7 +76,7 @@
                                     <select 
                                         class="form-select custom-select"
                                         id="selectCategory"
-                                        v-model="newCollection.category_id"
+                                        v-model="currentCollection.category_id"
                                         name="selectCategory"
                                         placeholder="Select Category"
                                         aria-label="Default select example">
@@ -90,31 +92,32 @@
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Royalty*</span>
                                     <input type="number" class="form-control"
-                                            v-model="newCollection.royalty"
+                                            v-model="currentCollection.royalty"
                                             placeholder="" value="0">
                                 </div>
                                 <div class="space-y-5">
-                                    <span class="nameInput p-20">Fee Recipient*</span>
+                                    <span class="nameInput p-20">Fee Recipient</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.recipient"
+                                            v-model="currentCollection.fee_recipient"
                                             placeholder="Fee Recipient">
                                 </div>
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Contract address*</span>
-                                    <input type="text" class="form-control"
-                                            v-model="newCollection.contractAddress"
-                                            placeholder="0x...">
+                                    <input type="text" class="form-control" style="color:#6c757d "
+                                            v-model="currentCollection.address"
+                                            placeholder="0x..."
+                                            readonly disabled>
                                 </div>
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Project Website</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.short_url"
+                                            v-model="currentCollection.short_url"
                                             placeholder="https://myproject.com">
                                 </div>
                                 <div class="space-y-5">
                                     <span class="nameInput p-20">Your Email</span>
                                     <input type="text" class="form-control"
-                                            v-model="newCollection.creator_email"
+                                            v-model="currentCollection.creator_email"
                                             placeholder="contact@project.com">
                                 </div>
                             </div>
@@ -125,8 +128,8 @@
                 <div class="content justify-content-between mt-40 mb-20_reset" style="margin-left:44%">
                     <div class="mb-20">
                         <router-link :to="{name:'collections'}">
-                            <div class="btn btn-grad btn_create" @click="createCollection"> 
-                                Create Cellection
+                            <div class="btn btn-grad btn_create" @click="editCollection"> 
+                                Update Collection
                             </div>
                         </router-link>
                     </div>
@@ -143,34 +146,47 @@
         components: {
             FileUpload
         },
-        data() {
-            return {
-                newCollection: { socials: {} },
-                image: require("@/assets/img/bg7.jpg"),
-            };
-        },
         computed: {
-            listCategory() {
-                return this.$store.state.category.categories;
+            userCollection() {
+                return this.$route.params.collectionid;
             },
             userData() {
                 return this.$store.state.user.information;
             },
+            listCategory() {
+                return this.$store.state.category.categories;
+            },
         },
-        async mounted() {
+        watch: {
+            userCollection(newValue, oldValue) {
+                this.reloadData();
+            },
+            userData(newValue, oldValue) {
+                this.reloadData();
+            },
+        },
+        mounted() {
             if (!this.userData) {
-              this.$router.push("/connect-wallet");
+                this.$router.push("/connect-wallet");
+            }
+            else {
+                this.reloadData();
             }
         },
+        data() {
+            return {
+                currentCollection: null,
+                image: require("@/assets/img/bg7.jpg"),
+            };
+        },
         methods: {
-            async createCollection() {
+            async editCollection() {
                 if (this.userData) {
                     this.$loading(true);
-                    this.newCollection.created_by = this.userData.address;
                     try {
                         const result = await this.$store.dispatch(
-                            "collection/createCollection",
-                            this.newCollection
+                            "collection/editCollection",
+                            this.currentCollection
                         );
 
                         this.$loading(false);
@@ -185,37 +201,29 @@
                     this.$router.push("/connect-wallet");
                 }
             },
+            async reloadData() {
+                this.$loading(true);
+                
+                try {
+                    if (this.userCollection && this.userCollection.length > 0) {
+
+                        this.currentCollection = await this.$store.dispatch(
+                            "collection/getDetailCollection", 
+                            {
+                                keysearch: 2
+                            }
+                        );
+                    }
+                    else
+                        return;
+
+                } catch (error) {
+                    this.$failAlert({
+                    text: error,
+                    });
+                }
+                this.$loading(false);
+            }
         },
     };
 </script>
-
-<style scoped>
-.upload {
-  cursor: pointer;
-  background-color:transparent;
-  width:100%;
-  box-sizing: border-box;
-  border-radius:15px;
-  border: 1px dashed #fff;
-  transform: scale(1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-}
-.or {
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #936d96;
-  margin: 10px 0;
-}
-.browse {
-  background: #ccc;
-  padding: 10px 45px;
-  text-transform: uppercase;
-  color: white;
-  margin-top: 10px;
-}
-
-</style>

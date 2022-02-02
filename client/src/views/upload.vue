@@ -3,7 +3,7 @@
         <div class="hero__upload">
             <div class="container">
                 <div class="space-y-20">
-                    <router-link :to="{name:'upload-type'}" class="btn btn-white btn-sm
+                    <router-link :to="{name:'upload-type'}" class="btn-white btn-sm
                 switch">
                         Switch
                         to Multiple</router-link>
@@ -98,7 +98,7 @@
                             </div>
                             <div class="space-y-20">
                                 <p class="color_text">or choose a file</p>
-                                <a href="#" class="btn btn-white"> Browse files </a>
+                                <a href="#" class="btn-white"> Browse files </a>
                                 <input type="file">
 
                             </div>
@@ -173,9 +173,9 @@
                 <div class="row content justify-content-between mb-20_reset">
                     <div class="col-md-auto col-12 mb-20">
                         <div class="space-x-10">
-                            <router-link :to="{name:'upload'}"> class="btn btn-white
+                            <router-link :to="{name:'upload'}"> class="btn-white
                               others_btn"> Cancel</router-link>
-                            <a href="#" class="btn btn-dark others_btn"
+                            <a href="#" class="btn-white others_btn"
                                data-toggle="modal"
                                data-target="#popup_preview"> Preview</a>
 

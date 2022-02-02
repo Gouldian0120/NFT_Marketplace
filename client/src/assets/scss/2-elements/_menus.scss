@@ -26,6 +26,13 @@
                 color: $color_brand;
             }
         }
+
+        &:hover {
+            a,
+            i {
+                color: $color_white;
+            }
+        }
     }
 }
 .filters {
@@ -62,7 +69,6 @@
         a {
             display: flex;
             align-items: center;
-            color: $color_black;
             span {
                 width: max-content;
                 white-space: nowrap;

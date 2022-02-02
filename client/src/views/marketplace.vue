@@ -8,9 +8,8 @@
         <div class="bg_white border-b py-20">
             <div class="container">
                 <div class="d-flex justify-content-center">
-                    <ul class="menu_categories space-x-20">
-                        <li>
-                            <a href="#" class="color_brand"
+                    <ul class="menu_categories space-x-10">
+                        <li class="btn btn-white btn-sm"
                             :class="'All' == filterName ? ' md-behance' : 'md-button-filter'"
                             @click="
                                 () => {
@@ -18,15 +17,13 @@
                                 getItems();
                                 }
                             ">
-                                <button class="btn btn-sm category"> 
-                                    <i class="ri-file-search-line"></i>
-                                    All </button>
-                            </a>
+                                <i class="ri-file-search-line"></i>
+                                <span>All</span>
                         </li>
-                        <li
+                        <li class="btn btn-white btn-sm"
                             v-for="(category, i) in listCategory"
                             :key="i"
-                            href="javascript:void(0)"
+                            
                             :class="
                                 category.name == filterName
                                 ? ' md-behance'
@@ -40,10 +37,8 @@
                                 }
                             "
                             >
-                            <button class="btn btn-sm category">
                                 <i :class="iconlist[i]"></i>
-                                {{ category.name }}
-                            </button>
+                                <span>{{ category.name }}</span>
                         </li>
                     </ul>
                 </div>
@@ -65,7 +60,6 @@
                                         <span> Has list price </span>
                                     </li>
                                     <li class="d-flex space-x-10 switch_item">
-
                                         <input type="checkbox" id="switch2" checked/><label
                                             for="switch2">Toggle</label>
                                         <span> Has open offer </span>
@@ -89,24 +83,35 @@
                             <div class="d-flex space-x-10 align-items-center sm:mt-20">
                                 <span class="color_text txt_sm"> SORT BY : </span>
                                 <div class="dropdown">
-                                    <button class="btn btn-dark btn-sm dropdown-toggle"
-                                            type="button"
-                                            data-toggle="dropdown" aria-haspopup="true"
+                                    <button class="btn-white btn-sm dropdown-toggle" type="button"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
                                             aria-expanded="false">
                                         Recent Active
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else
-                                            here</a>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Action</span>
+                                            </a>
+                                        </div>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Another action</span>
+                                            </a>
+                                        </div>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Something else</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div v-if="this.collectionid != null">
+                <div v-if="this.collectionid != null && this.collectionitem != null">
                     <span class="color_text txt_sm" > COLLECTION : </span> 
                     <span class="collection_bar ml-20" >
                         <img width="25px" height="25px"
@@ -130,11 +135,14 @@
                             card-plain
                             :item-id="item.id"
                             :item-name="item.name"
-                            :item-minBid="item.minBid"
+                            :item-minbid="item.min_bid"
                             :card-image="changeImagePath(item.image)"
                             :item-creator="item.created_by"
                             :item-owner="item.owner"
-                            :item-isputonmarket="item.is_on_market"
+                            :item-isonmarket="item.is_on_market"
+                            :item-collectionid="item.collection_id"
+                            :item-tokenid="item.token_id"
+                            :item-favoritecount="item.favorite_count"
                         >
                         </item-card>
                     </div>
@@ -143,7 +151,7 @@
         </div>
         <div class="section__head mt-5 text-align:center">
             <div 
-                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                class="btn btn-white btn-sm d-flex align-items-center mx-auto" 
                 @click="loadNextItems"
                 v-if="this.isShowMore"
                 >
@@ -166,7 +174,7 @@
                 filterData: {
                     skip: 0,
                     limit: 16,
-                    keySearch: null,
+                    keysearch: null,
                 },
                 categoryID: null,
                 filters: {},
@@ -215,7 +223,7 @@
             },
             async loadNextItems() {
                 try {
-                    this.filterData.keySearch = this.categoryID;
+                    this.filterData.keysearch = this.categoryID;
 
                     let newData = await this.$store.dispatch(
                         this.filterName == "All"
@@ -239,11 +247,18 @@
                 }
             },
             async getItems() {
-
+                this.isShowMore = true;
                 if (this.collectionid)
                 {
                     this.collectionitem = await this.getCollectionItem();
-                    this.listItems = this.collectionitem.items;
+
+                    this.listItems = await this.$store.dispatch("item/getItemsByCollection",
+                        {
+                            skip: 0,
+                            limit: this.filterData.limit,
+                            keysearch: this.collectionid,
+                        }
+                    );
                 }
                 else
                 {
@@ -253,10 +268,8 @@
                                 : "item/getItemsByCategory",
                         {
                             skip: 0,
-                            limit: 16,
-                            filter: {
-                                category_id: this.categoryID,
-                            }
+                            limit: this.filterData.limit,
+                            keysearch: this.categoryID,
                         }
                     );
                 }
@@ -271,20 +284,28 @@
                 await this.$store.dispatch("category/getCategories");
             },
             async getCollectionItem() {
-                return this.$store.dispatch("collection/getDetailCollection", { id: this.collectionid });
+                return this.$store.dispatch("collection/getDetailCollection", 
+                    { keysearch: this.collectionid }
+                );
             },
             async getAll() {
                 this.$loading(true);
+                this.isShowMore = true;
                 this.listItems = await this.$store.dispatch(
-                    this.filterName == "All"
-                            ? "item/getAllItems"
-                            : "item/getItemsByCategory",
+                    "item/getAllItems",
                     {
                         skip: 0,
-                        limit: 16,
-                        keySearch: this.categoryID,
+                        limit: this.filterData.limit,
+                        keysearch: this.categoryID,
                     }
                 );
+
+                if (this.listItems.length == this.filterData.limit) {
+                    this.filterData.skip += this.listItems.length;
+                } else {
+                    this.isShowMore = false;
+                }
+
                 this.$loading(false);
                 this.$router.push("/marketplace");
             }

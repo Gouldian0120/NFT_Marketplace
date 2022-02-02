@@ -1,10 +1,7 @@
 <template>
     <div>
         <div class="container pb-5">
-            <a href="/" class="btn btn-white btn-sm my-40">
-                Back to home
-            </a>
-            <div class="item_details">
+            <div class="item_details pt-80">
                 <div class="row sm:space-y-20">
                     <div class="col-md-6">
                         <div style="background-color:#fff"
@@ -50,15 +47,15 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Collection</span>
-                                                <span class="row-right">{{/* item.collection[0].name*/ }}</span>
+                                                <span class="row-right">{{ collectionItems.name }}</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Network</span>
-                                                <span class="row-right">Ropsten Testnet</span>
+                                                <span class="row-right">Rinkeby Testnet</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Chain ID</span>
-                                                <span class="row-right">4</span>
+                                                <span class="row-right">3</span>
                                             </div>
                                         </div>
                                     </div>
@@ -78,11 +75,11 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Royalty</span>
-                                                <span class="row-right">{{ item.royalties }}%</span>
+                                                <span class="row-right">{{ collectionItems.royalty }} %</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Recipient</span>
-                                                <span class="row-right">{{ item.fee_recipient }}</span>
+                                                <span class="row-right">{{ collectionItems.fee_recipient }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -91,35 +88,36 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="space-y-20"><!--
+                        <div class="space-y-20">
                             <div class="d-flex justify-content-between flex-wrap">
                                 <h3><span style="color:#f8f810">{{ item.name }}</span></h3>
                                 <div class="space-x-10 d-flex align-items-center">
-                                    <p>1 of {{ item.total_quantity }}</p>
-                                    <a href="#" class="likes space-x-3">
-                                        <i class="ri-heart-3-fill"></i>
-                                        <span class="txt_sm">2.1k</span>
+                                    <!--<p>1 of {{ item.total_quantity }}</p>-->
+                                    <a href="#" @click="setFavorite" class="likes space-x-3">
+                                        <i title="UnFavorite" v-if="this.isfavorited" class="ri-heart-3-fill red"></i>
+                                        <i  title="Favorite" v-if="!this.isfavorited" class="ri-heart-3-fill"></i>
+                                        <span class="txt_sm">{{ totalfavoriteCount }}</span>
                                     </a>
                                 </div>
-                            </div>-->
+                            </div>
                             <div class="d-flex justify-content-between flex-wrap">
                                 <div class="d-flex space-x-20">
-                                    <a href="" v-if="item.owner == metaMaskAddress && !item.is_on_market" 
+                                    <a href="" v-if="item.owner == metaMaskAddress && item.is_on_market == 0" 
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="sellItem" > Sell</a>
-                                    <a href="" v-else-if="item.owner == metaMaskAddress && item.is_on_market"
+                                    <a href="" v-else-if="item.owner == metaMaskAddress && item.is_on_market == 1"
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="editItem"> Edit Item</a>
-                                    <a href="" v-else-if="item.is_on_market && item.is_market_option"
+                                    <a href="" v-else-if="item.is_on_market && item.is_market_option == 1"
                                         class="btn btn-primary btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_buy"
                                         @click="buyItem"> Buy Now</a>
-                                    <a href="" v-else-if="item.is_on_market && !item.is_market_option"
+                                    <a href="" v-else-if="item.is_on_market && !item.is_market_option == 2"
                                         class="btn btn-grad btn-lg" 
                                         data-toggle="modal"
                                         data-target="#popup_bid"
@@ -181,9 +179,9 @@
                                     <div class="col-lg-6">
                                         <div class="space-y-5">
                                             <p class="color_text">Minimum bid</p>
-                                            <h4>{{ item.minBid || 0 }}
+                                            <h4>{{ item.min_bid || 0 }}
                                                 <span class="txt_sm color_text">
-                                                    ETH/ ($ {{ convertToUSD(item.minBid) }}
+                                                    ETH / ($ {{ convertToUSD(item.min_bid) }}
                                                     )
                                                 </span>
                                             </h4>
@@ -216,7 +214,7 @@
                                             <li class="nav-item">
                                                 <a
                                                     :class="{'active':tab===1}"
-                                                    class="btn btn-white btn-sm active"
+                                                    class="btn btn-black btn-sm"
                                                     @click="tab=1"
                                                     >
                                                 Details</a>
@@ -224,7 +222,7 @@
                                             <li class="nav-item">
                                                 <a
                                                     :class="{'active':tab===2}"
-                                                    class="btn btn-white btn-sm"
+                                                    class="btn btn-black btn-sm"
                                                     @click="tab=2"
                                                     >
                                                 Bids</a>
@@ -232,24 +230,35 @@
                                             <li class="nav-item">
                                                 <a
                                                     :class="{'active':tab===3}"
-                                                    class="btn btn-white btn-sm"
+                                                    class="btn btn-black btn-sm"
                                                     @click="tab=3"
                                                     >
                                                 History</a>
                                             </li>
                                         </ul>
-                                       
                                         <div class="dropdown d-none d-sm-block">
-                                            <button class="btn btn-white btn-sm dropdown-toggle" type="button"
+                                            <button class="btn-white btn-sm dropdown-toggle" type="button"
                                                     data-toggle="dropdown"
                                                     aria-haspopup="true"
                                                     aria-expanded="false">
                                                 Recent Active
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#">Something else here</a>
+                                                <div class="links ml-10 mr-10">
+                                                    <a href="">
+                                                        <span class="p-2">Action</span>
+                                                    </a>
+                                                </div>
+                                                <div class="links ml-10 mr-10">
+                                                    <a href="">
+                                                        <span class="p-2">Another action</span>
+                                                    </a>
+                                                </div>
+                                                <div class="links ml-10 mr-10">
+                                                    <a href="">
+                                                        <span class="p-2">Something else</span>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -258,7 +267,11 @@
                                         <div :class="{'active':tab===1}" v-if="tab===1" class="tab-pane active" id="tabs-1" role="tabpanel">
                                             <div class="row-detail">
                                                 <span class="row-left">Contract Address</span>
-                                                <span class="row-right">{{ item.id }}</span>
+                                                <span class="row-right">
+                                                    <a href="#" @click="redirectURL" target="_blank">
+                                                        {{this.collectionItems.address}}
+                                                    </a>
+                                                </span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Token ID</span>
@@ -357,12 +370,12 @@
                                         <div class="avatars space-x-5">
                                             <div><p>Creator</p></div>
                                             <div class="media">
-                                                <router-link :to="'/profile/' + item.creator">
+                                                <router-link :to="'/profile/' + item.created_by">
                                                     <div v-lazy-container="{ selector: 'img' }">
                                                         <img class="avatar avatar-sm" 
                                                             :data-src="viewCreator.avatar || avatarimage" 
                                                             :data-loading="loadimage"/>
-                                                        <span class="avatars_name color_black ml-1">{{ showWalletSeller(item.creator) }}</span>
+                                                        <span class="avatars_name color_black ml-1">{{ showWalletSeller(item.created_by) }}</span>
                                                     </div>
                                                 </router-link>
                                             </div>
@@ -382,15 +395,15 @@
                             <div v-lazy-container="{ selector: 'img' }">
                                 <img class="loadimg avatar avatar-sm" :data-src="collectionItems.image" :data-loading="loadimage"/>
                                 <span class="avatars_name color_green ml-1">{{ collectionItems.name }}</span>
-                                <span class="color_green text-sm"> ( {{this.collectionItems.count_items}} items )</span>
+                                <span class="color_green text-sm"> ( {{this.collectionItems.count_items - 1}} items )</span>
                             </div>
                         </router-link>
                     </div>
                 </div>
             </div>
-            <div v-if="listOtherItems && listOtherItems.length - 1 > 0" class="row mb-30_reset">
+            <div v-if="listOtherItemsFiltered && listOtherItemsFiltered.length - 1 > 0" class="row mb-30_reset">
                 <div
-                    v-for="(item1, i) in listOtherItems.slice(this.from, this.to)"
+                    v-for="(item1, i) in listOtherItemsFiltered"
                     :key="i"
                     class="col-xl-3 col-lg-4 col-md-6 col-sm-6"
                 >
@@ -402,13 +415,14 @@
                         :item-name="item1.name"
                         :itemMinBid="item1.minBid"
                         :card-image="changeImagePath(item1.image)"
+                        :item-favoritecount="item1.favorite_count"
                     >
                     </item-card>
                 </div>
             </div>
             <div class="section__head mt-5 text-align:center">
                 <div 
-                    class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                    class="btn btn-white btn-sm d-flex align-items-center mx-auto" 
                     @click="loadNextItems"
                     v-if="this.isShowMore"
                     >
@@ -433,19 +447,25 @@
                 tab: 1,
                 loadimage: require("@/assets/img/loading.gif"),
                 avatarimage: require("@/assets/img/avatars/avatar_4.png"),
-                item: null,
-                listOtherItems: null,
-                collectionItems: null,
+                item: {},
+                listOtherItems: [],
+                collectionItems: {},
                 carouselItems: [],
                 listItems: [],
                 selectColor: "rose",
                 selectSize: "small",
                 viewCreator: {},
                 viewOwner: {},
+                filterData: {
+                    skip: 0,
+                    limit: 12,
+                    keysearch: null,
+                },
                 isShowMore: true,
-                from: 0,
-                to: 12,
-                limit: 12/*
+                favorite: false,
+                favoriteCount: 0,
+                isfavorited: false
+                /*
                 tableData: [
                     {
                     id: 1,
@@ -518,61 +538,8 @@
             };
         },
         async mounted() {
-            this.$loading(true);/*
-            let box = document.querySelectorAll('.img-box');
-            box.forEach(el => {
-                el.style.height = el.offsetWidth * 0.75 + 'px'
-            })
-*/
-            try {
-                this.item = await this.getItem();
-/*
-                this.viewCreator = await this.$store.dispatch(
-                    "user/getUserProfile",
-                    this.item.creator
-                );
-
-                this.viewOwner = await this.$store.dispatch(
-                    "user/getUserProfile",
-                    this.item.owner
-                );*/
-            } 
-            catch (error) {
-                console.log("error000111")
-            }
-            
-            try {
-                this.listOtherItems = await this.$store.dispatch("item/getAllItems",
-                    {
-                        skip: 0,
-                        limit: 16,
-                        filter: {
-                            collection_id: this.item.collection_id,
-                        }
-                    }
-                );
-
-                this.collectionItems = await this.$store.dispatch(
-                    "collection/getDetailCollection", 
-                    {
-                        skip: 0,
-                        limit: 16,
-                        filter: {
-                            collection_id: this.item.collection_id,
-                        }
-                    }
-                );
-
-                console.log(this.collectionItems)
-
-                if (this.listOtherItems.length <= this.limit)
-                    this.isShowMore = false;
-            } catch (error) {
-                console.log("error2211")
-            }
-
+            this.reload();
 //            await this.$store.dispatch("user/getETHRate");
-            this.$loading(false);
         },
         computed: {
             itemId() {
@@ -585,18 +552,32 @@
                 return this.$store.state.user?.information;
             },
             metaMaskAddress() {
-                return this.userData?.wallet_address;
+                return this.userData?.address;
             },
+            listOtherItemsFiltered() {
+                return this.listOtherItems?.filter((token) => {
+                    return token.id != this.itemId
+                })
+            },
+            totalfavoriteCount() {
+                return this.favoriteCount
+            },
+            favoriteStatus() {
+                return this.isfavorited
+            }
         },
         watch: {
             async itemId(newValue, oldValue) {
-            if (newValue && newValue.length > 0) {
-                this.item = await this.getItem();
-            }
+                if (newValue && newValue.length > 0) {
+                    this.reload();
+                    await this.$store.dispatch("user/getETHRate");
+                }
             },
         },
         methods: {
             changeImagePath(name) {
+                if (name == null)
+                    return null;
                 if (name.substring(0, 7) == "ipfs://") {
                     let url = "https://gateway.pinata.cloud/ipfs/" + name.substring(7, name.length);
                     return url;
@@ -605,69 +586,185 @@
                     return name;
             },
             showShortName(name) {
-                return (
-                name.substring(0, 6) +
-                "..." +
-                name.substring(name.length - 8, name.length)
-                );
+                if (name.length < 25)
+                    return name;
+                else
+                    return (
+                        name.substring(0, 6) +
+                        "..." +
+                        name.substring(name.length - 8, name.length)
+                    );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 6) +
-                    "..." +
-                    wallet.substring(wallet.length - 8, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 6) +
+                        "..." +
+                        wallet.substring(wallet.length - 8, wallet.length)
+                    );
             },
             shadowImageBlog(image) {
                 return {
-                backgroundImage: `url(${image})`,
-                opacity: 1,
+                    backgroundImage: `url(${image})`,
+                    opacity: 1,
                 };
             },
+            async reload() {
+                this.$loading(true);
+                try {
+                    this.item = await this.getItem();
+                    let creators;
+                    creators = await this.$store.dispatch("user/getUserProfileByAddress",
+                        { keysearch: this.item.created_by }
+                    );
+
+                    this.viewCreator = creators[0];
+
+                    if (this.viewCreator == null)
+                    {
+                        this.viewCreator = {};
+                    }
+
+                    let owners = await this.$store.dispatch("user/getUserProfileByAddress",
+                        { keysearch: this.item.owner }
+                    );
+
+                    this.viewOwner = owners[0];
+
+                    if (this.viewOwner == null)
+                        this.viewOwner = {};
+                } 
+                catch (error) {
+                    this.$loading(false);
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error
+                        }
+                    );
+                }
+            
+                try {
+                    this.listOtherItems = await this.$store.dispatch("item/getItemsByCollection",
+                        {
+                            skip: 0,
+                            limit: this.filterData.limit,
+                            keysearch: this.item.collection_id,
+                        }
+                    );
+
+                    if (this.listOtherItems.length == this.filterData.limit) {
+                        this.filterData.skip += this.listOtherItems.length;
+                    } else {
+                        this.isShowMore = false;
+                    }
+
+                    this.collectionItems = await this.$store.dispatch(
+                        "collection/getDetailCollection", 
+                        {
+                            keysearch: this.item.collection_id,
+                        }
+                    );
+                } catch (error) {
+                    this.$loading(false);
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error
+                        }
+                    );
+                }
+
+//               await this.getFavorite();
+
+                this.$loading(false);
+            },
             getItem() {
-                return this.$store.dispatch("item/getDetailItem", { id: this.itemId });
+                return this.$store.dispatch("item/getDetailItem", 
+                    { id: this.itemId }
+                );
+            },
+            async getFavorite() {
+                try {
+                    this.favoriteCount = await this.$store.dispatch("activity/getFavoriteCount",
+                        {
+                            collection_id: this.item.collection_id,
+                            token_id: this.item.token_id
+                        }
+                    );
+
+                    let value = await this.$store.dispatch("activity/getFavoriteCount",
+                        {
+                            collection_id: this.item.collection_id,
+                            token_id: this.item.token_id,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    if (value > 0)
+                        this.isfavorited = true;
+                    else
+                        this.isfavorited = false;
+                } catch (error) {
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error
+                        }
+                    );
+                }
             },
             async loadNextItems() {
                 try {
-                    let totalCount = this.collectionItems.items.length;
-                    this.to += this.limit;
+                    this.filterData.keysearch = this.item.collection_id;
 
-                    if (this.to >= totalCount) {
-                        this.to = totalCount;
-                        this.isShowMore = false;
+                    let newData = await this.$store.dispatch("item/getItemsByCollection",  
+                        this.filterData
+                    );
+
+                    if (newData && newData.length > 0) {
+                        this.listOtherItems.push.apply(this.listOtherItems, newData);
+
+                        if (newData.length == this.filterData.limit) {
+                            this.filterData.skip += newData.length;
+                        } else {
+                            this.isShowMore = false;
+                        }
                     }
+                    else
+                        this.isShowMore = false;
+
                 } catch (error) {
-                    console.log(121212)
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error
+                        }
+                    );
                 }
             },
             async sellItem() {
-                await this.$store.dispatch("global/setLoadingTitle", "Sell Item");
-                this.$loadingModal(true);
-
-                try {
-                    const result = await this.$store.dispatch(
-                        "item/requestMintSignature",
-                        this.item.token_id
-                    );
-    
-                    const isSellItem = await Web3Ultils.sellItem(
-                        result,
-                        this.item,
-                        this.metaMaskAddress
-                    );
-                    if (isSellItem) {
-                        this.$successAlert({
-                            text: "Sell Item Successfull",
-                        });
- //                       this.$router.push("/user-profile");
+                if (this.userData) {
+                    this.$loading(true)
+                    try {
+                        await this.$store.dispatch("item/sellItem", {id:this.itemId,
+                                                                     is_on_market: 1});
+                        this.item.is_on_market = 1;
+                        this.$loading(false);
+                    } catch (error) {
+                        this.$loading(false);
+                        this.$store.dispatch("global/showMessage",
+                            { 
+                                kind:'show_error',
+                                content: error
+                            }
+                        );
                     }
-                } catch (error) {
-                    this.$failAlert({
-                        text: error,
-                    });
+                } else {
+                    this.$router.push("/connect-wallet");
                 }
-
-                this.$loadingModal(false);
             },
             convertToUSD(value) {
                 let eth = value || 0;
@@ -685,32 +782,66 @@
                 await this.$store.dispatch("global/setLoadingTitle", "Buy Item");
                 this.$loadingModal(true);
                 try {
-                    const result = await this.$store.dispatch(
-                        "item/requestBuyAsset",
-                        this.item.token_id
-                    );
-    
-                    const isBuyItem = await Web3Ultils.buyAsset(
-                        result,
+                    const isBuyItem = await Web3Ultils.buyItem(
                         this.item,
                         this.metaMaskAddress
                     );
 
                     if (isBuyItem) {
-                        this.$successAlert({
-                        text: "Buy Item Successfull",
-                        });
- //                       this.$router.push("/user-profile");
+                        this.$store.dispatch("global/showMessage",
+                            {   kind:'show_success',
+                                content: 'Buy Item Successfull'
+                            }
+                        );
+ //                     this.$router.push("/user-profile");
                     }
                 } 
                 catch (error) {
-                    this.$failAlert({
-                        text: error,
-                    });
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error
+                        }
+                    );
                 }
 
                 this.$loadingModal(false);
             },
+            redirectURL()
+            {
+                let url = "https://rinkeby.etherscan.io/address/" + this.collectionItems.address;
+                window.open(url, '_blank');
+            },
+            setFavorite()
+            {
+                if (!this.metaMaskAddress)
+                    return;
+
+                if (this.isfavorited){
+                    let value = this.$store.dispatch("activity/deleteFavorite",
+                        {
+                            collection_id: this.item.collection_id,
+                            token_id: this.item.token_id,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    this.isfavorited = false;
+                    this.favoriteCount--;
+                }
+                else {
+                    this.$store.dispatch("activity/insertFavorite",
+                        {
+                            collection_id: this.item.collection_id,
+                            token_id: this.item.token_id,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    this.isfavorited = true;
+                    this.favoriteCount++;
+                }
+            }
         },
     }
 </script>
@@ -718,6 +849,7 @@
 <style scoped>
 
     .img {
+        width:100% !important;
         max-height: 600px;
         text-align: center;
         border-radius: 12px;
@@ -745,5 +877,9 @@
         font-size: 14px;
         width: 350px;
         word-wrap: break-word;
+    }
+
+    i.red {
+        color: #ff6871;
     }
 </style>

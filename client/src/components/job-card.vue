@@ -32,9 +32,9 @@
             </div>
             <!-- =============== -->
             <h6 class="card_title">
-                <router-link :to="'item-details'" class="color_black">
+                <!--<router-link :to="'item-details'" class="color_black">-->
                     pop art Painting
-                </router-link>
+                <!--</router-link>-->
             </h6>
 
             <div class="card_footer d-block

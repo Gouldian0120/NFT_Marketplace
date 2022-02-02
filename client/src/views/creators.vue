@@ -12,17 +12,17 @@
                                 look at for a few seconds.
                             </p>
                         </div>
-                    </div>
+                    </div><!--
                     <div class="col-lg-auto mt-80">
-                        <router-link class="btn btn-dark" :to="{name:'connect-wallet'}"> 
+                        <router-link class="btn-white" :to="{name:'connect-wallet'}"> 
                             be one of our creators
                         </router-link>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
         <div class="container">
-            <div class="row"><!--
+            <div class="row">
                 <div class="col-lg-3 mb-4"  
                     v-for="(item, i) in listUsers"
                     :key="i">
@@ -30,18 +30,9 @@
                         :index="i"
                         :item-id="item.id"
                         :item-avatar="item.avatar"
-                        :item-name="item.full_name"
-                        :item-wallet="item.wallet_address">
-                    </creator-card>
-                </div>-->
-                <div class="col-lg-3 mb-4"  
-                    v-for="n in 8" :key="n">
-                    <creator-card 
-                        :index="n-1"
-                        item-id="123123"
-                        :item-avatar="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/avatar/avatar_1638152056627'"
-                        item-name="Anna"
-                        item-wallet="0xFC242f42127494934efc79386ec03DCc8991d095">
+                        :item-firstname="item.first_name"
+                        :item-lastname="item.last_name"
+                        :item-wallet="item.address">
                     </creator-card>
                 </div>
             </div>
@@ -56,40 +47,55 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="search">
-                                    <input v-model="wallet" type="text" placeholder="Search" 
+                                    <input v-model="wallet" type="text" placeholder="Input Wallet address" 
                                            class="bg_white" style="color:#000; background:white !important">
                                     <button class="result" @click="SearchCreator">
                                         <i class="ri-search-line"></i>
                                     </button>
                                 </div>
-                            </div><!--
+                            </div>
                             <div class="col-lg-auto">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm dropdown-toggle"
-                                            type="button"
-                                            data-toggle="dropdown" aria-haspopup="true"
+                                <div class="dropdown d-none d-sm-block">
+                                    <button class="btn-white btn-sm dropdown-toggle" type="button"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
                                             aria-expanded="false">
                                         Recent Active
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else here</a>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Action</span>
+                                            </a>
+                                        </div>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Another action</span>
+                                            </a>
+                                        </div>
+                                        <div class="links ml-10 mr-10">
+                                            <a href="">
+                                                <span class="p-2">Something else</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>-->
+                            </div>
                         </div>
                     </div>
                     <div class="section__body space-y-20">
                         <div class="row mb-20_reset">
-                            <div class="col-lg-4" v-for="n in 6" :key="n">
+                            <div class="col-lg-3 mb-4"  
+                                v-for="(item, i) in listUsers"
+                                :key="i">
                                 <creator-detail-card 
-                                    :index="n-1"
-                                    item-id="123123"
-                                    :item-avatar="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/avatar/avatar_1637952083624'"
-                                    :item-banner="'https://nimspace-staging-storage.s3.us-east-2.amazonaws.com/banner-user/banner-user_1637957938940'"
-                                    item-name="Danche"
-                                    item-wallet="0x2C4C168A2fE4CaB8E32d1B2A119d4Aa8BdA377e7">
+                                    :index="i"
+                                    :item-id="item.id"
+                                    :item-avatar="item.avatar"
+                                    :item-banner="item.banner_img"
+                                    :item-firstname="item.first_name"
+                                    :item-lastname="item.last_name"
+                                    :item-wallet="item.address">
                                 </creator-detail-card>
                             </div>
                         </div>
@@ -99,7 +105,7 @@
         </div>
         <div class="section__head mt-5 text-align:center">
             <div 
-                class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+                class="btn btn-white btn-sm d-flex align-items-center mx-auto" 
                 v-if="this.isShowMore"
                 @click="loadNextItems"
             >
@@ -126,7 +132,7 @@
                 filterData: {
                     skip: 0,
                     limit: 12,
-                    keySearch: null,
+                    keysearch: null,
                 },
             };
         },
@@ -149,19 +155,26 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 5) +
+                        "..." +
+                        wallet.substring(wallet.length - 5, wallet.length)
+                    );
             },
             async SearchCreator() {
-                this.this.listSearchResult = 
-                    await this.$store.dispatch("user/getDetailUser", 
-                        {
-                            id: this.wallet,
-                        }
-                    )
+                if (this.wallet.length > 0) {
+                    this.listUsers = 
+                        await this.$store.dispatch("user/getUserProfileByAddress", 
+                            {
+                                keysearch: this.wallet,
+                            }
+                        )
+                }
+                else
+                    this.getItems()
             },
             async getItems() {
                 try {

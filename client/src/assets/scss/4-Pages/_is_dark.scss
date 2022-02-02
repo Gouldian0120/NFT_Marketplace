@@ -37,8 +37,15 @@
         background: $color_dark !important;
     }
     .menu_activity li {
-        background-color: #e2eef114;
+        background-color: #183b56;
+        border: solid 1px #345a77;
     }
+
+    .menu_activity li:hover {
+        background-color: #566ffe;
+    //    background: $color-dark !important;
+    }
+
     .header__1 {
         background: $color_black !important;
         border-bottom: solid 1px #e2eef11f;
@@ -231,6 +238,10 @@
             border: none !important;
         }
     }
+    .btn-white {
+        color: white !important;
+    }
+
     .btn-white,
     .tags,
     .light_bg {
@@ -331,6 +342,7 @@
         &:hover {
             background: $color_dark;
         }
+        border-radius: 3px;
     }
 
     .vdp-datepicker__calendar div span{

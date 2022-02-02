@@ -20,7 +20,7 @@
                                 <router-link :to="{name:'marketplace'}" class="btn btn-primary">View
                                     market
                                 </router-link>
-                                <router-link class="btn btn-white" :to="{name:'upload-type'}">
+                                <router-link class="btn-white" :to="{name:'upload-type'}">
                                     Upload your item</router-link>
                             </div>
                         </div>

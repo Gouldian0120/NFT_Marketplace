@@ -66,6 +66,11 @@ const routes = [
         component: () => import( /* webpackChunkName: "about" */ '../views/createcollection.vue')
     },
     {
+        path: '/editcollection/:collectionid',
+        name: 'editcollection',
+        component: () => import( /* webpackChunkName: "about" */ '../views/editcollection.vue')
+    },
+    {
         path: '/edititem/:id',
         name: 'edititem',
         component: () => import( /* webpackChunkName: "about" */ '../views/edititem.vue')

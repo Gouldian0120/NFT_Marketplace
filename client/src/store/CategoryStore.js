@@ -7,16 +7,32 @@ export const CategoryStore = {
   },
   actions: {
     getCategories: async ({ commit }, data) => {
-      const result = await axios.get('http://192.168.107.91:3000/api/category/all', {
+      let url = process.env.VUE_APP_SERVER + "/api/category/all";
+
+      const result = await axios.get(url, {
         params: {
           skip:0, 
           limit:16, 
-          orderby:['id','ASC'], 
+          orderby:['id','ASC']
         }
       })
 
       let categories = result.data.data
       commit("SET_CATEGORY", categories);
+    },
+
+    getCategoriesById: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/category/all";
+
+      const result = await axios.get(url, {
+        params: {
+          filter:{
+            id:data.keysearch
+          }
+        }
+      })
+
+      return result.data.data[0];
     },
   },
   mutations: {

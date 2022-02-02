@@ -1,53 +1,34 @@
 import axios from 'axios'
-import { apolloClient } from "../utils/ApolloClient";
-import {
-  CREATE_ITEM,
-  EDIT_ITEM,
-  MINT_ITEM,
-  BUY_ITEM,
-  UPDATE_OWNER_ITEM,
-} from "./graphql/item/mutation";
-import {
-  GET_ALL_ITEM,
-  GET_ITEM_CATEGORY,
-  GET_ALL_ITEM_ON_SALE,
-  GET_ITEM_DETAIL,
-  GET_ITEM_OF_USER,
-  GET_ITEM_CREATED,
-} from "./graphql/item/query";
 
 export const ItemStore = {
   namespaced: true,
-  state: {},
+  state: {
+    messageContent: null,
+    messageType: null,
+  },
+  mutations: {
+    show_info(state,message) {
+      state.messageContent = message
+      state.messageType = 'info'
+    },
+    show_success(state,message) {
+        state.messageContent = message
+        state.messageType = 'success'
+    },
+    show_error(state,message) {
+        state.messageContent = message
+        state.messageType = 'error'
+    },
+    show_warning(state,message) {
+        state.messageContent = message
+        state.messageType = 'warning'
+    },
+  },
   actions: {
-    getItemForUser: async ({ commit }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: GET_ITEM_OF_USER,
-          variables: data,
-        })
-        .then(({ data }) => data.getItemForUser);*/
-        const result = await axios.get('http://192.168.107.91:3000/api/token/all', {
-          skip:data.skip, 
-          limit:data.limit, 
-          orderby:['name','ASC'], 
-          filter:{
-            creator:data.creator
-          }
-        })
-
-        return result.data.data
-    },
-    getItemCreated: ({ commit }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: GET_ITEM_CREATED,
-          variables: data,
-        })
-        .then(({ data }) => data.getItemCreated);*/
-    },
     getAllItems: async ({ commit }, data) => {
-      const result = await axios.get('http://192.168.107.91:3000/api/token/all', {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
         params: {
           skip:data.skip,
           limit:data.limit,
@@ -58,15 +39,41 @@ export const ItemStore = {
       return result.data.data
     },
     getItemsByCategory: async ({ commit }, data) => {
-      console.log(data)
-      const result = await axios.get('http://192.168.107.91:3000/api/token/all', {
-        params: data
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+        params: {
+          skip:data.skip,
+          limit:data.limit,
+          orderby:['name','ASC'], 
+          filter:{
+            category_id:data.keysearch
+          }
+        }
+      })
+
+      return result.data.data
+    },
+    getItemsByCollection: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+        params: {
+          skip:data.skip,
+          limit:data.limit,
+          orderby:['name','ASC'], 
+          filter:{
+            collection_id:data.keysearch
+          }
+        }
       })
 
       return result.data.data
     },
     getDetailItem: async ({ commit }, data) => {
-      const result = await axios.get('http://192.168.107.91:3000/api/token/all', {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
         params: {
           filter:{
             id:data.id
@@ -77,71 +84,93 @@ export const ItemStore = {
       return result.data.data[0]
     },
     getAllItemsOnSale: async ({ commit }, data) => {
-        const result = await axios.get('http://192.168.107.91:3000/api/token/all', {
-          params: data
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+        params: {
+          skip:data.skip,
+          limit:data.limit,
+          orderby:['name','ASC'],
+          filter:{
+            is_on_market:1
+          }
+        }
+      })
+
+      return result.data.data
+    },
+    getItemForCreator: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+          params: {
+            skip:data.skip,
+            limit:data.limit,
+            orderby:['name','ASC'],
+            filter:{
+              created_by:data.keysearch
+            }
+          }
         })
 
         return result.data.data
     },
-    editItem: ({ commit, dispatch }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: EDIT_ITEM,
-          variables: data,
-        })
-        .then(({ data }) => data.updateItem);*/
-      axios.put(`http://192.168.107.91:3000/api/token/${data.id}`, {
-        params: {
-          filter:{
-            name:data.name,
-            description:data.description,
-            short_url:data.short_url,
-            Socials1:data.Socials1,
-            Socials2:data.Socials2,
-            Socials3:data.Socials3,
-            Socials4:data.Socials4,
-            images:data.images,
-            banner_img:data.banner_img,
-            creator:data.creator,
-            updated_at:data.updated_at
+    getItemCountForCreator: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+          params: {
+            filter:{
+              created_by:data.keysearch
+            }
           }
+        })
+
+        return result.data.count
+    },
+    getItemForOwner: async ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/all";
+
+      const result = await axios.get(url, {
+        skip:data.skip, 
+        limit:data.limit, 
+        orderby:['name','ASC'], 
+        filter:{
+          owner:data.keysearch
         }
       })
+
+      return result.data.data
     },
-    requestMintSignature: ({ commit, dispatch }, data) => {
-      return apolloClient
-        .mutate({
-          mutation: MINT_ITEM,
-          variables: {
-            token_id: data,
-          },
-        })
-        .then(({ data }) => data.requestMintSignature);
+    editItem: ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/" + `${data.id}`;
+
+      axios.put(url, {
+        is_on_market: data.is_on_market,
+        is_market_option: data.is_market_option,
+        min_bid: data.min_bid,
+        start_bid: data.start_bid,
+        expire_bid: data.expire_bid
+      })
+
+      commit('show_success', 'Update item successfully!');
     },
-    requestBuyAsset: ({ commit, dispatch }, data) => {
-      return apolloClient
-        .mutate({
-          mutation: BUY_ITEM,
-          variables: {
-            token_id: data,
-          },
-        })
-        .then(({ data }) => data.requestBuyAsset);
+    sellItem: ({ commit }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/" + `${data.id}`;
+
+      axios.put(url, {
+        is_on_market: data.is_on_market,
+      })
+
+      commit('show_success', 'Update item successfully!');
     },
-    updateOwner: ({ commit, dispatch }, data) => {/*
-      return apolloClient
-        .mutate({
-          mutation: UPDATE_OWNER_ITEM,
-          variables: data,
-        })
-        .then(({ data }) => data.updateOwner);*/
-        axios.put(`http://192.168.107.91:3000/api/token/${data.id}`, {
+    updateOwner: ({ commit, dispatch }, data) => {
+      let url = process.env.VUE_APP_SERVER + "/api/token/" + `${data.id}`;
+      axios.put(url, {
           filter:{
-            creator:data.creator,
-            updated_at:data.updated_at
+            owner:data.owner
           }
-        })
+      })
     },
   },
-  mutations: {},
 };

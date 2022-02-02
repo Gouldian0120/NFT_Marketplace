@@ -1,15 +1,16 @@
 <template>
   <div>
     <template v-if="type === 'image-regular' || type === 'image-circle'">
-      <div class="file-input" :class="type">
-        <div class="image-container" style="padding:0">
-          <img v-if="type === 'image-circle' && inputValue && !hasImage" :src="inputValue" title="" />
-          <img v-if="type === 'image-regular' && inputValue && !hasImage" :src="inputValue" title="" 
-              style="border-radius:10px; height:300px; width:480px"/>
+      <div class="upload file-input" :class="type" @dragover.prevent @drop="onDrop">
+        <div class="pb-10"><h4>Drag &amp; drop your files here...</h4></div>
+        <div class="image-container">
+          <img v-if="type === 'image-circle' && inputValue && !hasImage" :src="inputValue" class="avatarImage" />
+          <img v-if="type === 'image-regular' && inputValue && !hasImage" :src="inputValue" class="bannerImage"
+                style="" />
           <img v-else-if="type === 'image-regular'"
-            :src="imageRegular" style="border-radius:10px; height:300px; width:480px"
+            :src="imageRegular" style="" class="bannerImage"
             title="" />
-          <img v-else :src="imageCircle" title="" />
+          <img v-else :src="imageCircle" title="" class="avatarImage"/>
         </div>
         <span v-if="type === 'image-circle'" style="text-align:left">
           We recommend an image of at least 400x400. Gifs work too.
@@ -31,12 +32,12 @@
               Select image  
             </template>
             <template v-else-if="type === 'image-circle' && !hasImage">
-              Add photo
+              Select photo
             </template>
             <template v-else>
               Change
             </template>
-            <input type="file" :name="type" @change="onFileChange" accept="image/*"/>
+            <input type="file" :id="id" :name="type" @change="onFileChange" accept="image/*"/>
           </button>
         </div>
       </div>
@@ -105,6 +106,7 @@ export default {
     multiple: Boolean,
     btnIcon: String,
     withButton: Boolean,
+    id:String
   },
   data() {
     return {
@@ -176,6 +178,15 @@ export default {
 
       visibleElem.value = names;
     },
+    onDrop (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      let files = e.dataTransfer.files
+      let fileInput = document.getElementById(this.id)
+      fileInput.files = files
+
+      this.onFileChange(e);
+    }
   },
 };
 </script>
@@ -210,9 +221,32 @@ export default {
     margin-bottom: 10px;
   }
 
+  .image-regular & {
+    border-radius: 10px;
+    max-width: 480px;
+    max-height: 300px;
+    overflow: hidden;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
+
   &,
   img {
     border-radius: 4px;
   }
+}
+
+.image-container:hover {
+  border:2px solid #183b56;
+}
+
+.avatarImage {
+  width:100px;
+  height:100px !important;
+}
+
+.bannerImage {
+  width:480px;
+  height:300px !important;
 }
 </style>

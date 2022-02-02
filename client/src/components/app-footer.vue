@@ -56,7 +56,7 @@
                             <li><router-link :to="{name:'upload'}"> Upload </router-link></li>
                             <li><router-link :to="{name:'connect-wallet'}"> Connect wallet
                             </router-link></li>
-                            <li><router-link :to="{name:'item-details'}"> Item details </router-link>
+                            <li> Item details
                             </li>
                         </ul>
                     </div>

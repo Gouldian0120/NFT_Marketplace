@@ -27,7 +27,7 @@
                         <textarea name="..." cols="30" rows="10"
                                   placeholder="Explain why you are concerned about it."></textarea>
                     </div>
-                    <a href="" class="btn btn-dark"> Report</a>
+                    <a href="" class="btn-white"> Report</a>
                 </div>
             </div>
         </div>

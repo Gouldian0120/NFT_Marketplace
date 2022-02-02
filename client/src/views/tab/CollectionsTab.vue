@@ -13,17 +13,18 @@
             :item-id="item.id"
             :item-name="item.name"
             :card-image="item.image"
-            :card-bannerimage="item.banner_img"
-            :creator="item.creator"
+            :card-bannerimage="item.banner_image"
+            :creator="item.created_by"
             :category-id="item.category_id"
-            :user-info="item.user_info"
+            :item-count="item.count_items"
+            :editable="true"
         >
         </collection-card>
       </div>
     </div>
     <div class="section__head mt-5 text-align:center">
         <div 
-            class="btn btn-dark btn-sm d-flex align-items-center mx-auto" 
+            class="btn btn-white btn-sm d-flex align-items-center mx-auto" 
             @click="loadNextItems"
             v-if="this.isShowMore"
         >
@@ -47,7 +48,6 @@
           this.loadFirst(newValue);
         } else {
           this.profileName = null;
-          this.filterData.wallet_address = null;
           this.listItems = [];
         }
       },
@@ -95,7 +95,7 @@
         this.$loading(true);
         try {
           this.profileName = newValue;
-          this.filterData.wallet_address = newValue;
+          this.filterData.keysearch = newValue;
           this.listItems = await this.$store.dispatch(
             "collection/getCollectionForUser",
             this.filterData
@@ -103,8 +103,9 @@
 
           if (this.listItems.length == this.filterData.limit) {
               this.filterData.skip += this.listItems.length;
-          } else
+          } else {
               this.isShowMore = false;
+          }
 
         } catch (error) {
           this.$failAlert({

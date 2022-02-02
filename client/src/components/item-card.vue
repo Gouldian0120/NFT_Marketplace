@@ -29,21 +29,19 @@
                 <router-link :to="'/item-details/' + this.itemId">
                     <div class="img-box zoom-box">
                         <div v-lazy-container="{ selector: 'img' }">
-                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>
+<!--                           <img class="loadimg" :data-src="cardImage" :data-loading="loadimage"/>-->
                         </div>
                     </div>
                 </router-link>
-                <a class="likes space-x-3">
-                    <i class="ri-heart-3-fill"></i>
-                    <span class="txt_sm">1.2k</span>
-                </a>
+               <!-- <div @click="setFavorite" class="likes space-x-3 cursor-pointer">-->
+                <div class="likes space-x-3">
+                    <i v-if="this.isfavorited" class="ri-heart-3-fill red"></i>
+                    <i v-if="!this.isfavorited" class="ri-heart-3-fill"></i>
+                    <span class="txt_sm">{{ this.itemFavoritecount }}</span>
+                </div>
             </div>
             <h6 class="card_title">
-                <router-link
-                    :to="'/item-details'"
-                    class="color_black">
-                    {{showShortName(this.itemName)}}
-                </router-link>
+                {{showShortName(this.itemName)}}
             </h6>
             <div class="card_footer d-block space-y-10">
                 <div class="card_footer justify-content-between">
@@ -53,7 +51,7 @@
                     <router-link :to="{name:'home'}">
                         <p class="txt_sm">
                             Price: <span class="color_green txt_sm">
-                                {{this.itemMinBid || 0}} ETH</span>
+                                {{this.itemMinbid || 0}} ETH</span>
                         </p>
                     </router-link>
                 </div>
@@ -72,22 +70,25 @@
                         </router-link>-->
                     </div>
                     <div class="d-flex align-items-center space-x-5" style="height:30px">
-                        <!--
-                        <a href="" v-if="this.itemOwner == metaMaskAddress && !this.itemSellOrder" 
+                        <div v-if="this.itemOwner == metaMaskAddress && !this.itemIsonmarket" 
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
-                            @click="sellItem" > Sell</a>
-                        <a href="" v-else-if="this.itemOwner == metaMaskAddress && this.itemSellOrder"
+                            @click="sellItem" > Sell</div>
+                        <div v-else-if="this.itemOwner == metaMaskAddress && this.itemIsonmarket"
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
-                            @click="editItem"> Edit Item</a>
-                        <a href="" v-if="this.itemIsputonmarket"
+                            >
+                            <router-link :to="'/edititem/' + this.itemId">
+                                Edit Item
+                            </router-link>
+                            </div>
+                        <div v-if="this.itemOwner != metaMaskAddress && this.itemIsonmarket"
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
-                            > Buy Now</a>-->
+                            > Buy Now</div>
                     </div>
                 </div>
             </div>
@@ -101,30 +102,44 @@
         props: {
             itemId: Number,
             itemName: String,
-            itemMinBid: Number,
+            itemMinbid: Number,
             cardImage: String,
             itemCreator:String,
             itemOwner:String,
-            itemIsputonmarket: Boolean,
+            itemIsonmarket: Number,
+            itemTokenid: Number,
+            itemCollectionid: Number,
+            itemFavoritecount: Number
         },
         data() {
             return {
                 loadimage: require("@/assets/img/loading.gif"),
+                favorite: false,
+                favoriteCount: 0,
+                isfavorited: false
             };
         },
-        mounted() {
+        async mounted() {
             let box = document.querySelectorAll('.img-box');
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
             })
+
+//          await this.getFavorite();
         },
        computed: {
             userData() {
                 return this.$store.state.user?.information;
             },
             metaMaskAddress() {
-                return this.userData?.wallet_address;
+                return this.userData?.address;
             },
+            totalfavoriteCount() {
+                return this.favoriteCount
+            },
+            favoriteStatus() {
+                return this.isfavorited
+            }
         },
         methods: {
             showShortName(name) {
@@ -138,20 +153,99 @@
                     );
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 5) +
+                        "..." +
+                        wallet.substring(wallet.length - 5, wallet.length)
+                    );
             },
+            async getFavorite() {
+                try {
+                    this.favoriteCount = await this.$store.dispatch("activity/getFavoriteCount",
+                        {
+                            collection_id: this.itemCollectionid,
+                            token_id: this.itemTokenid
+                        }
+                    );
+
+                    let value = await this.$store.dispatch("activity/getFavoriteCount",
+                        {
+                            collection_id: this.itemCollectionid,
+                            token_id: this.itemTokenid,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    if (value > 0)
+                        this.isfavorited = true;
+                    else
+                        this.isfavorited = false;
+                        
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+            setFavorite()
+            {
+                if (!this.metaMaskAddress)
+                    return;
+
+                if (this.isfavorited){
+                    let value = this.$store.dispatch("item/deleteFavorite",
+                        {
+                            collection_id: this.itemCollectionid,
+                            token_id: this.itemTokenid,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    this.isfavorited = false;
+                    this.favoriteCount--;
+                }
+                else {
+                    this.$store.dispatch("item/insertFavorite",
+                        {
+                            collection_id: this.itemCollectionid,
+                            token_id: this.itemTokenid,
+                            wallet_address: this.metaMaskAddress
+                        }
+                    );
+
+                    this.isfavorited = true;
+                    this.favoriteCount++;
+                }
+            },
+            async sellItem() {
+                if (this.userData) {
+                    this.$loading(true)
+                    try {
+                        await this.$store.dispatch("item/sellItem", {id:this.itemId,
+                                                                     is_on_market: 1});
+
+                        this.itemIsonmarket = 1;
+                        this.$loading(false);
+                    } catch (error) {
+                        this.$loading(false);
+                        this.$failAlert({
+                            text: error,
+                        });
+                    }
+                } else {
+                    this.$router.push("/connect-wallet");
+                }
+            },
+            buyItem() {
+            }
         },
     };
 </script>
 
 <style scoped>
     .loadimg {
-        width: 240px !important;
-        height: 180px !important;
+        height: 216px !important;
         text-align: center;
         border-radius: 12px;
     }

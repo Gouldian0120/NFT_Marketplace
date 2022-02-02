@@ -1,6 +1,7 @@
 <template>
     <div>
         <header class="header__1 js-header">
+            <notification v-if="hasMessage"/>
             <div class="container">
                 <div class="wrapper js-header-wrapper">
                     <div class="header__logo">
@@ -11,23 +12,23 @@
                         </router-link>
                     </div>
                     <div class="header__menu">
-                        <ul class="d-flex space-x-20">
-                            <li>
+                        <ul class="menu_categories space-x-10">
+                            <li class="btn-white btn-sm">
                                 <router-link :to="{name:'home'}" class="color_black"> Home</router-link>
                             </li>
-                            <li>
+                            <li class="btn-white btn-sm">
                                 <router-link :to="{name:'marketplace'}" class="color_black"> Marketplace</router-link>
                             </li>
-                            <li>
+                            <li class="btn-white btn-sm">
                                 <router-link :to="{name:'collections'}" class="color_black"> Collections</router-link>
                             </li><!--
                             <li>
                                 <router-link :to="{name:'profile'}" class="color_black"> Profile</router-link>
                             </li>-->
-                            <li>
+                            <li class="btn-white btn-sm">
                                 <router-link :to="{name:'creators'}" class="color_black"> Creators</router-link>
                             </li>
-                            <li>
+                            <li class="btn-white btn-sm">
                                 <router-link :to="{name:'activity'}" class="color_black"> Activity</router-link>
                             </li>
                         </ul>
@@ -48,20 +49,23 @@
                                     <i class="ri-notification-3-line"></i>
                                 </div>
                                 <div class="dropdown-menu space-y-10  pl-2 pr-2">
-                                    <div class="d-flex justify-content-between">
-                                        <h5> Notifications</h5>
-                                        <router-link to="/activity" class="badge color_white">
-                                            View all
+                                    <div class="d-flex justify-content-between px-2 py-1">
+                                        <h5 class="pt-1"> Notifications</h5>
+                                        <router-link to="/activity">
+                                            <span class="extra">View all</span>
                                         </router-link>
                                     </div>
-                                    <div class="item space-x-10 d-flex justify-content-between align-items-center">
+                                    <div class="hr"></div>
+                                    <div class="item space-x-10 d-flex pl-2 pr-5
+                                                justify-content-between 
+                                                align-items-center">
                                         <img class="thumb"
                                             :src="require('@/assets/img/notifications/1.png')"
                                             alt="..."
                                         />
-                                        <div class="" style="width:180px; word-wrap:break-word">
+                                        <div class="" style="word-wrap:break-word">
                                             <router-link to="/activity">
-                                                <div>Money revieved ...</div>
+                                                <span>Money revieved</span>
                                             </router-link>
                                             <p>0.6 ETH</p>
                                         </div>
@@ -80,7 +84,7 @@
                                 />
                             </div>
                             <div class="dropdown-menu space-y-10">
-                                <div class="d-flex align-items-center justify-content-between ml-10 mr-10">
+                                <div class="d-flex align-items-center justify-content-between ml-10 mr-10 px-2">
                                     <span>
                                         {{showWalletSeller(this.$store.state.user.account)}}
                                     </span>
@@ -93,7 +97,7 @@
                                 <div class="links ml-10 mr-10">
                                     <router-link :to="'/profile/' + this.$store.state.user.account">
                                         <a href="">
-                                            <i class="ri-landscape-line"></i> 
+                                            <i class="ri-landscape-line p-2"></i> 
                                             <span> My Items</span>
                                         </a>
                                     </router-link>
@@ -101,27 +105,27 @@
                                 <div class="links ml-10 mr-10">
                                     <router-link :to="'/editprofile/'">
                                         <a href="">
-                                            <i class="ri-pencil-line"></i> 
+                                            <i class="ri-pencil-line p-2"></i> 
                                             <span> Edit Profile</span>
                                         </a>
                                     </router-link>
                                 </div>
                                 <div class="links ml-10 mr-10">
                                     <a href="#" @click="logout">
-                                        <i class="ri-logout-circle-line"></i> 
+                                        <i class="ri-logout-circle-line p-2"></i> 
                                         <span> Logout</span>
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div class="header__btns">
-                            <router-link class="btn btn-primary btn-sm" to="/createcollection">
+                            <router-link class="btn-white btn-sm" to="/createcollection">
                                 Create
                             </router-link>
                         </div>
                     </div>
                     <div class="header__btns" v-else>
-                        <router-link :to="{name:'connect-wallet'}" class="btn btn-primary btn-sm">
+                        <router-link :to="{name:'connect-wallet'}" class="btn-white btn-sm">
                             Connect wallet
                         </router-link>
                     </div>
@@ -172,7 +176,11 @@
 </template>
 
 <script>
+    import Notification from '@/components/notification.vue';
     export default {
+        components: {
+            Notification
+        },
         name: "app-header",
         data() {
             return {
@@ -180,27 +188,37 @@
             }
         },
         async mounted() {
-//            document.addEventListener("scroll", this.scrollListener);
-//            var localAddress = localStorage.getItem("metaMaskAddress");
+//          document.addEventListener("scroll", this.scrollListener);
+            var localAddress = localStorage.getItem("metaMaskAddress");
 
             try {
-/*              if (localAddress && localAddress.length > 0) {
-                    await this.$store.dispatch("user/loginMetamask", localAddress);
+                if (localAddress && localAddress.length > 0) {
+                    await this.$store.dispatch("user/loginMetamask");
+                    await this.$store.dispatch("user/loginServer", localAddress);
                 } else {
                     this.$store.dispatch("user/logoutUser");
-                }*/
+                }
                 await this.$store.dispatch("category/getCategories");
             } catch (error) {
-                this.$failAlert({
-                    text: error,
-                });
+                this.$store.dispatch("global/showMessage",
+                    { 
+                        kind:'show_error',
+                        content: error
+                    }
+                );
                 return;
             }
         },
         computed: {
             metaMaskAddress() {
-                return this.$store.state.user.information?.wallet_address;
+                return this.$store.state.user.information?.address;
             },
+            hasMessage() {
+                return this.$store.state.user.messageContent!=null 
+                    || this.$store.state.collection.messageContent!=null
+                    || this.$store.state.item.messageContent!=null
+                    || this.$store.state.global.messageContent!=null
+            }
         },
         methods: {
             logout() {
@@ -208,30 +226,39 @@
                 this.$router.push("/");
             },
             showWalletSeller(wallet) {
-                return (
-                    wallet.substring(0, 5) +
-                    "..." +
-                    wallet.substring(wallet.length - 5, wallet.length)
-                );
+                if (wallet == null)
+                    return null;
+                else
+                    return (
+                        wallet.substring(0, 6) +
+                        "..." +
+                        wallet.substring(wallet.length - 8, wallet.length)
+                    );
             },
             copyToClipboard() {
                 if (!navigator.clipboard){
                     var input = document.createElement("input");
-                    input.setAttribute("value", this.profileName);
+                    console.log(this.$store.state.user.account)
+                    input.setAttribute("value", this.$store.state.user.account);
                     document.body.appendChild(input);
                     input.select();
                     var result = document.execCommand("copy");
                     document.body.removeChild(input);
 
-                    this.$successAlert({
-                        text: "Copy to clipboard successfull",
-                    });
-                } else{
-                    navigator.clipboard.writeText(this.profileName).then(
-                        console.log("success clipboard")
+                    this.$store.dispatch("global/showMessage",
+                        {   
+                            kind:'show_success',
+                            content: 'Copy to clipboard successfull'
+                        }
                     )
-                    .catch(
-                        console.log("error clipboard")
+                } else{
+                    navigator.clipboard.writeText(this.$store.state.user.account).then(
+                        this.$store.dispatch("global/showMessage",
+                            {   
+                                kind:'show_success',
+                                content: 'Copy to clipboard successfull'
+                            }
+                        )
                     )
                 }  
             },
@@ -251,4 +278,9 @@
         width:35px;
         height:35px;
     }
+
+    .extra {
+        font-size: 14px;
+    }
+
 </style>
