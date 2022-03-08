@@ -35,9 +35,9 @@
 				"type": "uint256"
 			},
 			{
-				"internalType": "address",
-				"name": "_maker",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
 			}
 		],
 		"name": "acceptOffer",
@@ -107,6 +107,12 @@
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "priceInWei",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "startAt",
 				"type": "uint256"
 			},
 			{
@@ -203,6 +209,11 @@
 				"internalType": "uint256",
 				"name": "_assetId",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
 			}
 		],
 		"name": "cancelOffer",
@@ -229,6 +240,79 @@
 		"type": "function"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "nftAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "royaltyRecipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "royalty",
+				"type": "uint256"
+			}
+		],
+		"name": "CollectionCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "nftAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "royaltyRecipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "royalty",
+				"type": "uint256"
+			}
+		],
+		"name": "CollectionUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_royaltyRecipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_royalty",
+				"type": "uint256"
+			}
+		],
+		"name": "createCollection",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -243,6 +327,11 @@
 			{
 				"internalType": "uint256",
 				"name": "_priceInWei",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_startAt",
 				"type": "uint256"
 			},
 			{
@@ -376,49 +465,6 @@
 			{
 				"indexed": false,
 				"internalType": "bytes32",
-				"name": "offerId",
-				"type": "bytes32"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "assetId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "maker",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "priceInWei",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "expiresAt",
-				"type": "uint256"
-			}
-		],
-		"name": "OfferUpdated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "bytes32",
 				"name": "orderId",
 				"type": "bytes32"
 			}
@@ -457,6 +503,12 @@
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "priceInWei",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "startAt",
 				"type": "uint256"
 			},
 			{
@@ -514,18 +566,6 @@
 				"internalType": "uint256",
 				"name": "priceInWei",
 				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "expiresAt",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "enum Marketplace.Status",
-				"name": "status",
-				"type": "uint8"
 			}
 		],
 		"name": "OrderUpdated",
@@ -574,14 +614,9 @@
 				"internalType": "uint256",
 				"name": "_assetId",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_expiresAt",
-				"type": "uint256"
 			}
 		],
-		"name": "PlaceBid",
+		"name": "placeBid",
 		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"
@@ -641,6 +676,19 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_account",
+				"type": "address"
+			}
+		],
+		"name": "setRoyaltyRecipient",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "newOwner",
 				"type": "address"
 			}
@@ -671,22 +719,17 @@
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
-				"name": "_assetId",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "_royaltyRecipient",
+				"type": "address"
 			},
 			{
 				"internalType": "uint256",
-				"name": "_priceInWei",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_expiresAt",
+				"name": "_royalty",
 				"type": "uint256"
 			}
 		],
-		"name": "updateOffer",
+		"name": "updateCollection",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -707,21 +750,42 @@
 				"internalType": "uint256",
 				"name": "_priceInWei",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_expiresAt",
-				"type": "uint256"
-			},
-			{
-				"internalType": "enum Marketplace.Status",
-				"name": "_status",
-				"type": "uint8"
 			}
 		],
 		"name": "updateOrder",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdrawFTM",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdrawToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
+	},
+	{
+		"inputs": [],
+		"name": "acceptedToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -756,7 +820,41 @@
 			},
 			{
 				"internalType": "uint256",
+				"name": "startAt",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "expiresAt",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "collections",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "royaltyRecipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "royalty",
 				"type": "uint256"
 			}
 		],
@@ -793,6 +891,11 @@
 					{
 						"internalType": "uint256",
 						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startAt",
 						"type": "uint256"
 					},
 					{
@@ -844,6 +947,11 @@
 					{
 						"internalType": "uint256",
 						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startAt",
 						"type": "uint256"
 					},
 					{
@@ -904,40 +1012,6 @@
 				"internalType": "uint256",
 				"name": "expiresAt",
 				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "active",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "offerIndexByMaker",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -976,6 +1050,11 @@
 			{
 				"internalType": "uint256",
 				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "startAt",
 				"type": "uint256"
 			},
 			{

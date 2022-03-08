@@ -14,7 +14,8 @@
                         <div>
                             <p><span class="nameInput p-20">Image</span></p>
                             <div class="left__part mt-10">
-                               <img class="loadimg" :src="changeImagePath(item.image)" />
+                               <img class="loadimg" v-if="item != null" 
+                                    :src="changeImagePath(item.image)" />
                             </div>
                         </div>
                         <div class="space-y-5 mt-40">
@@ -76,7 +77,8 @@
                                 <span class="pl-20">Starting Date</span>
                                 <div>
                                     <datepicker  
-                                        v-model="item.start_bid" format="yyyy-MM-dd"></datepicker>
+                                        v-model="item.start_at" format="yyyy-MM-dd">
+                                    </datepicker>
                                     <p class="pl-20">
                                         **Any bid placed in the last 10 minutes extends
                                         the auction by 10 minutes.
@@ -88,7 +90,7 @@
                                 <div>
                                     <select
                                         id="selectExpiration"
-                                        v-model="item.expire_bid"
+                                        v-model="item.expires_at"
                                         name="selectExpiration"
                                         placeholder="Select Expiration"
                                     >
@@ -127,14 +129,14 @@
                                 <div class="space-y-5">
                                     <span class="variationInput p-20">Category</span>
                                     <input type="text" class="form-control"
-                                            v-model="categoryItem.name"
+                                            v-model="categoryName"
                                             placeholder="item category name"
                                             readonly disabled>
                                 </div>
                                 <div class="space-y-5">
                                     <span class="variationInput p-20">Collection</span>
                                     <input type="text" class="form-control"
-                                            v-model="collectionItem.name"
+                                            v-model="collectionName"
                                             placeholder="item collection name"
                                             readonly disabled>
                                 </div>
@@ -157,7 +159,7 @@
 <script>
     import InfoAreas from "../components/InfoAreas";
     import Datepicker from 'vuejs-datepicker';
-    import Web3Ultils from "../utils/Web3Ultils";
+    import { Web3Ultils } from "../utils/Web3Ultils";
 
     export default {
         components: {
@@ -167,9 +169,20 @@
         data() {
             return {
                 collectionItem: null,
+                collectionName: '',
                 categoryItem: null,
+                categoryName: '',
                 image: require("@/assets/img/bg7.jpg"),
-                item: null,
+                item: {
+                    name: '',
+                    image: '',
+                    is_on_market: 0,
+                    is_market_option: 0,
+                    min_bid: 0,
+                    start_at: '',
+                    expires_at: '',
+                    description: ''
+                },
                 status: null
             };
         },
@@ -204,7 +217,7 @@
                 this.$store.dispatch("global/showMessage",
                     { 
                         kind:'show_error',
-                        content: error
+                        content: error.message
                     }
                 );
                 this.$router.go(-1);
@@ -217,6 +230,7 @@
                         keysearch: this.item.collection_id,
                     }
                 );
+                this.collectionName = this.collectionItem.name;
 
                 this.categoryItem = await this.$store.dispatch(
                     "category/getCategoriesById", 
@@ -224,6 +238,7 @@
                         keysearch: this.collectionItem.category_id,
                     }
                 );
+                this.categoryName = this.categoryItem.name;
             } else {
                 this.$router.push("/connect-wallet");
             }
@@ -244,30 +259,33 @@
             },
             async editItem() {
                 if (this.userData) {
-                    await this.$store.dispatch("global/setLoadingTitle", "Sell Item");
-                    this.$loadingModal(true);
-
                     try {
-                        const isSellItem = await Web3Ultils.sellItem(
-                            this.item,
+                        this.$loading(true);
+
+                        const isSellItem = await Web3Ultils.sellItem(this.item, 
                             this.collectionItem.address,
-                            this.wallet_address,
-                            this.status
+                            this.wallet_address
                         );
-
+/*
                         if (isSellItem) {
-                            this.$router.push("/profile/" + this.userData.address);
+                            this.$store.dispatch("global/showMessage",
+                                {   kind:'show_success',
+                                    content: 'Create auction Successfull'
+                                }
+                            );
                         }
+*/
+                        this.$loading(false);
+                        this.$router.push("/profile/" + this.userData.address);
                     } catch (error) {
+                        this.$loading(false);
                         this.$store.dispatch("global/showMessage",
-                            { 
-                                kind:'show_error',
-                                content: error
-                            }
-                        );
+                                { 
+                                    kind:'show_error',
+                                    content: error.message
+                                }
+                            );
                     }
-
-                    this.$loadingModal(false);
                 }
                 else {
                     this.$router.push("/connect-wallet");

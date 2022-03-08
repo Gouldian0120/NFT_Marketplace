@@ -6,11 +6,11 @@
                     <div class="col-md-6">
                         <div style="background-color:#fff"
                              class="item_img p-1">
-                             <div v-lazy-container="{ selector: 'img' }">
+                             <div v-lazy-container="{ selector: 'img' }"><!--
                                 <img class="img"
                                     :data-src="changeImagePath(item.image)"
                                     :data-loading="loadimage"
-                                />
+                                />-->
                             </div>
                         </div>
                         <div class="my-3">
@@ -47,7 +47,7 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Collection</span>
-                                                <span class="row-right">{{ collectionItems.name }}</span>
+                                                <span class="row-right">{{ collectionItem.name }}</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Network</span>
@@ -75,11 +75,11 @@
                                         <div class="card-body">
                                             <div class="row-detail">
                                                 <span class="row-left">Royalty</span>
-                                                <span class="row-right">{{ collectionItems.royalty }} %</span>
+                                                <span class="row-right">{{ collectionItem.royalty }} %</span>
                                             </div>
                                             <div class="row-detail">
                                                 <span class="row-left">Recipient</span>
-                                                <span class="row-right">{{ collectionItems.fee_recipient }}</span>
+                                                <span class="row-right">{{ collectionItem.fee_recipient }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -269,7 +269,7 @@
                                                 <span class="row-left">Contract Address</span>
                                                 <span class="row-right">
                                                     <a href="#" @click="redirectURL" target="_blank">
-                                                        {{this.collectionItems.address}}
+                                                        {{this.collectionItem.address}}
                                                     </a>
                                                 </span>
                                             </div>
@@ -393,9 +393,9 @@
                     <div class="media">
                         <router-link :to="'/marketplace/' + this.item.collection_id">
                             <div v-lazy-container="{ selector: 'img' }">
-                                <img class="loadimg avatar avatar-sm" :data-src="collectionItems.image" :data-loading="loadimage"/>
-                                <span class="avatars_name color_green ml-1">{{ collectionItems.name }}</span>
-                                <span class="color_green text-sm"> ( {{this.collectionItems.count_items - 1}} items )</span>
+                                <img class="loadimg avatar avatar-sm" :data-src="collectionItem.image" :data-loading="loadimage"/>
+                                <span class="avatars_name color_green ml-1">{{ collectionItem.name }}</span>
+                                <span class="color_green text-sm"> ( {{this.collectionItem.count_items - 1}} items )</span>
                             </div>
                         </router-link>
                     </div>
@@ -449,7 +449,7 @@
                 avatarimage: require("@/assets/img/avatars/avatar_4.png"),
                 item: {},
                 listOtherItems: [],
-                collectionItems: {},
+                collectionItem: {},
                 carouselItems: [],
                 listItems: [],
                 selectColor: "rose",
@@ -641,7 +641,7 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }
@@ -661,7 +661,7 @@
                         this.isShowMore = false;
                     }
 
-                    this.collectionItems = await this.$store.dispatch(
+                    this.collectionItem = await this.$store.dispatch(
                         "collection/getDetailCollection", 
                         {
                             keysearch: this.item.collection_id,
@@ -672,12 +672,12 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }
 
-//               await this.getFavorite();
+                await this.getFavorite();
 
                 this.$loading(false);
             },
@@ -711,7 +711,7 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }
@@ -740,7 +740,7 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }
@@ -758,7 +758,7 @@
                         this.$store.dispatch("global/showMessage",
                             { 
                                 kind:'show_error',
-                                content: error
+                                content: error.message
                             }
                         );
                     }
@@ -784,6 +784,7 @@
                 try {
                     const isBuyItem = await Web3Ultils.buyItem(
                         this.item,
+                        this.collectionItem.address,
                         this.metaMaskAddress
                     );
 
@@ -800,7 +801,7 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }
@@ -809,7 +810,7 @@
             },
             redirectURL()
             {
-                let url = "https://rinkeby.etherscan.io/address/" + this.collectionItems.address;
+                let url = "https://rinkeby.etherscan.io/address/" + this.collectionItem.address;
                 window.open(url, '_blank');
             },
             setFavorite()

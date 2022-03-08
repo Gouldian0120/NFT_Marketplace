@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const UserStore = {
+export const AuctionStore = {
   namespaced: true,
   state: {
     account: null,
@@ -23,11 +23,9 @@ export const UserStore = {
         }
       })
     },
-    createOrder: ({ commit }, data) => {
+    createOrder: async ({ commit }, data) => {
       let url = process.env.VUE_APP_SERVER + "/api/auction/";
-      axios.post(url, {
-        data
-      })
+      const result = await axios.post(url, data)
     },
     updateOrder: ({ commit }, data) => {
       let url = process.env.VUE_APP_SERVER + "/api/auction/" + `${data.id}`;

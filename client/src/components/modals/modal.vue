@@ -10,7 +10,6 @@
           <div class="modal-header">
             <slot name="header" />
           </div>
-
           <div
             v-if="$slots.body"
             class="modal-body text-center"

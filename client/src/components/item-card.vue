@@ -70,12 +70,12 @@
                         </router-link>-->
                     </div>
                     <div class="d-flex align-items-center space-x-5" style="height:30px">
-                        <div v-if="this.itemOwner == metaMaskAddress && !this.itemIsonmarket" 
+                        <div v-if="this.itemOwner == metaMaskAddress && !this.itemStatus" 
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
                             @click="sellItem" > Sell</div>
-                        <div v-else-if="this.itemOwner == metaMaskAddress && this.itemIsonmarket"
+                        <div v-else-if="this.itemOwner == metaMaskAddress && this.itemStatus"
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
@@ -84,7 +84,7 @@
                                 Edit Item
                             </router-link>
                             </div>
-                        <div v-if="this.itemOwner != metaMaskAddress && this.itemIsonmarket"
+                        <div v-if="this.itemOwner != metaMaskAddress && this.itemStatus"
                             class="btn btn-sm btn-primary" 
                             data-toggle="modal"
                             data-target="#popup_buy"
@@ -116,7 +116,8 @@
                 loadimage: require("@/assets/img/loading.gif"),
                 favorite: false,
                 favoriteCount: 0,
-                isfavorited: false
+                isfavorited: false,
+                itemSellStatus: null
             };
         },
         async mounted() {
@@ -124,6 +125,8 @@
             box.forEach(el=>{
                 el.style.height=el.offsetWidth*0.75+'px'
             })
+
+            this.itemSellStatus = this.itemIsonmarket
 
 //          await this.getFavorite();
         },
@@ -139,6 +142,9 @@
             },
             favoriteStatus() {
                 return this.isfavorited
+            },
+            itemStatus() {
+                return this.itemSellStatus
             }
         },
         methods: {
@@ -225,7 +231,7 @@
                         await this.$store.dispatch("item/sellItem", {id:this.itemId,
                                                                      is_on_market: 1});
 
-                        this.itemIsonmarket = 1;
+                        this.itemSellStatus = 1;
                         this.$loading(false);
                     } catch (error) {
                         this.$loading(false);

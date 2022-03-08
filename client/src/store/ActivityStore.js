@@ -31,13 +31,12 @@ export const ActivityStore = {
 
     addActivity: async ({ commit }, data) => {
       let url = process.env.VUE_APP_SERVER + "/api/activity/";
-      axios.post(url, {
-        data
-      })
+      axios.post(url, data)
     },
 
     getFavoriteCount: async ({ commit }, data) => {
       let url = process.env.VUE_APP_SERVER + "/api/favorite/all";
+
       const result = await axios.get(url, {
         params: {
           filter:data

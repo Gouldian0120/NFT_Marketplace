@@ -149,8 +149,8 @@ export const ItemStore = {
         is_on_market: data.is_on_market,
         is_market_option: data.is_market_option,
         min_bid: data.min_bid,
-        start_bid: data.start_bid,
-        expire_bid: data.expire_bid
+        start_at: data.start_at,
+        expires_at: data.expires_at
       })
 
       commit('show_success', 'Update item successfully!');
@@ -160,9 +160,10 @@ export const ItemStore = {
 
       axios.put(url, {
         is_on_market: data.is_on_market,
+        is_market_option: 1
       })
 
-      commit('show_success', 'Update item successfully!');
+//    commit('show_success', 'Update item successfully!');
     },
     updateOwner: ({ commit, dispatch }, data) => {
       let url = process.env.VUE_APP_SERVER + "/api/token/" + `${data.id}`;

@@ -579,6 +579,81 @@ abstract contract Pausable is Context {
     }
 }
 
+interface IERC20 {
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -760,6 +835,12 @@ contract Marketplace is Ownable, Pausable {
         uint256 expiresAt;
     }
 
+    struct Collection {
+        address nftAddress;
+        address royaltyRecipient;
+        uint256 royalty;
+    }
+
     enum Status {
         Pending,
         FixedPrice,
@@ -775,53 +856,75 @@ contract Marketplace is Ownable, Pausable {
     // From ERC721 registry assetId to Order (to avoid asset collision)
     mapping(address => mapping(uint256 =>Offer[])) public offerByAssetId;
 
+    mapping(address => Collection) public collections;
+
     // royalty
-    uint256 royalty = 1000; // 10%
+    uint256 royalty = 250; // 2.5% fee for fantoon marketplace
+    address royaltyRecipient;
+
+    event CollectionCreated(
+        address nftAddress,
+        address royaltyRecipient,
+        uint256 royalty
+    );
+
+    event CollectionUpdated(
+        address nftAddress,
+        address royaltyRecipient,
+        uint256 royalty
+    );
 
     event OrderCreated(
-            bytes32 orderId,
-            address assetOwner,
-            address nftAddress,
-            uint256 assetId,
-            uint256 priceInWei,
-            uint256 startAt,
-            uint256 expiresAt,
-            Status status
-        );
+        bytes32 orderId,
+        address assetOwner,
+        address nftAddress,
+        uint256 assetId,
+        uint256 priceInWei,
+        uint256 startAt,
+        uint256 expiresAt,
+        Status status
+    );
 
     event OrderCancelled(bytes32 orderId);
     event OrderUpdated(bytes32 orderId, uint256 priceInWei);
     event OrderSuccessful(bytes32 orderId, address buyer, uint256 priceInWei);
     event Buycreate(
-            address nftAddress,
-            uint256 assetId,
-            address seller,
-            address buyer,
-            uint256 priceInWei
-        );
+        address nftAddress,
+        uint256 assetId,
+        address seller,
+        address buyer,
+        uint256 priceInWei
+    );
+
     event BidCreated(
-            bytes32 bidId,
-            address nftAddress,
-            uint256 assetId,
-            address bidder,
-            uint256 priceInWei,
-            uint256 startAt,
-            uint256 expiresAt
-        );
+        bytes32 bidId,
+        address nftAddress,
+        uint256 assetId,
+        address bidder,
+        uint256 priceInWei,
+        uint256 startAt,
+        uint256 expiresAt
+    );
 
     event BidAccepted(bytes32 bidId);
     event BidCancelled(bytes32 bidId);
 
     event OfferCreated(
-            bytes32 offerId,
-            address nftAddress,
-            uint256 assetId,
-            address maker,
-            uint256 priceInWei,
-            uint256 expiresAt
-        );
+        bytes32 offerId,
+        address nftAddress,
+        uint256 assetId,
+        address maker,
+        uint256 priceInWei,
+        uint256 expiresAt
+    );
+
     event OfferAccepted(bytes32 offerId);
     event OfferCancelled(address nftAddress, uint256 assetId, address maker);
+
+    modifier notRegisteredNFT(address _nftAddress) {
+        require(collections[_nftAddress].nftAddress != address(0), "Not registered NFT");
+        _;
+    }
 
     /**
      * @dev Initialize this contract. Acts as a constructor
@@ -829,6 +932,11 @@ contract Marketplace is Ownable, Pausable {
     constructor() Ownable() {
         acceptedToken = IERC20(0xf1277d1Ed8AD466beddF92ef448A132661956621); //WFTM in testnet
 //      acceptedToken = IERC20(0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83); //WFTM in mainnet
+
+        royaltyRecipient = owner();
+    }
+
+    receive() external payable {
     }
 
     /**
@@ -849,6 +957,75 @@ contract Marketplace is Ownable, Pausable {
     }
 
     /**
+     * @dev Sets the Royalty Recipient. Can only be called by owner
+     * @param _account - Royalty Recipient address
+     */
+    function setRoyaltyRecipient (address _account) public onlyOwner {
+       require(_account != address(0), "Wrong address");
+       royaltyRecipient = _account;
+    }
+
+    /**
+     * @dev Creates a new collection
+     * @param _nftAddress - Non fungible registry address
+     * @param _royaltyRecipient - address of royalty recipient
+     * @param _royalty - royalty amount for royalty recipient
+     */
+    function createCollection(
+        address _nftAddress, address _royaltyRecipient, uint256 _royalty) public {
+        // Check nft registry
+//        IERC721 nftRegistry = _requireERC721(_nftAddress);
+
+        // Check order creator is the asset owner
+//      address nftOwner = nftRegistry.owner();
+
+//      require(nftOwner == msg.sender, "Marketplace: Only the asset owner can create orders");
+        require(collections[_nftAddress].nftAddress == address(0), 
+                "Marketplace: nftAddress already created");
+
+        // save collection
+        collections[_nftAddress] = Collection ({
+            nftAddress: _nftAddress,
+            royaltyRecipient: _royaltyRecipient,
+            royalty: _royalty
+        });
+
+        emit CollectionCreated(
+            _nftAddress,
+            _royaltyRecipient,
+            _royalty
+        );
+    }
+
+/**
+     * @dev update a collection
+     * @param _nftAddress - Non fungible registry address
+     * @param _royaltyRecipient - address of royalty recipient
+     * @param _royalty - royalty amount for royalty recipient
+     */
+    function updateCollection(
+        address _nftAddress, address _royaltyRecipient, uint256 _royalty) public notRegisteredNFT(_nftAddress) {
+        // Check nft registry
+//      IERC721 nftRegistry = _requireERC721(_nftAddress);
+
+        // Check order creator is the asset owner
+//      address nftOwner = nftRegistry.owner();
+
+//      require(nftOwner == msg.sender, "Marketplace: Only the asset owner can create orders");
+        require(collections[_nftAddress].nftAddress == _nftAddress, 
+                "Marketplace: nftAddress not created");
+
+        collections[_nftAddress].royaltyRecipient = _royaltyRecipient;
+        collections[_nftAddress].royalty = _royalty;
+
+        emit CollectionUpdated(
+            _nftAddress,
+            _royaltyRecipient,
+            _royalty
+        );
+    }
+
+    /**
      * @dev Creates a new order
      * @param _nftAddress - Non fungible registry address
      * @param _assetId - ID of the published NFT
@@ -858,7 +1035,7 @@ contract Marketplace is Ownable, Pausable {
      */
     function createOrder(
         address _nftAddress, uint256 _assetId, uint256 _priceInWei, 
-        uint256 _startAt, uint256 _expiresAt, Status _status) public whenNotPaused {
+        uint256 _startAt, uint256 _expiresAt, Status _status) public whenNotPaused notRegisteredNFT(_nftAddress) {
         // Check nft registry
         IERC721 nftRegistry = _requireERC721(_nftAddress);
 
@@ -915,7 +1092,7 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function cancelOrder(address _nftAddress, uint256 _assetId) public whenNotPaused {
+    function cancelOrder(address _nftAddress, uint256 _assetId) public whenNotPaused notRegisteredNFT(_nftAddress) {
         Order memory order = orderByAssetId[_nftAddress][_assetId];
 
         require(order.seller == msg.sender || msg.sender == owner(), "Marketplace: unauthorized sender");
@@ -946,7 +1123,8 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function updateOrder(address _nftAddress, uint256 _assetId, uint256 _priceInWei) public whenNotPaused {
+    function updateOrder(address _nftAddress, uint256 _assetId, uint256 _priceInWei) 
+            public whenNotPaused notRegisteredNFT(_nftAddress) {
         Order memory order = orderByAssetId[_nftAddress][_assetId];
 
         // Check valid order to update
@@ -957,7 +1135,7 @@ contract Marketplace is Ownable, Pausable {
         require(_priceInWei > 0 && _priceInWei < order.price , 
             "Marketplace: Price should be bigger than 0 and smaller than current price");
 
-        order.price = _priceInWei;
+        orderByAssetId[_nftAddress][_assetId].price = _priceInWei;
 
         emit OrderUpdated(order.id, _priceInWei);
     }
@@ -967,14 +1145,13 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function safeExecuteOrder(address _nftAddress, uint256 _assetId) public payable whenNotPaused {
+    function safeExecuteOrder(address _nftAddress, uint256 _assetId) public payable whenNotPaused notRegisteredNFT(_nftAddress) {
         // Get the current valid order for the asset or fail
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
         /// Check the execution price matches the order price
-        require(order.price == msg.value, "Marketplace: invalid price");
+        require(order.price <= msg.value, "Marketplace: invalid price");
         require(order.seller != msg.sender, "Marketplace: unauthorized sender");
-        require(order.buyer == msg.sender, "Marketplace: unauthorized sender");
 
         // market fee to cut
         uint256 _priceInWei = msg.value;
@@ -1002,17 +1179,18 @@ contract Marketplace is Ownable, Pausable {
         );
     }
 
+
     /**
      * @dev Buy the sale for a published NFT and checks for the asset fingerprint
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function Buy(address _nftAddress, uint256 _assetId) public payable whenNotPaused {
+    function Buy(address _nftAddress, uint256 _assetId) public payable whenNotPaused notRegisteredNFT(_nftAddress) {
         // Checks order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
         require(order.status == Status.FixedPrice, "Unauthorized");
-        require(msg.value == order.price, "Marketplace : price is not right");
+        require(msg.value >= order.price, "Marketplace : price is not right");
         require(block.timestamp > order.startAt && block.timestamp < order.expiresAt, 
             "Marketplace : You can not buy now");
 
@@ -1031,8 +1209,7 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function PlaceBid(address _nftAddress, uint256 _assetId) public payable whenNotPaused
-    {
+    function placeBid(address _nftAddress, uint256 _assetId) public payable whenNotPaused notRegisteredNFT(_nftAddress) {
         // Checks order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
@@ -1062,7 +1239,7 @@ contract Marketplace is Ownable, Pausable {
             );
         } 
         else {
-            require(_priceInWei > 0, "Marketplace: bid should be > 0");
+            require(_priceInWei > order.price, "Marketplace: bid should be > order's initial price");
         }
 
         // Create bid
@@ -1076,8 +1253,8 @@ contract Marketplace is Ownable, Pausable {
             )
         );
 
-        if (order.exiresAt.sub(block.timestamp) < 10 minutes) {
-            order.exiresAt = order.exiresAt.add(10 minutes);
+        if (order.expiresAt.sub(block.timestamp) < 10 minutes) {
+            order.expiresAt = order.expiresAt.add(10 minutes);
         }
 
         // Save Bid for this order
@@ -1107,7 +1284,7 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function cancelBid(address _nftAddress, uint256 _assetId) public whenNotPaused {
+    function cancelBid(address _nftAddress, uint256 _assetId) public whenNotPaused notRegisteredNFT(_nftAddress) {
         Bid memory bid = bidByOrderId[_nftAddress][_assetId];
 
         require(bid.bidder == msg.sender || msg.sender == owner(), "Marketplace: Unauthorized sender");
@@ -1127,9 +1304,10 @@ contract Marketplace is Ownable, Pausable {
      * @dev Executes the sale for a published NFT by accepting a current bid, called by the owner of token
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
-     * @param _priceInWei - Bid price
+     * @param _priceInWei - bid price
      */
-    function acceptBid(address _nftAddress, uint256 _assetId) public whenNotPaused {
+    function acceptBid(address _nftAddress, uint256 _assetId, uint256 _priceInWei) 
+        public whenNotPaused notRegisteredNFT(_nftAddress) {
         // check order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
@@ -1162,12 +1340,12 @@ contract Marketplace is Ownable, Pausable {
      * @param _priceInWei - Offer price
      * @param _expiresAt - Offer expiration time
      */
-    function makeOffer(address _nftAddress, uint256 _assetId, 
-                        uint256 _priceInWei, uint256 _expiresAt) public whenNotPaused {
+    function makeOffer(address _nftAddress, uint256 _assetId, uint256 _priceInWei, uint256 _expiresAt) 
+        public whenNotPaused notRegisteredNFT(_nftAddress) {
         // Checks order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
-        require(order.status == Status.pending || order.status == Status.FixedPrice || 
+        require(order.status == Status.Pending || order.status == Status.FixedPrice || 
                 (order.status == Status.Auction && block.timestamp > order.expiresAt), "Unauthorized");
 
         // check on expire time
@@ -1190,8 +1368,7 @@ contract Marketplace is Ownable, Pausable {
             id: offerId,
             maker: msg.sender,
             price: _priceInWei,
-            expiresAt: _expiresAt,
-            active: true
+            expiresAt: _expiresAt
         });
 
         offerByAssetId[_nftAddress][_assetId].push(_offer);
@@ -1210,41 +1387,47 @@ contract Marketplace is Ownable, Pausable {
      * @dev Executes the sale for a published NFT by accepting a current bid, called by the owner of token
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
-     * @param _maker - Address of the offer maker
+     * @param index - index of the offer
      */
-    function acceptOffer(address _nftAddress, uint256 _assetId, uint index) public whenNotPaused {
+    function acceptOffer(address _nftAddress, uint256 _assetId, uint index) 
+        public whenNotPaused notRegisteredNFT(_nftAddress) {
         // check order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
         // item seller is the only allowed to accept a bid
         require(order.seller == msg.sender, "Marketplace: unauthorized sender");
-        require(index < offerIndexByMaker[_nftAddress][_assetId].length, "Marketplace: Wrong index")
+        require(index < offerByAssetId[_nftAddress][_assetId].length, "Marketplace: Wrong index");
 
-        Offer memory _offer = offerIndexByMaker[_nftAddress][_assetId][index];
+        Offer memory _offer = offerByAssetId[_nftAddress][_assetId][index];
 
         require(block.timestamp < _offer.expiresAt, "Marketplace : Marketplace: offer expired");
 
-        order.buyer = offer.maker;
-        order.price = offer.price;
+        order.price = _offer.price;
 
-        emit OfferAccepted(offer.id);
+        emit OfferAccepted(_offer.id);
 
         uint256 _priceInWei = order.price;
 
         //royalty
-        uint256 royaltyShareAmount= _priceInWei.mul(royalty).div(1e4);
 
-        acceptedToken.transferFrom(order.buyer, IERC721(_nftAddress).createrOf(_assetId)), proyaltyShareAmount);
-        acceptedToken.transferFrom(order.buyer, order.seller, priceInWei.sub(royaltyShareAmount));
+        //royalty for fantoon Marketplace
+        uint256 royaltyforFatoon= _priceInWei.mul(royalty).div(1e4);
+        acceptedToken.transferFrom(_offer.maker, royaltyRecipient, royaltyforFatoon);
+
+        //royalty for nft creator
+        uint256 royaltyforNFTCreator= _priceInWei.mul(collections[_nftAddress].royalty).div(1e4);
+        acceptedToken.transferFrom(_offer.maker, collections[_nftAddress].royaltyRecipient, royaltyforNFTCreator);
+
+        acceptedToken.transferFrom(_offer.maker, order.seller, _priceInWei.sub(royaltyforFatoon.add(royaltyforNFTCreator)));
 
         // remove order
         delete orderByAssetId[_nftAddress][_assetId];
 
         // Transfer NFT asset
-        IERC721(_nftAddress).transfer(_buyer, _assetId);
+        IERC721(_nftAddress).transferFrom(address(this), _offer.maker, _assetId);
 
         // Notify ..
-        emit OrderSuccessful(order.id, _buyer, _priceInWei);
+        emit OrderSuccessful(order.id, _offer.maker, _priceInWei);
     }
 
     /**
@@ -1253,17 +1436,16 @@ contract Marketplace is Ownable, Pausable {
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
      */
-    function cancelOffer(address _nftAddress, uint256 _assetId, uint index) public whenNotPaused {
-        Order memory order = _getValidOrder(_nftAddress, _assetId);
+    function cancelOffer(address _nftAddress, uint256 _assetId, uint index) 
+        public whenNotPaused notRegisteredNFT(_nftAddress) {
+        require(index < offerByAssetId[_nftAddress][_assetId].length, "Marketplace: Wrong index");
 
-        require(index < offerIndexByMaker[_nftAddress][_assetId].length, "Marketplace: Wrong index")
+        Offer memory _offer = offerByAssetId[_nftAddress][_assetId][index];
 
-        Offer memory _offer = offerIndexByMaker[_nftAddress][_assetId][index];
+        require(_offer.expiresAt >= block.timestamp, "Marketplace: offer expired");
+        require(_offer.maker == msg.sender, "Marketplace: unauthorized offer maker");
 
-        require(offer.expiresAt >= block.timestamp, "Marketplace: offer expired");
-        require(offer.maker == msg.sender, "Marketplace: unauthorized offer maker");
-
-        delete offerIndexByMaker[_nftAddress][_assetId][index];
+        delete offerByAssetId[_nftAddress][_assetId][index];
 
         emit OfferCancelled(_nftAddress, _assetId, msg.sender);
     }
@@ -1284,27 +1466,27 @@ contract Marketplace is Ownable, Pausable {
         uint256 _assetId,
         uint256 _priceInWei
     )
-        internal
-    {
-        Order memory order = orderByAssetId[_nftAddress][_assetId];
+        internal {
+        //royalty for fantoon Marketplace
+        uint256 royaltyforFatoon= _priceInWei.mul(royalty).div(1e4);
+        require(payable(royaltyRecipient).send(royaltyforFatoon));
 
-        //royalty
-        uint256 royaltyShareAmount= _priceInWei.mul(royalty).div(1e4);
+        //royalty for nft creator
+        uint256 royaltyforNFTCreator= _priceInWei.mul(collections[_nftAddress].royalty).div(1e4);
+        require(payable(collections[_nftAddress].royaltyRecipient).send(royaltyforNFTCreator));
 
-        require(payable(IERC721(_nftAddress).createrOf(_assetId)).send(royaltyShareAmount));
-        require(payable(_orderSeller).send(_priceInWei.sub(royaltyShareAmount)));
+        require(payable(_orderSeller).send(_priceInWei.sub(royaltyforFatoon.add(royaltyforNFTCreator))));
 
         // remove order
         delete orderByAssetId[_nftAddress][_assetId];
 
         // Transfer NFT asset
+        IERC721(_nftAddress).approve(_buyer, _assetId);
         IERC721(_nftAddress).transferFrom(
             address(this),
             _buyer,
             _assetId
         );
-
-        order.buyer = _buyer;
 
         // Notify ..
         emit OrderSuccessful(
@@ -1343,8 +1525,7 @@ contract Marketplace is Ownable, Pausable {
         address _bidder,
         uint256 _escrowAmount
     )
-        internal
-    {
+        internal {
         delete bidByOrderId[_nftAddress][_assetId];
 
         // return escrow to canceled bidder
@@ -1362,17 +1543,39 @@ contract Marketplace is Ownable, Pausable {
         return IERC721(_nftAddress);
     }
 
-    function getOrderByAssetIds (address _nftAddress,uint256[] memory _assetIds) external view returns(Order[] memory orders){
+    function getOrderByAssetIds (address _nftAddress,uint256[] memory _assetIds) 
+            external view returns(Order[] memory orders) {
         orders = new Order[](_assetIds.length);
         for(uint256 i = 0; i < _assetIds.length; i++){
             orders[i] = orderByAssetId[_nftAddress][_assetIds[i]];
         }
     }
 
-    function getBidByAssetIds (address _nftAddress,uint256[] memory _assetIds) external view returns(Bid[] memory bids){
+    function getBidByAssetIds (address _nftAddress,uint256[] memory _assetIds) 
+            external view returns(Bid[] memory bids) {
         bids = new Bid[](_assetIds.length);
         for(uint256 i = 0; i < _assetIds.length; i++){
             bids[i] = bidByOrderId[_nftAddress][_assetIds[i]];
         }
     }
+
+    /**
+     * @dev It allows the admin to withdraw FTM sent to the contract by the users, 
+     * only callable by owner.
+     */
+    function withdrawFTM() public onlyOwner {
+        require(address(this).balance > 0, "No balance of ETH.");
+        require(payable(msg.sender).send(address(this).balance));
+    } 
+
+    /**
+     * @dev It allows the admin to withdraw accepted token sent to the contract by the users, 
+     * only callable by owner.
+     */
+    function withdrawToken() public onlyOwner {
+        uint256 amount = IERC20(acceptedToken).balanceOf(address(this));
+        require(amount > 0, "No balance of token.");
+
+        IERC20(acceptedToken).transfer(msg.sender, amount);
+    }    
 }

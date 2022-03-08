@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <wallet-card  
-                                        name="Coibase" 
+                                        name="Coinbase" 
                                         :card-image="wallets.coibase">
                                     </wallet-card>
                                 </div>

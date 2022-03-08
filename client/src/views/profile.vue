@@ -316,7 +316,7 @@
                     this.$store.dispatch("global/showMessage",
                         { 
                             kind:'show_error',
-                            content: error
+                            content: error.message
                         }
                     );
                 }

@@ -149,7 +149,12 @@
                     this.$router.push("/profile/" + this.userData.address);
                 } catch (error) {
                     this.$loading(false);
-                    console.log(444)
+                    this.$store.dispatch("global/showMessage",
+                        { 
+                            kind:'show_error',
+                            content: error.message
+                        }
+                    );
                 }
             },
             goTo(url) {
